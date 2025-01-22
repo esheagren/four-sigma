@@ -1,0 +1,14 @@
+.range-input-container {
+  @apply w-full max-w-2xl mx-auto p-8 rounded-xl;
+  background-color: var(--background-color);
+}
+
+.bell-curve {
+  @apply absolute inset-0 w-full h-full overflow-visible;
+}
+
+.range-slider {
+  @apply relative h-48;
+}
+
+/* Add more specific styles for other components */ 
