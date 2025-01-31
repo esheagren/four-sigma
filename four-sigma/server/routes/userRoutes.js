@@ -7,10 +7,8 @@ const db = getFirestore();
 
 router.post('/', async (req, res) => {
   try {
-    // With admin SDK, we use db directly
-    const userDoc = db.collection('users').doc(req.body.userId);
-    
-    await userDoc.set({
+    // Use add() instead of doc().set() to auto-generate an ID
+    const userRef = await db.collection('users').add({
       email: req.body.email,
       username: req.body.username,
       profile: {
@@ -30,7 +28,10 @@ router.post('/', async (req, res) => {
       }
     });
 
-    res.status(201).json({ message: 'User created successfully' });
+    res.status(201).json({ 
+      message: 'User created successfully',
+      // userId: userRef.id  // Return the auto-generated ID
+    });
   } catch (error) {
     console.error('Error creating user:', error);
     res.status(500).json({ error: error.message });

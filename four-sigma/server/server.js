@@ -20,21 +20,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Add a test endpoint to verify Firebase connection
-app.get('/test-firebase', async (req, res) => {
-    try {
-        const timestamp = admin.firestore.Timestamp.now();
-        await db.collection('test').doc('connection-test').set({
-            timestamp,
-            message: 'Firebase connection test'
-        });
-        res.json({ success: true, timestamp });
-    } catch (error) {
-        console.error('Firebase test error:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/questions', questionRoutes);
