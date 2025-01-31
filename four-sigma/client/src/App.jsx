@@ -40,6 +40,7 @@ function App() {
       const data = await response.json();
       console.log('New question data:', data);
       setCurrentQuestion(data);
+      console.log('Current question:', currentQuestion);
       setError(null);
     } catch (error) {
       setError('Failed to fetch question');
@@ -64,7 +65,8 @@ function App() {
       
       // Add current question to answered questions
       setAnsweredQuestions(prev => [...prev, {
-        question: currentQuestion.question,
+        //changed to text from question
+        question: currentQuestion.text,
         answer: currentQuestion.answer,
         userLower: Number(lowerNumber),
         userUpper: Number(upperNumber),
