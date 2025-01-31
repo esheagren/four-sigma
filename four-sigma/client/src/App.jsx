@@ -10,8 +10,8 @@ import './styles/scoreCard.css'
 
 function App() {
   
-  const [lowerNumber, setLowerNumber] = useState();  // Initialize as empty string
-  const [upperNumber, setUpperNumber] = useState();
+  const [lowerNumber, setLowerNumber] = useState('');
+  const [upperNumber, setUpperNumber] = useState('');
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [score, setScore] = useState(0);
   const [error, setError] = useState(null);
