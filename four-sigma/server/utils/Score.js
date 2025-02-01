@@ -46,6 +46,7 @@ class Score {
     return comp;
   }
 
+  //checks if the true answer is within the (possibly modified) range 
   static inBounds(lowerBound, upperBound, answer) {
     return lowerBound <= answer && upperBound >= answer;
   }

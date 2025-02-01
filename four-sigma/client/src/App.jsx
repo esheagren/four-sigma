@@ -94,9 +94,9 @@ function App() {
     }
   };
 
-  // Add validation check
+  // Update the validation check to allow equal bounds
   const isValidBounds = () => {
-    return lowerNumber && upperNumber && Number(lowerNumber) < Number(upperNumber);
+    return lowerNumber && upperNumber && Number(lowerNumber) <= Number(upperNumber);
   };
 
   if (error) return <div>Error: {error}</div>;
