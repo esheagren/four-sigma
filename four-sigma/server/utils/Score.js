@@ -10,7 +10,8 @@ class Score {
     this.score = score;
   }
 
-  //provides higher score if the answer given is exactly correct
+  // Provides a calculated score based on the submitted range and true answer,
+  // Rounded to the nearest whole number.
   static calculateScore(lower, upper, answer) {
     console.log("Score.calculateScore called with:", { lower, upper, answer });
     
@@ -19,19 +20,21 @@ class Score {
         upper *= 1.05;
         lower *= 0.95;
         let test = this.computeScore(lower, upper, answer);
-        console.log("Score.computeScore computed (triple):", test * 3);
-        return 3 * test;
+        const finalScore = Math.round(3 * test);
+        console.log("Score.computeScore computed (triple):", finalScore);
+        return finalScore;
       }
       let computed = this.computeScore(lower, upper, answer);
-      console.log("Score.computeScore computed:", computed);
-      return computed;
+      const finalScore = Math.round(computed);
+      console.log("Score.computeScore computed:", finalScore);
+      return finalScore;
     } else {
       console.log("Answer is out of bounds. Returning -1");
       return -1;
     }
   }
 
-  //computes the score based on the answers given
+  // Computes the score based on the answers given
   static computeScore(lower, upper, answer) {
     const upperLog = Math.log10(upper + 1.1);
     const lowerLog = Math.log10(lower + 1.1);
@@ -46,7 +49,7 @@ class Score {
     return comp;
   }
 
-  //checks if the true answer is within the (possibly modified) range 
+  // Checks if the true answer is within the (possibly modified) range 
   static inBounds(lowerBound, upperBound, answer) {
     return lowerBound <= answer && upperBound >= answer;
   }
