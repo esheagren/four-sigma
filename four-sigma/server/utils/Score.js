@@ -10,31 +10,39 @@ class Score {
     this.score = score;
   }
 
+  //provides higher score if the answer given is exactly correct
   static calculateScore(lower, upper, answer) {
+    console.log("Score.calculateScore called with:", { lower, upper, answer });
+    
     if (Score.inBounds(lower, upper, answer)) {
       if (lower === answer && upper === answer) {
         upper *= 1.05;
         lower *= 0.95;
         let test = this.computeScore(lower, upper, answer);
+        console.log("Score.computeScore computed (triple):", test * 3);
         return 3 * test;
       }
-      return this.computeScore(lower, upper, answer);
+      let computed = this.computeScore(lower, upper, answer);
+      console.log("Score.computeScore computed:", computed);
+      return computed;
     } else {
+      console.log("Answer is out of bounds. Returning -1");
       return -1;
     }
   }
 
+  //computes the score based on the answers given
   static computeScore(lower, upper, answer) {
-    let upperLog = Math.log10(upper + 1.1);
-    let lowerLog = Math.log10(lower + 1.1);
-    let answerLog = Math.log10(answer + 1.1);
-    let upperLogMinusLowerLog = Math.log10(upperLog - lowerLog);
-    let upperMinusLower = upperLog - lowerLog;
-    let allThree = answerLog - 2 * upperLog - 2 * lowerLog;
-    let pow = Math.pow(allThree / upperMinusLower, 2);
+    const upperLog = Math.log10(upper + 1.1);
+    const lowerLog = Math.log10(lower + 1.1);
+    const answerLog = Math.log10(answer + 1.1);
+    const upperLogMinusLowerLog = Math.log10(upperLog - lowerLog);
+    const upperMinusLower = upperLog - lowerLog;
+    const allThree = answerLog - 2 * upperLog - 2 * lowerLog;
+    const pow = Math.pow(allThree / upperMinusLower, 2);
 
-    let algo = upperLogMinusLowerLog / 4 + 2 * pow;
-    let comp = Math.sqrt(algo);
+    const algo = upperLogMinusLowerLog / 4 + 2 * pow;
+    const comp = Math.sqrt(algo);
     return comp;
   }
 

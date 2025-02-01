@@ -57,7 +57,7 @@ function App() {
         body: JSON.stringify({
           lowerBound: Number(lowerNumber),
           upperBound: Number(upperNumber),
-          questionId: currentQuestion.id
+          questionId: currentQuestion.questionId
         })
       });
 
@@ -65,7 +65,6 @@ function App() {
       
       // Add current question to answered questions
       setAnsweredQuestions(prev => [...prev, {
-        //changed to text from question
         question: currentQuestion.text,
         answer: currentQuestion.answer,
         userLower: Number(lowerNumber),
