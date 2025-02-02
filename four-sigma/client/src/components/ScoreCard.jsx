@@ -60,9 +60,9 @@ function ScoreCard({ score, totalQuestions, answeredQuestions }) {
             </div>
             <div className="question-text">{q.question}</div>
             <div className="answer-details">
-              <div>Correct Answer: {q.answer.toLocaleString()}</div>
-              <div>Your Interval: [{q.userLower.toLocaleString()} - {q.userUpper.toLocaleString()}]</div>
-              <div>Score: {q.score}</div>
+              <div>{q.answer.toLocaleString()}</div>
+              <div>[{q.userLower.toLocaleString()} - {q.userUpper.toLocaleString()}]</div>
+              <div>{q.score}</div>
             </div>
           </div>
         ))}
