@@ -9,10 +9,11 @@ import express from 'express';
 import cors from 'cors';
 
 // Route imports
-import userRoutes from './routes/userRoutes.js';
-import questionRoutes from './routes/questionRoutes.js';
-import logRoutes from './routes/logRoutes.js';
-import gameSessionRoutes from './routes/gameSessionRoutes.js';
+import logMiddleware from './middleware/logMiddleware.js';
+import userMiddleware from './middleware/userMiddleware.js';
+import questionMiddleware from './middleware/questionMiddleware.js';
+import gameSessionMiddleware from './middleware/gameSessionMiddleware.js';
+import { calculateScore, calculateStats } from './middleware/calculationMiddleware.js';
 
 const app = express();
 
@@ -21,10 +22,21 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api/users', userRoutes);
-app.use('/api/questions', questionRoutes);
-app.use('/api/logs', logRoutes);
-app.use('/api/sessions', gameSessionRoutes);
+app.use('/api/users', userMiddleware);
+app.use('/api/questions', questionMiddleware);
+app.use('/api/logs', logMiddleware);
+app.use('/api/sessions', gameSessionMiddleware);
+
+// New submit endpoint that processes the user's answer using calculateScore middleware.
+app.post('/api/submit', calculateScore, (req, res) => {
+  const score = res.locals.score;
+  // In this example, a score greater than or equal to 0 is considered correct.
+  // You could modify this logic as needed.
+  const correct = score >= 0;
+  
+  // Optionally, you could call calculateStats here before sending the response.
+  res.json({ correct, score });
+});
 
 // Server initialization
 const PORT = process.env.PORT || 3000;

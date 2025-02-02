@@ -3,47 +3,30 @@ import PropTypes from 'prop-types';
 // The component maintains its own state while also trying to sync with parent state through callbacks. 
 // This can lead to synchronization issues.
 
-function InputFields({ lowerValue, upperValue, onValueChange} ) {
-
-
-function handleLowerChange(event) {
-    const newValue = Number(event.target.value);
-    if (upperValue && newValue > upperValue) {
-      // Show error state
-      event.target.setCustomValidity('Lower bound must be less than upper bound');
-      event.target.reportValidity();
-    } else {
-      event.target.setCustomValidity('');
-      onValueChange("lower", event.target.value);
-    }
+function InputFields({ lowerValue, upperValue, onValueChange }) {
+  function handleLowerChange(event) {
+    const newValue = event.target.value;
+    onValueChange("lower", newValue);
   }
 
   function handleUpperChange(event) {
-    const newValue = Number(event.target.value);
-    if (lowerValue && newValue < lowerValue) {
-      // Show error state
-      event.target.setCustomValidity('Upper bound must be greater than lower bound');
-      event.target.reportValidity();
-    } else {
-      event.target.setCustomValidity('');
-      onValueChange("upper", event.target.value);
-    }
+    const newValue = event.target.value;
+    onValueChange("upper", newValue);
   }
-
 
   return (
     <div className="input-container">
       <input 
         type="number"
         className="box"
-        value={lowerValue}
+        value={lowerValue === undefined ? '' : lowerValue}
         onChange={handleLowerChange}
         placeholder="Lower Bound"
       />
       <input 
         type="number"
         className="box"
-        value={upperValue}
+        value={upperValue === undefined ? '' : upperValue}
         onChange={handleUpperChange}
         placeholder="Upper Bound"
       />
@@ -53,8 +36,8 @@ function handleLowerChange(event) {
 
 InputFields.propTypes = {
   onValueChange: PropTypes.func.isRequired,
-  lowerValue: PropTypes.number,
-  upperValue: PropTypes.number
+  lowerValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  upperValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 };
 
 export default InputFields;

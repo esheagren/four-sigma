@@ -1,0 +1,12 @@
+{
+  "name": "foursigmafull",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "cd four-sigma && npm start",
+    "install-deps": "cd four-sigma && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
