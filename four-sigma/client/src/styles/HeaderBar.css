@@ -44,4 +44,53 @@
 .metrics-button:hover {
   background-color: #404040;
   transform: translateY(-1px);
+}
+
+/* New styles for More Information icon and popup */
+.info-icon {
+  background-color: transparent;
+  border: none;
+  color: #E8E8E8;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.info-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1500;
+}
+
+.info-popup {
+  background-color: #fff;
+  color: #333;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+.info-popup h2 {
+  margin-top: 0;
+}
+
+.info-popup-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
 } 
