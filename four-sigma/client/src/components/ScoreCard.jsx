@@ -39,10 +39,10 @@ function ScoreCard({ score, totalQuestions, answeredQuestions }) {
       
       <div className="final-score">
         <div className="score-summary">
-          <h3>Final Score: {Math.round(animatedScore)}</h3>
-          <p className="accuracy">
+          <h1>Final Score: {Math.round(animatedScore)}</h1>
+          <h2 className="accuracy">
             Accuracy: {accuracyPercentage}%
-          </p>
+          </h2>
         </div>
       </div>
       

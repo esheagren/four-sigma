@@ -32,7 +32,7 @@ body {
   backdrop-filter: blur(10px);
   border: 1px solid rgba(110, 110, 215, 0.2);
   border-radius: 16px; /* Increased from 12px */
-  padding: 3rem; /* Increased padding */
+  padding: .75rem; /* Increased padding */
   margin: 1rem auto;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   text-align: center;
@@ -71,7 +71,7 @@ body {
 }
 
 .box:focus {
-  border-color: #6E6ED7;
+  border-color: #51b1a8;
   background: rgba(110, 110, 215, 0.1);
   outline: none;
   box-shadow: 0 0 0 3px rgba(110, 110, 215, 0.2);
@@ -85,7 +85,7 @@ body {
   width: auto;
   min-width: 140px; /* Increased from 120px */
   padding: 0.875rem 2rem; /* Increased padding */
-  background: linear-gradient(135deg, #6E6ED7, #5B5BC0);
+  background: linear-gradient(135deg, #7e5dc0, #4f3582);
   color: white;
   border: none;
   border-radius: 10px;
@@ -99,12 +99,12 @@ body {
 .submit-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(110, 110, 215, 0.3);
-  background: linear-gradient(135deg, #7878E1, #6565CA);
+  background: linear-gradient(135deg, #51b1a8, #347b74);
 }
 
 .submit-button:disabled {
   background: #2D2D2D;
-  color: #666;
+  color: #414141;
   cursor: not-allowed;
 }
 
