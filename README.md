@@ -85,7 +85,7 @@ The game uses a logarithmic scoring algorithm that:
 Each result card displays:
 - Your interval and score
 - True value
-- **Precision tooltip** (hover over ⓘ icon) - Shows precision percentage where 100% = perfectly narrow
+- **Precision score** - Visible percentage showing interval narrowness (100% = perfectly narrow; 0% for misses). Hover ⓘ icon for explanation
 - **Community statistics**:
   - Community average score for this question
   - Community best score for this question

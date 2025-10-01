@@ -79,11 +79,11 @@ export function Results({ judgements, score, onRestart }: ResultsProps) {
                     Precision:
                     <span className="precision-tooltip-trigger">ⓘ</span>
                     <span className="precision-tooltip">
-                      {judgement.hit 
-                        ? `${metrics.precisionScore}% · Narrower intervals score higher`
-                        : '0% · Missed the true value'
-                      }
+                      Narrower range yields higher precision. Only updated with correct answer.
                     </span>
+                  </span>
+                  <span className={`value ${judgement.hit ? 'precision-value' : ''}`}>
+                    {metrics.precisionScore}%
                   </span>
                 </div>
                 

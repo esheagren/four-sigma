@@ -13,22 +13,23 @@ Interval width: 399,900  (for [100, 400000])
 Interval width: 200      (for [1400, 1600])
 ```
 
-#### 2. Precision Tooltip
-Appears on hover for a clean, uncluttered interface:
+#### 2. Precision Score with Tooltip
+Displays as a visible percentage with an explanatory tooltip:
 
 **Display:**
 ```
-Precision: ⓘ   ← Hover here
+Precision: ⓘ                     86%
 ```
 
-**Tooltip appears:**
+**Tooltip appears on hover:**
 ```
 ┌────────────────────────────────────────────┐
-│ 86% · Narrower intervals score higher     │
+│ Narrower range yields higher precision.   │
+│ Only updated with correct answer.         │
 └────────────────────────────────────────────┘
 ```
 
-Only shown for hits. Provides context without taking up space.
+The percentage is always visible. Hover over ⓘ for a concise explanation.
 
 **Precision Scale:**
 - 100% = Perfect precision (interval width is 0, and hit)
@@ -72,12 +73,14 @@ if (hit) {
 
 ### Visual Design Features
 
-✨ **Hover Tooltip**
-- Clean interface - no visual clutter
+✨ **Elegant Hover Tooltip**
+- Clean, minimal design
 - Info icon (ⓘ) changes color on hover
-- Dark tooltip with white text
+- Dark tooltip with white text, rounded corners
 - Arrow pointer to indicate source
-- Smooth fade-in animation
+- Smooth slide-up animation with fade-in
+- Deeper shadow for better depth
+- Concise, clear messaging
 
 ✨ **Color Coding**
 - Green border for hits
