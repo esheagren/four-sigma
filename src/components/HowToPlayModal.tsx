@@ -65,22 +65,54 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2 className="modal-title">4-σ</h2>
-          <p className="modal-subtitle">Provide your 95% confidence interval</p>
+          <p className="modal-subtitle">Daily Quant Game | 3 Questions | Answers are 95% Confidence Intervals</p>
         </div>
 
         <div className="modal-body">
           <>
               <p className="modal-intro">
-                For each question, provide a range where you're 95% confident the true answer lies.
+                The purpose of 4-σ is to estimate the numerical quantity of various things.
               </p>
 
               <div className="how-to-section">
+                <h3>Answers</h3>
+                <p className="modal-intro">
+                  Answers are given with two numbers, an Upper Bound and a Lower Bound, such that you are 95% sure the true answer lies somewhere between the bounds you gave.
+                </p>
+
+                <div className="answer-visual">
+                  <div className="answer-diagram">
+                    <div className="answer-question-example">
+                      Height of Mount Everest
+                    </div>
+                    <div className="answer-unit-example">
+                      Unit: <span className="unit-value">meters</span>
+                    </div>
+                    <div className="answer-bounds">
+                      <div className="answer-bound-container">
+                        <div className="answer-bound-label">Lower Bound</div>
+                        <div className="answer-input-demo">0</div>
+                      </div>
+                      <span className="answer-to">to</span>
+                      <div className="answer-bound-container">
+                        <div className="answer-bound-label">Upper Bound</div>
+                        <div className="answer-input-demo">0</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="how-to-section">
                 <h3>Scoring</h3>
-                <p style={{ marginBottom: '1rem', fontSize: '0.9375rem', color: 'var(--text-tertiary)' }}>
-                  Example: Height of Mount Everest (8,849m)
+                <p className="modal-intro">
+                  Scoring works as follows: If the upper and lower bound you submit contains the true answer, you will get more points the narrower your range. However, if the true answer is outside the bound you gave, you will get no points for that question.
                 </p>
 
                 <div className="scoring-visual">
+                  <p className="scoring-example-label">
+                    Example: Height of Mount Everest (8,849m)
+                  </p>
                   <div className="scoring-scale">
                     {/* Correct answer marker */}
                     <div className="correct-answer-indicator" style={{ left: `${((trueValue - scaleMin) / scaleRange) * 100}%` }}>

@@ -944,6 +944,81 @@ body {
   margin-bottom: 2.5rem;
 }
 
+/* Answer Diagram */
+.answer-visual {
+  background: var(--background);
+  border-radius: 12px;
+  padding: 2rem 2rem;
+  margin-top: 1.5rem;
+}
+
+.answer-diagram {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.answer-question-example {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.answer-unit-example {
+  background: var(--surface);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9375rem;
+  color: var(--text-tertiary);
+  display: inline-block;
+}
+
+.unit-value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.answer-bounds {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.answer-bound-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.answer-bound-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.answer-input-demo {
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+.answer-to {
+  font-size: 1rem;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  padding-bottom: 0.75rem;
+}
+
 .how-to-section {
   margin-bottom: 2.5rem;
 }
@@ -1028,6 +1103,13 @@ body {
   border-radius: 8px;
   padding: 2rem 1rem;
   margin: 1.5rem 0 2rem;
+}
+
+.scoring-example-label {
+  text-align: center;
+  font-size: 0.9375rem;
+  color: var(--text-tertiary);
+  margin: 0 0 1.5rem 0;
 }
 
 .scoring-scale {
