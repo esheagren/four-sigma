@@ -5,41 +5,39 @@ interface HowToPlayModalProps {
   onClose: () => void;
 }
 
-// Import scoring function
+// Scoring function matching server-side algorithm
 function calculateScore(lower: number, upper: number, answer: number): number {
-  const inBounds = (l: number, u: number, a: number) => a >= l && a <= u;
-
-  if (!inBounds(lower, upper, answer)) {
-    return 0;
+  // Check if answer is within bounds
+  if (lower > answer || upper < answer) {
+    return 0; // Miss scores zero
   }
 
-  const buffer = 0.05;
-  if (Math.abs(lower - answer) < buffer && Math.abs(upper - answer) < buffer) {
-    return computeScore(lower * (1 - buffer), upper * (1 + buffer), answer) * 3;
+  // Handle exact guess
+  if (lower === upper && lower === answer) {
+    return 10000;
   }
 
-  return computeScore(lower, upper, answer);
-}
+  // Handle edge case where bounds are equal but not exact
+  if (lower === upper) {
+    const buffer = Math.max(0.01, Math.abs(lower) * 0.01);
+    lower = lower - buffer;
+    upper = upper + buffer;
+  }
 
-function computeScore(lower: number, upper: number, answer: number): number {
-  const lowerLog = Math.log10(Math.abs(lower) + 1);
-  const upperLog = Math.log10(Math.abs(upper) + 1);
-  const answerLog = Math.log10(Math.abs(answer) + 1);
+  // Calculate score
+  const BASE_SCORE = 50;
+  const PRECISION_EXPONENT = 0.7;
 
-  const upperLogMinusLowerLog = upperLog - lowerLog;
-  const answerLogMinusLowerLog = answerLog - lowerLog;
+  const intervalWidth = Math.abs(upper - lower);
+  const answerMagnitude = Math.max(1, Math.abs(answer));
+  const relativeWidth = intervalWidth / answerMagnitude;
+  const precisionMultiplier = 1 / Math.pow(relativeWidth, PRECISION_EXPONENT);
+  const score = BASE_SCORE * precisionMultiplier;
 
-  const score = Math.sqrt(
-    upperLogMinusLowerLog / 4 +
-    2 * Math.pow(upperLogMinusLowerLog - 2 * answerLogMinusLowerLog, 2)
-  );
-
-  return Math.max(0, 100 - score * 10);
+  return Math.round(score * 10) / 10;
 }
 
 export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
-  const [activeTab, setActiveTab] = useState<'how-to' | 'scoring'>('how-to');
-
   if (!isOpen) return null;
 
   // Example scoring scenarios
@@ -48,6 +46,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
     { lower: 2000, upper: 15000, label: 'Very wide range', color: '#ff6b6b' },
     { lower: 5000, upper: 12000, label: 'Medium range', color: '#ffa500' },
     { lower: 8700, upper: 9000, label: 'Narrow range', color: '#4ecdc4' },
+    { lower: 9500, upper: 12000, label: 'Miss (too high)', color: '#df1b41' },
   ];
 
   const scaleMin = 0;
@@ -56,7 +55,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
 
   const examplesWithScores = examples.map(ex => ({
     ...ex,
-    score: calculateScore(ex.lower, ex.upper, trueValue).toFixed(1),
+    score: Math.round(calculateScore(ex.lower, ex.upper, trueValue)),
     width: ((ex.upper - ex.lower) / scaleRange) * 100,
     offset: ((ex.lower - scaleMin) / scaleRange) * 100,
   }));
@@ -65,84 +64,37 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <div className="modal-tabs">
-            <button
-              className={`modal-tab ${activeTab === 'how-to' ? 'modal-tab-active' : ''}`}
-              onClick={() => setActiveTab('how-to')}
-            >
-              How to Play
-            </button>
-            <button
-              className={`modal-tab ${activeTab === 'scoring' ? 'modal-tab-active' : ''}`}
-              onClick={() => setActiveTab('scoring')}
-            >
-              Scoring
-            </button>
-          </div>
+          <h2 className="modal-title">4-σ</h2>
+          <p className="modal-subtitle">Provide your 95% confidence interval</p>
         </div>
 
         <div className="modal-body">
-          {activeTab === 'how-to' ? (
-            <>
+          <>
               <p className="modal-intro">
-                <strong>4-σ</strong> is a daily calibration training game that teaches you to think accurately about uncertainty.
+                For each question, provide a range where you're 95% confident the true answer lies.
               </p>
-
-              <div className="how-to-section">
-                <h3>The Challenge</h3>
-                <p>
-                  For each question, provide a <strong>95% confidence interval</strong> — a range where you're 95% confident the true answer lies.
-                </p>
-              </div>
 
               <div className="how-to-section">
                 <h3>Scoring</h3>
-                <ul>
-                  <li><strong>Hit:</strong> True value falls within your range — you score points!</li>
-                  <li><strong>Miss:</strong> True value is outside your range — you score 0 points</li>
-                  <li><strong>Precision Bonus:</strong> Narrower correct ranges earn more points</li>
-                </ul>
-              </div>
-
-              <div className="how-to-section">
-                <h3>The Goal</h3>
-                <p>
-                  Most people are overconfident and hit less than 95% of questions. Train yourself to be properly calibrated by hitting close to 95% over time while keeping your ranges as narrow as possible.
-                </p>
-              </div>
-
-              <div className="how-to-section">
-                <h3>Daily Play</h3>
-                <p>
-                  Answer 3 questions each day. Everyone gets the same questions, so you can compare your performance on the leaderboard.
-                </p>
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="modal-intro">
-                The scoring algorithm rewards <strong>narrow, accurate ranges</strong> using logarithmic scaling.
-              </p>
-
-              <div className="how-to-section">
-                <h3>Key Principles</h3>
-                <ul>
-                  <li><strong>Hits vs Misses:</strong> True value must fall within your range to score</li>
-                  <li><strong>Narrower is Better:</strong> Smaller correct ranges earn exponentially more points</li>
-                  <li><strong>Scale Matters:</strong> Scoring is proportional to the magnitude of the answer</li>
-                  <li><strong>Logarithmic:</strong> Ranges are compared on a log scale for fairness across magnitudes</li>
-                </ul>
-              </div>
-
-              <div className="how-to-section">
-                <h3>Example: Height of Mount Everest (8,849m)</h3>
-                <p style={{ marginBottom: '1.5rem', fontSize: '0.9375rem', color: 'var(--text-tertiary)' }}>
-                  Compare three different ranges that all contain the true value:
+                <p style={{ marginBottom: '1rem', fontSize: '0.9375rem', color: 'var(--text-tertiary)' }}>
+                  Example: Height of Mount Everest (8,849m)
                 </p>
 
                 <div className="scoring-visual">
                   <div className="scoring-scale">
+                    {/* Correct answer marker */}
+                    <div className="correct-answer-indicator" style={{ left: `${((trueValue - scaleMin) / scaleRange) * 100}%` }}>
+                      <div className="correct-answer-line"></div>
+                    </div>
+
                     <div className="scoring-ranges">
+                      <div className="scoring-range-row scoring-header-row">
+                        <div className="scoring-range-label-left">Guesses</div>
+                        <div className="scoring-range-visualization"></div>
+                        <div className="scoring-range-score" style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>
+                          Points
+                        </div>
+                      </div>
                       {examplesWithScores.map((ex, i) => {
                         const lowerPercent = ex.offset;
                         const upperPercent = ex.offset + ex.width;
@@ -151,7 +103,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                         return (
                           <div key={i} className="scoring-range-row">
                             <div className="scoring-range-label-left">
-                              Guess {i + 1}
+                              {i + 1}
                             </div>
                             <div className="scoring-range-visualization">
                               <div className="scoring-range-line" />
@@ -176,7 +128,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
 
                               {/* Lower bound */}
                               <div
-                                className="scoring-range-bound"
+                                className="scoring-range-bound scoring-range-bound-lower"
                                 style={{ left: `${lowerPercent}%` }}
                               >
                                 <div
@@ -193,7 +145,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
 
                               {/* Upper bound */}
                               <div
-                                className="scoring-range-bound"
+                                className="scoring-range-bound scoring-range-bound-upper"
                                 style={{ left: `${upperPercent}%` }}
                               >
                                 <div
@@ -209,7 +161,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                               </div>
                             </div>
                             <div className="scoring-range-score" style={{ color: ex.color }}>
-                              {ex.score} pts
+                              {ex.score}
                             </div>
                           </div>
                         );
@@ -217,25 +169,15 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                     </div>
                   </div>
                 </div>
-
-                <div className="scoring-explanation">
-                  <p>
-                    Notice how the <span style={{ color: '#4ecdc4', fontWeight: 600 }}>narrow range</span> (8,700-9,000)
-                    earns dramatically more points than the <span style={{ color: '#ff6b6b', fontWeight: 600 }}>very wide range</span> (2,000-15,000),
-                    even though both contain the answer. The narrow range scores {examplesWithScores[2].score} points while the wide range scores only {examplesWithScores[0].score} points — a {Math.round((parseFloat(examplesWithScores[2].score) / parseFloat(examplesWithScores[0].score)) * 10) / 10}x difference!
-                  </p>
-                </div>
               </div>
 
               <div className="how-to-section">
-                <h3>Why Logarithmic?</h3>
+                <h3>Daily Play</h3>
                 <p>
-                  A ±100 range is impressive for small numbers (e.g., 100-300 for 200) but trivial for large numbers (e.g., 999,900-1,000,100 for 1 million).
-                  Logarithmic scoring ensures fairness across all magnitudes.
+                  Answer 3 questions each day. Everyone gets the same questions, so you can compare your performance on the leaderboard.
                 </p>
               </div>
             </>
-          )}
         </div>
 
         <div className="modal-footer">
