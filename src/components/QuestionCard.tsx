@@ -32,51 +32,49 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
   };
 
   return (
-    <div className="question-card">
-      <div className="question-section">
-        <h2 className="question-prompt">{question.prompt}</h2>
-        {question.unit && (
-          <div className="unit-badge">
-            <span className="unit-label">Unit:</span>
-            <span className="unit-value">{question.unit}</span>
+    <>
+      <div className="question-card">
+        <div className="question-section">
+          <h2 className="question-prompt">{question.prompt}</h2>
+          {question.unit && (
+            <div className="unit-badge">
+              <span className="unit-label">Unit:</span>
+              <span className="unit-value">{question.unit}</span>
+            </div>
+          )}
+        </div>
+
+        <div className="inputs-container">
+          <div className="input-group">
+            <input
+              id="lower-bound"
+              type="number"
+              value={lower}
+              onChange={(e) => setLower(e.target.value)}
+              placeholder="0"
+              className="bound-input"
+            />
           </div>
+
+          <div className="input-separator">to</div>
+
+          <div className="input-group">
+            <input
+              id="upper-bound"
+              type="number"
+              value={upper}
+              onChange={(e) => setUpper(e.target.value)}
+              placeholder="0"
+              className="bound-input"
+            />
+          </div>
+        </div>
+
+        {isLowerValid && isUpperValid && lowerNum > upperNum && (
+          <p className="validation-error">Lower bound must be ≤ upper bound</p>
         )}
       </div>
-      
-      <div className="confidence-label">Enter your 95% confidence interval</div>
-      
-      <div className="inputs-container">
-        <div className="input-group">
-          <label htmlFor="lower-bound">Lower bound</label>
-          <input
-            id="lower-bound"
-            type="number"
-            value={lower}
-            onChange={(e) => setLower(e.target.value)}
-            placeholder="0"
-            className="bound-input"
-          />
-        </div>
-        
-        <div className="input-separator">to</div>
-        
-        <div className="input-group">
-          <label htmlFor="upper-bound">Upper bound</label>
-          <input
-            id="upper-bound"
-            type="number"
-            value={upper}
-            onChange={(e) => setUpper(e.target.value)}
-            placeholder="0"
-            className="bound-input"
-          />
-        </div>
-      </div>
-      
-      {isLowerValid && isUpperValid && lowerNum > upperNum && (
-        <p className="validation-error">Lower bound must be ≤ upper bound</p>
-      )}
-      
+
       <button
         onClick={handleSubmit}
         disabled={isSubmitDisabled}
@@ -84,7 +82,7 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
       >
         Submit answer
       </button>
-    </div>
+    </>
   );
 }
 

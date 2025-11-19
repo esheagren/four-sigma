@@ -167,10 +167,6 @@ export function Game() {
 
   return (
     <div className="game-container">
-      <div className="progress-indicator">
-        Question {currentQuestionIndex + 1} of {questions.length}
-      </div>
-      
       {currentQuestion && (
         <QuestionCard
           question={currentQuestion}

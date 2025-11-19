@@ -1,3 +1,5 @@
+import { Leaderboard } from './Leaderboard';
+
 interface Judgement {
   questionId: string;
   prompt: string;
@@ -43,16 +45,17 @@ export function Results({ judgements, score, onRestart }: ResultsProps) {
 
   return (
     <div className="results-container">
-      <div className="score-display">
-        <h1>Session complete</h1>
-        <div className="score">
-          <span className="score-number">{score.toFixed(2)}</span>
+      <div className="results-main-column">
+        <div className="score-display">
+          <h1>Session complete</h1>
+          <div className="score">
+            <span className="score-number">{score.toFixed(2)}</span>
+          </div>
+          <p className="score-label">Total score</p>
         </div>
-        <p className="score-label">Total score</p>
-      </div>
-      
-      <div className="judgements-list">
-        {judgements.map((judgement) => {
+        
+        <div className="judgements-list">
+          {judgements.map((judgement) => {
           const metrics = getIntervalMetrics(judgement.lower, judgement.upper, judgement.trueValue, judgement.hit);
           
           return (
@@ -133,11 +136,16 @@ export function Results({ judgements, score, onRestart }: ResultsProps) {
             </div>
           );
         })}
+        </div>
+        
+        <button onClick={onRestart} className="restart-button">
+          Start new session
+        </button>
       </div>
       
-      <button onClick={onRestart} className="restart-button">
-        Start new session
-      </button>
+      <div className="results-sidebar-column">
+        <Leaderboard userScore={score} />
+      </div>
     </div>
   );
 }

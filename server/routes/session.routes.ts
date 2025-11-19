@@ -8,6 +8,8 @@ import {
   isQuestionInSession,
   recordQuestionScore,
   getQuestionStats,
+  addToLeaderboard,
+  getLeaderboard,
 } from '../database/storage.js';
 import {
   Answer,
@@ -149,6 +151,9 @@ router.post('/finalize', (req: Request, res: Response) => {
   // Calculate total score
   const score = Score.calculateTotalScore(judgements.map(j => j.score));
   
+  // Add to leaderboard
+  addToLeaderboard(sessionId, score);
+  
   const response: FinalizeSessionResponse = {
     judgements,
     score,
@@ -156,6 +161,17 @@ router.post('/finalize', (req: Request, res: Response) => {
   };
   
   res.json(response);
+});
+
+/**
+ * GET /api/session/leaderboard
+ * Get top scores from the leaderboard
+ */
+router.get('/leaderboard', (req: Request, res: Response) => {
+  const limit = parseInt(req.query.limit as string) || 10;
+  const leaderboard = getLeaderboard(Math.min(limit, 50)); // Cap at 50
+  
+  res.json({ leaderboard });
 });
 
 export default router;

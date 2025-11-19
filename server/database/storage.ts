@@ -11,6 +11,15 @@ interface QuestionStats {
 
 const questionStats = new Map<string, QuestionStats>();
 
+// Leaderboard storage - tracks top scores across all sessions
+interface LeaderboardEntry {
+  sessionId: string;
+  score: number;
+  timestamp: Date;
+}
+
+const leaderboard: LeaderboardEntry[] = [];
+
 /**
  * Generate a unique session ID
  */
@@ -108,6 +117,32 @@ export function getQuestionStats(questionId: string): { averageScore: number; hi
     averageScore: Math.round(averageScore * 100) / 100,
     highestScore: Math.round(highestScore * 100) / 100,
   };
+}
+
+/**
+ * Add a score to the leaderboard
+ */
+export function addToLeaderboard(sessionId: string, score: number): void {
+  leaderboard.push({
+    sessionId,
+    score,
+    timestamp: new Date(),
+  });
+  
+  // Keep leaderboard sorted by score (descending)
+  leaderboard.sort((a, b) => b.score - a.score);
+  
+  // Keep only top 100 entries to prevent memory issues
+  if (leaderboard.length > 100) {
+    leaderboard.splice(100);
+  }
+}
+
+/**
+ * Get top leaderboard entries
+ */
+export function getLeaderboard(limit: number = 10): LeaderboardEntry[] {
+  return leaderboard.slice(0, limit);
 }
 
 
