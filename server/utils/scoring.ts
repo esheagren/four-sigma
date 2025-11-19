@@ -2,7 +2,19 @@
  * Scoring utility for Four Sigma game
  * Rewards narrow confidence intervals that contain the true value
  * Misses score 0 points
+ * 
+ * Algorithm parameters are configurable via environment variables to keep
+ * the scoring logic secure on the server side.
  */
+
+// Load scoring parameters from environment variables with defaults
+const EXACT_GUESS_BONUS = parseFloat(process.env.SCORING_EXACT_GUESS_BONUS || '10000');
+const BUFFER_MULTIPLIER = parseFloat(process.env.SCORING_BUFFER_MULTIPLIER || '0.01');
+const BASE_SCORE = parseFloat(process.env.SCORING_BASE_SCORE || '50');
+const PRECISION_EXPONENT = parseFloat(process.env.SCORING_PRECISION_EXPONENT || '0.7');
+const INDIVIDUAL_SCORE_DECIMALS = parseInt(process.env.SCORING_INDIVIDUAL_DECIMALS || '1', 10);
+const TOTAL_SCORE_DECIMALS = parseInt(process.env.SCORING_TOTAL_DECIMALS || '2', 10);
+
 export class Score {
   /**
    * Calculate score for a single answer
@@ -12,42 +24,56 @@ export class Score {
    * @returns Score (positive for hit, 0 for miss)
    */
   static calculateScore(lower: number, upper: number, answer: number): number {
-    if (Score.inBounds(lower, upper, answer)) {
-      // Special case: exact guess (same lower and upper)
-      if (lower === answer && upper === answer) {
-        // Apply 5% buffer for exact guesses
-        const adjustedUpper = upper * 1.05;
-        const adjustedLower = lower * 0.95;
-        const baseScore = this.computeScore(adjustedLower, adjustedUpper, answer);
-        return 3 * baseScore;
-      }
-      return this.computeScore(lower, upper, answer);
-    } else {
-      // Out of bounds: no score
-      return 0;
+    // Check if answer is within bounds
+    if (!Score.inBounds(lower, upper, answer)) {
+      return 0; // Miss scores zero
     }
+    
+    // Handle exact guess - legendary precision bonus
+    if (lower === upper && lower === answer) {
+      return EXACT_GUESS_BONUS;
+    }
+    
+    // Handle edge case where bounds are equal but not exact
+    if (lower === upper) {
+      // Add small buffer to prevent division issues
+      const buffer = Math.max(0.01, Math.abs(lower) * BUFFER_MULTIPLIER);
+      lower = lower - buffer;
+      upper = upper + buffer;
+    }
+    
+    // Calculate the actual score
+    return Score.computeScore(lower, upper, answer);
   }
 
   /**
-   * Compute score using logarithmic formula
-   * Narrower intervals get higher scores
+   * Compute score using very steep convexity formula
+   * Score = BASE_SCORE * (1 / relativeWidth^PRECISION_EXPONENT)
    * @param lower - Lower bound
    * @param upper - Upper bound
    * @param answer - True value
    * @returns Computed score
    */
   static computeScore(lower: number, upper: number, answer: number): number {
-    const upperLog = Math.log10(upper + 1.1);
-    const lowerLog = Math.log10(lower + 1.1);
-    const answerLog = Math.log10(answer + 1.1);
-    const upperLogMinusLowerLog = Math.log10(upperLog - lowerLog);
-    const upperMinusLower = upperLog - lowerLog;
-    const allThree = answerLog - 2 * upperLog - 2 * lowerLog;
-    const pow = Math.pow(allThree / upperMinusLower, 2);
-
-    const algo = upperLogMinusLowerLog / 4 + 2 * pow;
-    const comp = Math.sqrt(algo);
-    return comp;
+    // Calculate interval width
+    const intervalWidth = Math.abs(upper - lower);
+    
+    // Handle zero answers by using minimum magnitude of 1
+    const answerMagnitude = Math.max(1, Math.abs(answer === 0 ? 1 : answer));
+    
+    // Calculate relative width (interval as proportion of answer)
+    const relativeWidth = intervalWidth / answerMagnitude;
+    
+    // Precision multiplier with very steep convexity
+    // This creates dramatic rewards for precision
+    const precisionMultiplier = 1 / Math.pow(relativeWidth, PRECISION_EXPONENT);
+    
+    // Calculate final score
+    const score = BASE_SCORE * precisionMultiplier;
+    
+    // Round to configured decimal places for display
+    const multiplier = Math.pow(10, INDIVIDUAL_SCORE_DECIMALS);
+    return Math.round(score * multiplier) / multiplier;
   }
 
   /**
@@ -64,11 +90,12 @@ export class Score {
   /**
    * Calculate total score from multiple answers
    * @param scores - Array of individual scores
-   * @returns Sum of all scores, rounded to 2 decimal places
+   * @returns Sum of all scores, rounded to configured decimal places
    */
   static calculateTotalScore(scores: number[]): number {
     const total = scores.reduce((sum, score) => sum + score, 0);
-    return Math.round(total * 100) / 100;
+    const multiplier = Math.pow(10, TOTAL_SCORE_DECIMALS);
+    return Math.round(total * multiplier) / multiplier;
   }
 }
 
