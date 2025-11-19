@@ -1,18 +1,29 @@
-export function Nav() {
-  return (
-    <nav className="navbar">
-      <div className="navbar-container">
-        <div className="navbar-brand">
-          <span className="brand-name">4-σ</span>
-        </div>
+import { useState } from 'react';
+import { HowToPlayModal } from './HowToPlayModal';
 
-        <div className="navbar-links">
-          <a href="#" className="nav-link">Today</a>
-          <a href="#" className="nav-link">Explore</a>
-          <a href="#" className="nav-link">Leaderboard</a>
-          <a href="#" className="nav-link nav-link-cta">Sign In</a>
+export function Nav() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  return (
+    <>
+      <nav className="navbar">
+        <div className="navbar-container">
+          <div className="navbar-brand">
+            <button
+              className="brand-name-button"
+              onClick={() => setIsModalOpen(true)}
+              aria-label="How to play"
+            >
+              4-σ
+            </button>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+
+      <HowToPlayModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </>
   );
 }
