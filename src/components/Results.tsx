@@ -1,3 +1,5 @@
+import { DailyScoreCard } from './DailyScoreCard';
+
 interface Judgement {
   questionId: string;
   prompt: string;
@@ -19,21 +21,35 @@ interface ResultsProps {
   judgements: Judgement[];
   score: number;
   onRestart: () => void;
+  dailyRank?: number;
+  topScoreGlobal?: number;
+  averageScore?: number;
+  dailyAverageScore?: number;
+  calibration?: number;
 }
 
-export function Results({ judgements, score, onRestart }: ResultsProps) {
+export function Results({
+  judgements,
+  score,
+  onRestart,
+  dailyRank,
+  topScoreGlobal,
+  averageScore,
+  dailyAverageScore,
+  calibration
+}: ResultsProps) {
   // Calculate interval metrics for visual display
   const getIntervalMetrics = (lower: number, upper: number, trueValue: number, hit: boolean) => {
     const width = upper - lower;
     const widthPercent = ((width / trueValue) * 100);
-    
+
     // Calculate precision score (0-100) - inverse of width percentage, capped
     // Narrower intervals get higher precision scores
     // Only meaningful if the interval contains the true value (hit)
-    const precisionScore = hit 
+    const precisionScore = hit
       ? Math.max(0, Math.min(100, 100 - widthPercent))
       : 0;
-    
+
     return {
       width,
       widthPercent: widthPercent.toFixed(1),
@@ -43,13 +59,14 @@ export function Results({ judgements, score, onRestart }: ResultsProps) {
 
   return (
     <div className="results-container">
-      <div className="score-display">
-        <h1>Session complete</h1>
-        <div className="score">
-          <span className="score-number">{score.toFixed(2)}</span>
-        </div>
-        <p className="score-label">Total score</p>
-      </div>
+      <DailyScoreCard
+        totalScore={score}
+        dailyRank={dailyRank}
+        topScoreGlobal={topScoreGlobal}
+        averageScore={averageScore}
+        dailyAverageScore={dailyAverageScore}
+        calibration={calibration}
+      />
 
       <div className="judgements-list">
         {judgements.map((judgement) => {

@@ -341,45 +341,37 @@ body {
   box-shadow: var(--shadow-md);
 }
 
-.daily-score-title {
-  font-size: 1.75rem;
-  font-weight: 600;
-  margin-bottom: 2rem;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
-  text-align: center;
-}
-
-.score-grid {
+.score-layout {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: auto auto auto;
   gap: 2rem;
 }
 
-.score-item {
+/* Top Row - Total Score & Calibration */
+.score-top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.stat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+  text-align: center;
 }
 
-.score-item-primary {
-  grid-column: span 6;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 0.5rem;
-}
-
-.score-item-calibration {
-  grid-column: span 3;
-  padding: 1.25rem;
+.stat-primary {
+  padding: 1.5rem;
   border-radius: 8px;
   background: var(--background);
   border: 2px solid var(--border);
-  transition: all 0.2s ease;
+  width: 100%;
 }
 
-.score-value-large {
+.stat-value-large {
   font-size: 4rem;
   font-weight: 700;
   color: var(--primary);
@@ -387,16 +379,27 @@ body {
   letter-spacing: -0.03em;
 }
 
-.score-value {
-  font-size: 1.75rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  line-height: 1;
-  letter-spacing: -0.02em;
+.stat-label {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 
-.score-value-calibration {
-  font-size: 2.25rem;
+/* Calibration */
+.stat-calibration {
+  padding: 1.5rem;
+  border-radius: 8px;
+  background: var(--background);
+  border: 2px solid var(--border);
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+.stat-value-calibration {
+  font-size: 3rem;
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -408,7 +411,57 @@ body {
   color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+/* Calibration Info Button */
+.calibration-label-with-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.calibration-info-button {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  line-height: 1;
+}
+
+.calibration-info-button:hover {
+  color: var(--primary);
+}
+
+.calibration-info-button:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+/* Calibration Popup Modal */
+.calibration-popup {
+  max-width: 500px;
+}
+
+.calibration-popup .modal-body p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.calibration-popup .modal-body p:last-child {
+  margin-bottom: 0;
+}
+
+.calibration-popup .modal-body strong {
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 /* Calibration status colors */
@@ -417,7 +470,7 @@ body {
   border-color: var(--success);
 }
 
-.calibration-excellent .score-value-calibration {
+.calibration-excellent .stat-value-calibration {
   color: #00a81c;
 }
 
@@ -430,7 +483,7 @@ body {
   border-color: #22c55e;
 }
 
-.calibration-good .score-value-calibration {
+.calibration-good .stat-value-calibration {
   color: #16a34a;
 }
 
@@ -439,7 +492,7 @@ body {
   border-color: #fbbf24;
 }
 
-.calibration-fair .score-value-calibration {
+.calibration-fair .stat-value-calibration {
   color: #d97706;
 }
 
@@ -448,20 +501,113 @@ body {
   border-color: var(--error);
 }
 
-.calibration-poor .score-value-calibration {
+.calibration-poor .stat-value-calibration {
   color: #c41638;
 }
 
-.calibration-unknown .score-value-calibration {
+.calibration-unknown .stat-value-calibration {
   color: var(--text-tertiary);
 }
 
-.score-label {
+/* Middle Row - Secondary Stats (Horizontal) */
+.stat-row-horizontal {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  justify-items: center;
+}
+
+.stat-item-small {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  text-align: center;
+}
+
+.stat-value-small {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.stat-label-small {
   color: var(--text-secondary);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.3px;
   text-transform: uppercase;
+}
+
+/* Bottom Row - Performance Chart (Full Width) */
+.performance-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--background);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.chart-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.chart-svg {
+  width: 100%;
+  height: auto;
+}
+
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 0.5rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legend-line {
+  width: 24px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.legend-line-user {
+  background: var(--primary);
+}
+
+.legend-line-avg {
+  background: #9d98d4;
+}
+
+.legend-line-calibration {
+  background: #00d924;
+}
+
+.legend-line-target {
+  background: #00d924;
+  opacity: 0.5;
+  height: 2px;
+  border: 1px dashed #00d924;
+  background: transparent;
+}
+
+.legend-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
 }
 
 /* Judgements List */
@@ -778,17 +924,18 @@ body {
   }
 
   /* Daily Score Card Tablet */
-  .score-grid {
-    grid-template-columns: repeat(3, 1fr);
+  .score-top-row {
+    grid-template-columns: 1fr;
     gap: 1.5rem;
   }
 
-  .score-item-primary {
-    grid-column: span 3;
+  .stat-row-horizontal {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
   }
 
-  .score-item-calibration {
-    grid-column: span 3;
+  .performance-chart {
+    max-width: 100%;
   }
 }
 
@@ -820,34 +967,38 @@ body {
     padding: 2rem 1.5rem;
   }
 
-  .daily-score-title {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
+  .score-layout {
+    gap: 1.5rem;
   }
 
-  .score-grid {
+  .score-top-row {
     grid-template-columns: 1fr;
-    gap: 1.25rem;
+    gap: 1.5rem;
   }
 
-  .score-item-primary {
-    grid-column: span 1;
-  }
-
-  .score-item-calibration {
-    grid-column: span 1;
-  }
-
-  .score-value-large {
+  .stat-value-large {
     font-size: 3rem;
   }
 
-  .score-value {
-    font-size: 1.5rem;
+  .stat-value-calibration {
+    font-size: 2.5rem;
   }
 
-  .score-value-calibration {
-    font-size: 2rem;
+  .stat-row-horizontal {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .stat-value-small {
+    font-size: 1.125rem;
+  }
+
+  .performance-chart {
+    padding: 1rem;
+  }
+
+  .chart-title {
+    font-size: 0.9375rem;
   }
 }
 
