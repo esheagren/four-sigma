@@ -70,13 +70,13 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
 
         <div className="modal-body">
           <>
-              <p className="modal-intro">
+              <p style={{ fontSize: '1.0625rem', lineHeight: '1.7', color: 'var(--text-secondary)', marginBottom: '2.5rem' }}>
                 The purpose of 4-σ is to estimate the numerical quantity of various things.
               </p>
 
               <div className="how-to-section">
                 <h3>Answers</h3>
-                <p className="modal-intro">
+                <p style={{ fontSize: '1.0625rem', lineHeight: '1.7', color: 'var(--text-secondary)' }}>
                   Answers are given with two numbers, an Upper Bound and a Lower Bound, such that you are 95% sure the true answer lies somewhere between the bounds you gave.
                 </p>
 
@@ -106,7 +106,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
               <div className="how-to-section">
                 <h3>Scoring</h3>
                 <p className="modal-intro">
-                  Scoring works as follows: If the upper and lower bound you submit contains the true answer, you will get more points the narrower your range. However, if the true answer is outside the bound you gave, you will get no points for that question.
+                  If the upper and lower bound you submit contains the true answer, you will get more points the narrower your range.
                 </p>
 
                 <div className="scoring-visual">
@@ -201,12 +201,9 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="how-to-section">
-                <h3>Daily Play</h3>
-                <p>
-                  Answer 3 questions each day. Everyone gets the same questions, so you can compare your performance on the leaderboard.
+                <p className="modal-intro" style={{ marginTop: '1.5rem', fontWeight: 600 }}>
+                  However, if the true answer is outside the bound you gave, you will get no points for that question.
                 </p>
               </div>
             </>
