@@ -14,20 +14,23 @@ interface QuestionCardProps {
 export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
   const [lower, setLower] = useState<string>('');
   const [upper, setUpper] = useState<string>('');
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
   const lowerNum = parseFloat(lower);
   const upperNum = parseFloat(upper);
-  
+
   const isLowerValid = lower !== '' && !isNaN(lowerNum);
   const isUpperValid = upper !== '' && !isNaN(upperNum);
   const isRangeValid = isLowerValid && isUpperValid && lowerNum <= upperNum;
   const isSubmitDisabled = !isRangeValid;
 
   const handleSubmit = () => {
+    setHasAttemptedSubmit(true);
     if (!isSubmitDisabled) {
       onSubmit(lowerNum, upperNum);
       setLower('');
       setUpper('');
+      setHasAttemptedSubmit(false);
     }
   };
 
@@ -70,7 +73,7 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
           </div>
         </div>
 
-        {isLowerValid && isUpperValid && lowerNum > upperNum && (
+        {hasAttemptedSubmit && isLowerValid && isUpperValid && lowerNum > upperNum && (
           <p className="validation-error">Lower bound must be ≤ upper bound</p>
         )}
       </div>
