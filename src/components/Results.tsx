@@ -1,4 +1,5 @@
 import { DailyScoreCard } from './DailyScoreCard';
+import { useState, useEffect } from 'react';
 
 interface Judgement {
   questionId: string;
@@ -26,6 +27,38 @@ interface ResultsProps {
   averageScore?: number;
   dailyAverageScore?: number;
   calibration?: number;
+}
+
+// Counter animation component
+function AnimatedScore({ finalScore, delay = 0 }: { finalScore: number; delay?: number }) {
+  const [displayScore, setDisplayScore] = useState(0);
+
+  useEffect(() => {
+    // Wait for the delay before starting animation
+    const delayTimeout = setTimeout(() => {
+      const duration = 800; // Animation duration in ms
+      const steps = 30; // Number of steps in the animation
+      const increment = finalScore / steps;
+      const stepDuration = duration / steps;
+
+      let currentStep = 0;
+      const timer = setInterval(() => {
+        currentStep++;
+        if (currentStep >= steps) {
+          setDisplayScore(finalScore);
+          clearInterval(timer);
+        } else {
+          setDisplayScore(Math.floor(increment * currentStep));
+        }
+      }, stepDuration);
+
+      return () => clearInterval(timer);
+    }, delay);
+
+    return () => clearTimeout(delayTimeout);
+  }, [finalScore, delay]);
+
+  return <>{displayScore}</>;
 }
 
 export function Results({
@@ -72,88 +105,154 @@ export function Results({
         {judgements.map((judgement) => {
         const metrics = getIntervalMetrics(judgement.lower, judgement.upper, judgement.trueValue, judgement.hit);
 
+        // Fixed visual display - always show bounds at consistent positions
+        // regardless of actual numerical range
+        const VISUAL_WIDTH = 60; // Fixed width for the interval display (percentage)
+        const CENTER = 50; // Center point of the visualization
+
+        // Place bounds symmetrically around center at fixed visual distance
+        const lowerPercent = CENTER - (VISUAL_WIDTH / 2);
+        const upperPercent = CENTER + (VISUAL_WIDTH / 2);
+
+        // Calculate where the true value should appear
+        const range = judgement.upper - judgement.lower;
+        let trueValuePosition: number;
+        let isOutsideBounds = false;
+
+        if (judgement.trueValue < judgement.lower) {
+          // True value is below the lower bound
+          isOutsideBounds = true;
+          // Clamp to show just outside the lower bound (5% of visual width)
+          trueValuePosition = -0.05;
+        } else if (judgement.trueValue > judgement.upper) {
+          // True value is above the upper bound
+          isOutsideBounds = true;
+          // Clamp to show just outside the upper bound (105% of visual width)
+          trueValuePosition = 1.05;
+        } else {
+          // True value is within or at the bounds
+          // Use epsilon for floating point comparison
+          const epsilon = 0.0001;
+
+          if (Math.abs(judgement.trueValue - judgement.lower) < epsilon) {
+            // Exactly at lower bound
+            trueValuePosition = 0;
+          } else if (Math.abs(judgement.trueValue - judgement.upper) < epsilon) {
+            // Exactly at upper bound
+            trueValuePosition = 1;
+          } else {
+            // Between bounds - proportional positioning
+            trueValuePosition = (judgement.trueValue - judgement.lower) / range;
+          }
+        }
+
+        // Convert position to percentage
+        const trueValuePercent = lowerPercent + (trueValuePosition * VISUAL_WIDTH);
+        const rangeWidth = upperPercent - lowerPercent;
+
+        const rangeColor = judgement.hit ? '#4ecdc4' : '#df1b41';
+
         return (
           <div
             key={judgement.questionId}
             className={`judgement-card ${judgement.hit ? 'hit' : 'miss'}`}
           >
             <h3 className="judgement-prompt">{judgement.prompt}</h3>
-            {judgement.unit && <p className="judgement-unit">{judgement.unit}</p>}
 
-            <div className="judgement-details">
-              <div className="interval">
-                <span className="label">Your interval:</span>
-                <span className="value">[{judgement.lower}, {judgement.upper}]</span>
-              </div>
+            {/* Visual Range Display */}
+            <div className="judgement-visual">
+              <div className="judgement-range-visualization">
+                <div className="judgement-range-line" />
 
-              <div className="true-value">
-                <span className="label">True value:</span>
-                <span className="value">{judgement.trueValue}</span>
-              </div>
+                {/* Span between bounds */}
+                <div
+                  className="judgement-range-span"
+                  style={{
+                    left: `${lowerPercent}%`,
+                    width: `${rangeWidth}%`,
+                    background: rangeColor,
+                  }}
+                />
 
-              <div className="precision-row">
-                <span className="label precision-label-hover">
-                  Precision:
-                  <span className="precision-tooltip-trigger">ⓘ</span>
-                  <span className="precision-tooltip">
-                    Narrower range yields higher precision. Only updated with correct answer.
-                  </span>
-                </span>
-                <span className={`value ${judgement.hit ? 'precision-value' : ''}`}>
-                  {metrics.precisionScore}%
-                </span>
-              </div>
+                {/* True value marker */}
+                <div
+                  className={`judgement-true-answer-marker ${isOutsideBounds ? 'outside-bounds' : ''}`}
+                  style={{ left: `${trueValuePercent}%` }}
+                  title={`True value: ${judgement.trueValue.toLocaleString()}`}
+                >
+                  <div className="judgement-true-answer-dot" />
+                </div>
 
-              <div className="score-row">
-                <span className="label">Your score:</span>
-                <span className={`score-value ${judgement.score === 0 ? 'zero' : judgement.score < 0 ? 'negative' : 'positive'}`}>
-                  {judgement.score.toFixed(2)}
-                </span>
-              </div>
-
-              {judgement.communityStats && (
-                <>
-                  <div className="community-stats-divider" />
-                  <div className="community-stats-row">
-                    <span className="label">Community average:</span>
-                    <span className="value community-value">
-                      {judgement.communityStats.averageScore.toFixed(2)}
-                    </span>
+                {/* Lower bound */}
+                <div
+                  className="judgement-range-bound judgement-range-bound-lower"
+                  style={{ left: `${lowerPercent}%` }}
+                >
+                  <div
+                    className="judgement-range-bound-dot"
+                    style={{ background: rangeColor }}
+                  />
+                  <div
+                    className="judgement-range-bound-label"
+                    style={{ background: rangeColor }}
+                  >
+                    {judgement.lower.toLocaleString()}
                   </div>
-                  <div className="community-stats-row">
-                    <span className="label">Community best:</span>
-                    <span className="value community-value">
-                      {judgement.communityStats.highestScore.toFixed(2)}
-                    </span>
+                </div>
+
+                {/* Upper bound */}
+                <div
+                  className="judgement-range-bound judgement-range-bound-upper"
+                  style={{ left: `${upperPercent}%` }}
+                >
+                  <div
+                    className="judgement-range-bound-dot"
+                    style={{ background: rangeColor }}
+                  />
+                  <div
+                    className="judgement-range-bound-label"
+                    style={{ background: rangeColor }}
+                  >
+                    {judgement.upper.toLocaleString()}
                   </div>
-                </>
+                </div>
+              </div>
+
+              {judgement.sourceUrl ? (
+                <a
+                  href={judgement.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="judgement-guess-display judgement-answer-link"
+                  title="Click to view source"
+                >
+                  <span className="judgement-guess-value">{judgement.trueValue.toLocaleString()}</span>
+                  {judgement.unit && <div className="judgement-unit">Unit: {judgement.unit}</div>}
+                </a>
+              ) : (
+                <div className="judgement-guess-display">
+                  <span className="judgement-guess-value">{judgement.trueValue.toLocaleString()}</span>
+                  {judgement.unit && <div className="judgement-unit">Unit: {judgement.unit}</div>}
+                </div>
               )}
             </div>
 
-            {judgement.source && (
-              <div className="question-source">
-                <span className="source-label">Source:</span>
-                {judgement.sourceUrl ? (
-                  <a
-                    href={judgement.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="source-link"
-                  >
-                    {judgement.source}
-                  </a>
-                ) : (
-                  <span className="source-text">{judgement.source}</span>
-                )}
+            {/* Score display in bottom right */}
+            <div className={`judgement-score-display-bottom ${judgement.hit ? 'score-hit' : 'score-miss'}`}>
+              <div className="judgement-score-value">
+                <AnimatedScore finalScore={Math.round(judgement.score)} delay={0} />
               </div>
-            )}
+              <div className="judgement-score-label">
+                points
+              </div>
+            </div>
           </div>
         );
       })}
       </div>
 
-      <button onClick={onRestart} className="restart-button">
-        Start new session
+      <button onClick={onRestart} className="explore-button">
+        Explore More Questions
       </button>
     </div>
   );

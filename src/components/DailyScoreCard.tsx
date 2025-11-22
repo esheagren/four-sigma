@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface DailyScoreCardProps {
   totalScore: number;
@@ -13,6 +13,42 @@ interface DailyScoreCardProps {
     avgScore: number;
     calibration: number;
   }>;
+}
+
+// Animated counter component for total score with easing
+function AnimatedTotalScore({ finalScore }: { finalScore: number }) {
+  const [displayScore, setDisplayScore] = useState(0);
+
+  useEffect(() => {
+    const duration = 1800; // 1.8 seconds for more gradual effect
+    const startTime = Date.now();
+
+    // Ease-out quint function: more gradual slowdown
+    const easeOutQuint = (t: number): number => {
+      return 1 - Math.pow(1 - t, 5);
+    };
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Apply easing function
+      const easedProgress = easeOutQuint(progress);
+      const currentScore = Math.floor(easedProgress * finalScore);
+
+      setDisplayScore(currentScore);
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setDisplayScore(finalScore); // Ensure we end exactly on the final score
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, [finalScore]);
+
+  return <>{displayScore}</>;
 }
 
 export function DailyScoreCard({
@@ -93,7 +129,9 @@ export function DailyScoreCard({
         <div className="score-top-row">
           {/* Total Score - Left */}
           <div className="stat-item stat-primary">
-            <div className="stat-value-large">{Math.round(totalScore)}</div>
+            <div className="stat-value-large">
+              <AnimatedTotalScore finalScore={Math.round(totalScore)} />
+            </div>
             <div className="stat-label">Total score</div>
           </div>
 
