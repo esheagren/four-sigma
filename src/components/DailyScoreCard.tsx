@@ -522,17 +522,27 @@ export function DailyScoreCard({
                 <div className="leaderboard-empty">No guesses yet</div>
               ) : (
                 bestGuessesLeaderboard.map((entry) => {
-                  // Calculate visualization percentages
-                  const range = entry.upperBound - entry.lowerBound;
-                  const padding = range * 0.3; // Add 30% padding on each side
-                  const scaleMin = Math.min(entry.lowerBound - padding, entry.trueValue - padding);
-                  const scaleMax = Math.max(entry.upperBound + padding, entry.trueValue + padding);
-                  const scaleRange = scaleMax - scaleMin;
+                  // Check if we have the visualization data
+                  const hasVisualizationData = entry.lowerBound != null && entry.upperBound != null && entry.trueValue != null;
 
-                  const lowerPercent = ((entry.lowerBound - scaleMin) / scaleRange) * 100;
-                  const upperPercent = ((entry.upperBound - scaleMin) / scaleRange) * 100;
-                  const trueValuePercent = ((entry.trueValue - scaleMin) / scaleRange) * 100;
-                  const spanWidth = upperPercent - lowerPercent;
+                  // Calculate visualization percentages (only if we have data)
+                  let lowerPercent = 20;
+                  let upperPercent = 80;
+                  let trueValuePercent = 50;
+                  let spanWidth = 60;
+
+                  if (hasVisualizationData) {
+                    const range = entry.upperBound - entry.lowerBound;
+                    const padding = Math.max(range * 0.3, Math.abs(entry.trueValue) * 0.1); // Add padding
+                    const scaleMin = Math.min(entry.lowerBound - padding, entry.trueValue - padding);
+                    const scaleMax = Math.max(entry.upperBound + padding, entry.trueValue + padding);
+                    const scaleRange = scaleMax - scaleMin || 1; // Prevent division by zero
+
+                    lowerPercent = ((entry.lowerBound - scaleMin) / scaleRange) * 100;
+                    upperPercent = ((entry.upperBound - scaleMin) / scaleRange) * 100;
+                    trueValuePercent = ((entry.trueValue - scaleMin) / scaleRange) * 100;
+                    spanWidth = upperPercent - lowerPercent;
+                  }
 
                   return (
                     <div key={`guess-${entry.rank}`} className="best-guess-entry">
@@ -546,51 +556,55 @@ export function DailyScoreCard({
                       <div className="best-guess-question" title={entry.questionText}>
                         {truncateQuestion(entry.questionText, 50)}
                       </div>
-                      <div className="best-guess-visualization">
-                        <div className="best-guess-range-line" />
+                      {hasVisualizationData && (
+                        <>
+                          <div className="best-guess-visualization">
+                            <div className="best-guess-range-line" />
 
-                        {/* Span between bounds */}
-                        <div
-                          className="best-guess-range-span"
-                          style={{
-                            left: `${lowerPercent}%`,
-                            width: `${spanWidth}%`,
-                          }}
-                        />
+                            {/* Span between bounds */}
+                            <div
+                              className="best-guess-range-span"
+                              style={{
+                                left: `${lowerPercent}%`,
+                                width: `${spanWidth}%`,
+                              }}
+                            />
 
-                        {/* True value marker */}
-                        <div
-                          className="best-guess-true-marker"
-                          style={{ left: `${trueValuePercent}%` }}
-                        >
-                          <div className="best-guess-true-dot" />
-                        </div>
+                            {/* True value marker */}
+                            <div
+                              className="best-guess-true-marker"
+                              style={{ left: `${trueValuePercent}%` }}
+                            >
+                              <div className="best-guess-true-dot" />
+                            </div>
 
-                        {/* Lower bound */}
-                        <div
-                          className="best-guess-bound best-guess-bound-lower"
-                          style={{ left: `${lowerPercent}%` }}
-                        >
-                          <div className="best-guess-bound-dot" />
-                          <div className="best-guess-bound-label">
-                            {entry.lowerBound.toLocaleString()}
+                            {/* Lower bound */}
+                            <div
+                              className="best-guess-bound best-guess-bound-lower"
+                              style={{ left: `${lowerPercent}%` }}
+                            >
+                              <div className="best-guess-bound-dot" />
+                              <div className="best-guess-bound-label">
+                                {entry.lowerBound.toLocaleString()}
+                              </div>
+                            </div>
+
+                            {/* Upper bound */}
+                            <div
+                              className="best-guess-bound best-guess-bound-upper"
+                              style={{ left: `${upperPercent}%` }}
+                            >
+                              <div className="best-guess-bound-dot" />
+                              <div className="best-guess-bound-label">
+                                {entry.upperBound.toLocaleString()}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-
-                        {/* Upper bound */}
-                        <div
-                          className="best-guess-bound best-guess-bound-upper"
-                          style={{ left: `${upperPercent}%` }}
-                        >
-                          <div className="best-guess-bound-dot" />
-                          <div className="best-guess-bound-label">
-                            {entry.upperBound.toLocaleString()}
+                          <div className="best-guess-answer">
+                            Answer: <strong>{entry.trueValue.toLocaleString()}</strong>
                           </div>
-                        </div>
-                      </div>
-                      <div className="best-guess-answer">
-                        Answer: <strong>{entry.trueValue.toLocaleString()}</strong>
-                      </div>
+                        </>
+                      )}
                     </div>
                   );
                 })
