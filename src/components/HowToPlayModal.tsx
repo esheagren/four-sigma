@@ -206,17 +206,6 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                 <p className="modal-intro" style={{ marginTop: '1.5rem', fontWeight: 600 }}>
                   However, if the true answer is outside the bound you gave, you will get no points for that question.
                 </p>
-
-                <div className="scoring-formula" style={{ marginTop: '2rem', padding: '1.25rem', background: 'var(--bg-secondary)', borderRadius: '12px' }}>
-                  <h4 style={{ margin: '0 0 0.75rem 0', fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Scoring Formula</h4>
-                  <div style={{ fontFamily: 'monospace', fontSize: '0.95rem', color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
-                    Score = 50 × (1 / relativeWidth<sup>0.7</sup>)
-                  </div>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                    <div>where <span style={{ fontFamily: 'monospace' }}>relativeWidth = (upper - lower) / trueValue</span></div>
-                    <div style={{ marginTop: '0.5rem' }}>Very wide guesses approach 0 points. Extremely narrow guesses can score 1000+.</div>
-                  </div>
-                </div>
               </div>
             </>
         </div>

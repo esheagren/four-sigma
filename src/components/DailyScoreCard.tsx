@@ -190,11 +190,11 @@ export function DailyScoreCard({
             <div className="stat-label-small">Daily rank</div>
           </div>
           <div className="stat-item-small">
-            <div className="stat-value-small">{topScoreGlobal ? topScoreGlobal.toFixed(2) : '—'}</div>
+            <div className="stat-value-small">{topScoreGlobal ? Math.round(topScoreGlobal) : '—'}</div>
             <div className="stat-label-small">Top score today</div>
           </div>
           <div className="stat-item-small">
-            <div className="stat-value-small">{dailyAverageScore ? dailyAverageScore.toFixed(2) : '—'}</div>
+            <div className="stat-value-small">{dailyAverageScore ? Math.round(dailyAverageScore) : '—'}</div>
             <div className="stat-label-small">Today's average</div>
           </div>
         </div>

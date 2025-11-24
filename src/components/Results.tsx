@@ -1,5 +1,7 @@
 import { DailyScoreCard } from './DailyScoreCard';
-import { useState, useEffect } from 'react';
+import { ShareScoreCard, type ShareScoreCardRef } from './ShareScoreCard';
+import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 interface Judgement {
   questionId: string;
@@ -81,6 +83,66 @@ export function Results({
   calibration,
   performanceHistory
 }: ResultsProps) {
+  const { user } = useAuth();
+  const shareCardRef = useRef<ShareScoreCardRef>(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [shareSuccess, setShareSuccess] = useState(false);
+
+  const hits = judgements.filter(j => j.hit).length;
+  const total = judgements.length;
+
+  const handleShare = async () => {
+    if (!shareCardRef.current) return;
+
+    setIsSharing(true);
+    setShareSuccess(false);
+
+    try {
+      const blob = await shareCardRef.current.generateImage();
+      if (!blob) {
+        throw new Error('Failed to generate image');
+      }
+
+      // Try to use Web Share API first (works on mobile and some desktop browsers)
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], '4sigma-score.png', { type: 'image/png' });
+        const shareData = { files: [file] };
+
+        if (navigator.canShare(shareData)) {
+          await navigator.share(shareData);
+          setShareSuccess(true);
+          return;
+        }
+      }
+
+      // Fallback: Copy to clipboard
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]);
+        setShareSuccess(true);
+      } catch (clipboardError) {
+        // Final fallback: Download the image
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = '4sigma-score.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setShareSuccess(true);
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+    } finally {
+      setIsSharing(false);
+      // Reset success message after 3 seconds
+      if (shareSuccess) {
+        setTimeout(() => setShareSuccess(false), 3000);
+      }
+    }
+  };
   // Calculate interval metrics for visual display
   const getIntervalMetrics = (lower: number, upper: number, trueValue: number, hit: boolean) => {
     const width = upper - lower;
@@ -102,6 +164,16 @@ export function Results({
 
   return (
     <div className="results-container">
+      {/* Hidden share card for image generation */}
+      <ShareScoreCard
+        ref={shareCardRef}
+        totalScore={score}
+        displayName={user?.displayName || 'Player'}
+        hits={hits}
+        total={total}
+        calibration={calibration}
+      />
+
       <DailyScoreCard
         totalScore={score}
         dailyRank={dailyRank}
@@ -111,6 +183,30 @@ export function Results({
         calibration={calibration}
         performanceHistory={performanceHistory}
       />
+
+      {/* Share button */}
+      <button
+        onClick={handleShare}
+        disabled={isSharing}
+        className="share-score-button"
+      >
+        {isSharing ? (
+          'Generating...'
+        ) : shareSuccess ? (
+          'Copied to clipboard!'
+        ) : (
+          <>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            Share Score
+          </>
+        )}
+      </button>
 
       <div className="judgements-list">
         {judgements.map((judgement) => {
