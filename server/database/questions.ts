@@ -1,87 +1,75 @@
 import { Question } from '../types/index.js';
-
-// Mock question bank - in v2 this will be replaced with Supabase queries
-export const questions: Question[] = [
-  {
-    id: 'q1',
-    prompt: 'Global CO2 emissions in gigatons',
-    unit: 'gigatons',
-    trueValue: 37,
-    source: 'IEA',
-    sourceUrl: 'https://www.iea.org',
-  },
-  {
-    id: 'q2',
-    prompt: 'Total number of publicly traded companies on the New York Stock Exchange',
-    unit: 'companies',
-    trueValue: 2400,
-    source: 'NYSE',
-    sourceUrl: 'https://www.nyse.com',
-  },
-  {
-    id: 'q3',
-    prompt: 'Percentage of the world\'s population that has access to the internet as of 2023, representing roughly the proportion of humanity connected to digital networks',
-    unit: 'percent',
-    trueValue: 64,
-    source: 'ITU',
-    sourceUrl: 'https://www.itu.int',
-  },
-  {
-    id: 'q4',
-    prompt: 'Distance from Earth to the Moon in kilometers',
-    unit: 'km',
-    trueValue: 384400,
-    source: 'NASA',
-    sourceUrl: 'https://www.nasa.gov/moon',
-  },
-  {
-    id: 'q5',
-    prompt: 'Boiling point of water in Celsius at sea level',
-    unit: '°C',
-    trueValue: 100,
-    source: 'NIST',
-    sourceUrl: 'https://www.nist.gov',
-  },
-  {
-    id: 'q6',
-    prompt: 'Number of countries in the United Nations (2023)',
-    unit: 'countries',
-    trueValue: 193,
-    source: 'United Nations',
-    sourceUrl: 'https://www.un.org/en/about-us/member-states',
-  },
-  {
-    id: 'q7',
-    prompt: 'Speed of light in kilometers per second',
-    unit: 'km/s',
-    trueValue: 299792,
-    source: 'NIST',
-    sourceUrl: 'https://www.nist.gov/pml/special-publication-811',
-  },
-  {
-    id: 'q8',
-    prompt: 'Population of Tokyo metropolitan area in millions (2023)',
-    unit: 'millions',
-    trueValue: 37,
-    source: 'World Population Review',
-    sourceUrl: 'https://worldpopulationreview.com/world-cities/tokyo-population',
-  },
-];
+import { supabase } from './supabase.js';
 
 /**
- * Get a question by ID
+ * Get a question by ID from Supabase
  */
-export function getQuestionById(id: string): Question | undefined {
-  return questions.find(q => q.id === id);
+export async function getQuestionById(id: string): Promise<Question | undefined> {
+  const { data, error } = await supabase
+    .from('questions')
+    .select(`
+      id,
+      question_text,
+      answer_value,
+      answer_explanation,
+      source_url,
+      source_name,
+      units (name)
+    `)
+    .eq('id', id)
+    .single();
+
+  if (error || !data) {
+    console.error('Error fetching question:', error);
+    return undefined;
+  }
+
+  return {
+    id: data.id,
+    prompt: data.question_text,
+    unit: data.units?.name || '',
+    trueValue: data.answer_value,
+    source: data.source_name || '',
+    sourceUrl: data.source_url || '',
+  };
 }
 
 /**
- * Get a set of questions for a new session
- * Currently returns first 3 for determinism
- * Can be changed to random selection later
+ * Get a set of random questions for a new session from Supabase
  */
-export function getQuestionsForSession(count: number = 3): Question[] {
-  return questions.slice(0, count);
+export async function getQuestionsForSession(count: number = 3): Promise<Question[]> {
+  // Fetch random questions using Supabase
+  // We fetch more than needed and pick randomly on the server side
+  // since Supabase doesn't have built-in random ordering
+  const { data, error } = await supabase
+    .from('questions')
+    .select(`
+      id,
+      question_text,
+      answer_value,
+      answer_explanation,
+      source_url,
+      source_name,
+      units (name)
+    `)
+    .eq('is_active', true)
+    .limit(100);
+
+  if (error || !data || data.length === 0) {
+    console.error('Error fetching questions:', error);
+    return [];
+  }
+
+  // Shuffle and pick `count` questions
+  const shuffled = data.sort(() => Math.random() - 0.5);
+  const selected = shuffled.slice(0, count);
+
+  return selected.map(q => ({
+    id: q.id,
+    prompt: q.question_text,
+    unit: q.units?.name || '',
+    trueValue: q.answer_value,
+    source: q.source_name || '',
+    sourceUrl: q.source_url || '',
+  }));
 }
-
-
