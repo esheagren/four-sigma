@@ -197,6 +197,51 @@ export function DailyScoreCard({
   return (
     <div className="daily-score-card">
       <div className="score-layout">
+        {/* View Toggle - At the very top */}
+        <div className="view-toggle">
+          <button
+            className={`view-toggle-btn ${activeView === 'performance' ? 'active' : ''}`}
+            onClick={() => setActiveView('performance')}
+          >
+            Your Performance
+          </button>
+          <button
+            className={`view-toggle-btn ${activeView === 'leaderboard' ? 'active' : ''}`}
+            onClick={() => setActiveView('leaderboard')}
+          >
+            Leaderboard
+          </button>
+        </div>
+
+        {/* Calibration Info Popup */}
+        {showCalibrationPopup && (
+          <div className="modal-overlay" onClick={() => setShowCalibrationPopup(false)}>
+            <div className="modal-content calibration-popup" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>What is Calibration?</h2>
+              </div>
+              <div className="modal-body">
+                <p>
+                  Calibration measures how well your confidence intervals match reality. It's the percentage of your 95% confidence intervals that actually contained the correct answer.
+                </p>
+                <p>
+                  <strong>Well-calibrated forecasters hit 95%.</strong> If you make 100 predictions with 95% confidence intervals, about 95 should contain the true value.
+                </p>
+                <p>
+                  <strong>Below 95%:</strong> You're overconfident (intervals too narrow)
+                </p>
+              </div>
+              <div className="modal-footer">
+                <button className="modal-button" onClick={() => setShowCalibrationPopup(false)}>
+                  Got it!
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeView === 'performance' ? (
+        <>
         {/* Top Row - Total Score, Daily Rank, Calibration */}
         <div className="score-top-row score-top-row-three">
           {/* Total Score */}
@@ -245,51 +290,6 @@ export function DailyScoreCard({
           </div>
         </div>
 
-        {/* Calibration Info Popup */}
-        {showCalibrationPopup && (
-          <div className="modal-overlay" onClick={() => setShowCalibrationPopup(false)}>
-            <div className="modal-content calibration-popup" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <h2>What is Calibration?</h2>
-              </div>
-              <div className="modal-body">
-                <p>
-                  Calibration measures how well your confidence intervals match reality. It's the percentage of your 95% confidence intervals that actually contained the correct answer.
-                </p>
-                <p>
-                  <strong>Well-calibrated forecasters hit 95%.</strong> If you make 100 predictions with 95% confidence intervals, about 95 should contain the true value.
-                </p>
-                <p>
-                  <strong>Below 95%:</strong> You're overconfident (intervals too narrow)
-                </p>
-              </div>
-              <div className="modal-footer">
-                <button className="modal-button" onClick={() => setShowCalibrationPopup(false)}>
-                  Got it!
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* View Toggle */}
-        <div className="view-toggle">
-          <button
-            className={`view-toggle-btn ${activeView === 'performance' ? 'active' : ''}`}
-            onClick={() => setActiveView('performance')}
-          >
-            Your Performance
-          </button>
-          <button
-            className={`view-toggle-btn ${activeView === 'leaderboard' ? 'active' : ''}`}
-            onClick={() => setActiveView('leaderboard')}
-          >
-            Leaderboard
-          </button>
-        </div>
-
-        {activeView === 'performance' ? (
-        <>
         {/* Performance Chart */}
         <div className="performance-chart">
           <svg
