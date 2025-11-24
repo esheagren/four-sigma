@@ -43,7 +43,6 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
   // Example scoring scenarios
   const trueValue = 8849; // Mount Everest height
   const examples = [
-    { lower: 0, upper: 50000, label: 'Extremely wide', color: '#888888' },
     { lower: 2000, upper: 15000, label: 'Very wide range', color: '#ff6b6b' },
     { lower: 5000, upper: 12000, label: 'Medium range', color: '#ffa500' },
     { lower: 8700, upper: 9000, label: 'Narrow range', color: '#4ecdc4' },

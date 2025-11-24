@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { getQuestionsForSession, getQuestionById } from '../database/questions.js';
+import { supabase } from '../database/supabase.js';
 import {
   generateSessionId,
   createSession,
@@ -243,8 +244,84 @@ router.post('/finalize', async (req: Request, res: Response) => {
 router.get('/leaderboard', (req: Request, res: Response) => {
   const limit = parseInt(req.query.limit as string) || 10;
   const leaderboard = getLeaderboard(Math.min(limit, 50)); // Cap at 50
-  
+
   res.json({ leaderboard });
+});
+
+/**
+ * GET /api/session/leaderboard/overall
+ * Get top 10 users by total/average score
+ */
+router.get('/leaderboard/overall', async (req: Request, res: Response) => {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, display_name, total_score, games_played, average_score')
+      .gt('games_played', 0)
+      .order('total_score', { ascending: false })
+      .limit(10);
+
+    if (error) {
+      console.error('Failed to fetch overall leaderboard:', error);
+      return res.status(500).json({ error: 'Failed to fetch leaderboard' });
+    }
+
+    const leaderboard = (data || []).map((user, index) => ({
+      rank: index + 1,
+      displayName: user.display_name,
+      totalScore: Math.round(Number(user.total_score)),
+      gamesPlayed: user.games_played,
+      averageScore: Number(user.average_score).toFixed(1),
+    }));
+
+    res.json({ leaderboard });
+  } catch (err) {
+    console.error('Overall leaderboard error:', err);
+    res.status(500).json({ error: 'Failed to fetch leaderboard' });
+  }
+});
+
+/**
+ * GET /api/session/leaderboard/best-guesses
+ * Get top 10 single-question scores with bounds visualization data
+ */
+router.get('/leaderboard/best-guesses', async (req: Request, res: Response) => {
+  try {
+    const { data, error } = await supabase
+      .from('user_responses')
+      .select(`
+        score,
+        lower_bound,
+        upper_bound,
+        answer_value_at_response,
+        answered_at,
+        users!fk_user_responses_user(display_name),
+        questions!inner(question_text)
+      `)
+      .order('score', { ascending: false })
+      .limit(10);
+
+    if (error) {
+      console.error('Failed to fetch best guesses leaderboard:', error);
+      return res.status(500).json({ error: 'Failed to fetch leaderboard' });
+    }
+
+    const leaderboard = (data || []).map((entry: any, index: number) => ({
+      rank: index + 1,
+      displayName: entry.users?.display_name || 'Anonymous',
+      score: Math.round(Number(entry.score)),
+      questionText: entry.questions?.question_text || 'Unknown question',
+      lowerBound: Number(entry.lower_bound),
+      upperBound: Number(entry.upper_bound),
+      trueValue: Number(entry.answer_value_at_response),
+      answeredAt: entry.answered_at,
+    }));
+
+    res.json({ leaderboard });
+  } catch (err) {
+    console.error('Best guesses leaderboard error:', err);
+    res.status(500).json({ error: 'Failed to fetch leaderboard' });
+  }
 });
 
 export default router;
