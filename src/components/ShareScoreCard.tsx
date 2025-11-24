@@ -80,7 +80,7 @@ export const ShareScoreCard = forwardRef<ShareScoreCardRef, ShareScoreCardProps>
           </div>
 
           <div className="share-card-footer">
-            <span>Play at foursigma.game</span>
+            <span>Play at 4sig.xyz</span>
           </div>
         </div>
       </div>

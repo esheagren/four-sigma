@@ -417,11 +417,39 @@ body {
 }
 
 .stat-primary {
+  position: relative;
   padding: 1.5rem;
   border-radius: 8px;
   background: var(--background);
   border: 2px solid var(--border);
   width: 100%;
+}
+
+.share-icon-button {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.5rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-icon-button:hover {
+  background: var(--surface);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.share-icon-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .stat-value-large {
@@ -1155,40 +1183,6 @@ body {
 .explore-button:active {
   transform: translateY(0);
   box-shadow: var(--shadow-sm);
-}
-
-/* Share Score Button */
-.share-score-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.875rem 1.5rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  background: transparent;
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  margin-bottom: 1rem;
-}
-
-.share-score-button:hover {
-  background: var(--surface);
-  color: var(--text-primary);
-  border-color: var(--primary);
-}
-
-.share-score-button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.share-score-button svg {
-  flex-shrink: 0;
 }
 
 /* Share Score Card (for image generation) */
