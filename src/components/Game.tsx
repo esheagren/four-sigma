@@ -203,6 +203,7 @@ export function Game() {
           dailyAverageScore={dailyStats?.todaysAverage ?? undefined}
           calibration={calibration}
           performanceHistory={performanceHistory}
+          totalParticipants={dailyStats?.totalParticipantsToday ?? undefined}
         />
       </div>
     );

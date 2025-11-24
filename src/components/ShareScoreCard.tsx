@@ -1,4 +1,4 @@
-import { useRef, forwardRef, useImperativeHandle } from 'react';
+import { useRef, forwardRef, useImperativeHandle, useMemo } from 'react';
 import html2canvas from 'html2canvas';
 
 interface ShareScoreCardProps {
@@ -7,15 +7,50 @@ interface ShareScoreCardProps {
   hits: number;
   total: number;
   calibration?: number;
+  percentile?: number;
 }
 
 export interface ShareScoreCardRef {
   generateImage: () => Promise<Blob | null>;
 }
 
+// Generate random color variations while keeping the same feel
+function generateColorScheme() {
+  // Base hues to pick from (purple-blue-cyan range for consistency)
+  const hueOptions = [
+    { primary: 250, secondary: 280 }, // Purple-violet
+    { primary: 230, secondary: 260 }, // Blue-purple
+    { primary: 260, secondary: 220 }, // Violet-blue
+    { primary: 245, secondary: 290 }, // Indigo-magenta
+    { primary: 220, secondary: 250 }, // Blue-indigo
+  ];
+
+  const scheme = hueOptions[Math.floor(Math.random() * hueOptions.length)];
+
+  // Add slight random variation to the hues
+  const hueVariation = (Math.random() - 0.5) * 20;
+  const primaryHue = scheme.primary + hueVariation;
+  const secondaryHue = scheme.secondary + hueVariation;
+
+  // Random saturation and lightness variations
+  const saturation = 60 + Math.random() * 20; // 60-80%
+  const lightness = 55 + Math.random() * 15; // 55-70%
+
+  return {
+    primary: `hsl(${primaryHue}, ${saturation}%, ${lightness}%)`,
+    gradientStart: `hsl(${primaryHue}, 30%, 8%)`,
+    gradientMid: `hsl(${secondaryHue}, 25%, 12%)`,
+    gradientEnd: `hsl(${primaryHue + 20}, 20%, 6%)`,
+    accent: `hsl(${primaryHue}, ${saturation - 10}%, ${lightness + 10}%)`,
+  };
+}
+
 export const ShareScoreCard = forwardRef<ShareScoreCardRef, ShareScoreCardProps>(
-  ({ totalScore, displayName, hits, total, calibration }, ref) => {
+  ({ totalScore, displayName, hits, total, calibration, percentile }, ref) => {
     const cardRef = useRef<HTMLDivElement>(null);
+
+    // Generate colors once per render (will regenerate each time share is clicked)
+    const colors = useMemo(() => generateColorScheme(), []);
 
     useImperativeHandle(ref, () => ({
       generateImage: async () => {
@@ -23,7 +58,7 @@ export const ShareScoreCard = forwardRef<ShareScoreCardRef, ShareScoreCardProps>
 
         try {
           const canvas = await html2canvas(cardRef.current, {
-            backgroundColor: '#0a0a0f',
+            backgroundColor: null,
             scale: 2, // Higher resolution
             logging: false,
             useCORS: true,
@@ -41,6 +76,9 @@ export const ShareScoreCard = forwardRef<ShareScoreCardRef, ShareScoreCardProps>
       },
     }));
 
+    // Generate random gradient angle
+    const gradientAngle = 120 + Math.random() * 40; // 120-160 degrees
+
     return (
       <div
         ref={cardRef}
@@ -49,6 +87,7 @@ export const ShareScoreCard = forwardRef<ShareScoreCardRef, ShareScoreCardProps>
           position: 'absolute',
           left: '-9999px',
           top: '-9999px',
+          background: `linear-gradient(${gradientAngle}deg, ${colors.gradientStart} 0%, ${colors.gradientMid} 50%, ${colors.gradientEnd} 100%)`,
         }}
       >
         <div className="share-card-content">
@@ -58,9 +97,25 @@ export const ShareScoreCard = forwardRef<ShareScoreCardRef, ShareScoreCardProps>
           </div>
 
           <div className="share-card-score">
-            <div className="share-card-score-value">{Math.round(totalScore)}</div>
+            <div
+              className="share-card-score-value"
+              style={{ color: colors.primary }}
+            >
+              {Math.round(totalScore)}
+            </div>
             <div className="share-card-score-label">points</div>
           </div>
+
+          {percentile !== undefined && (
+            <div className="share-card-percentile">
+              <span
+                className="share-card-percentile-value"
+                style={{ color: colors.accent }}
+              >
+                Top {100 - percentile}%
+              </span>
+            </div>
+          )}
 
           <div className="share-card-stats">
             <div className="share-card-stat">
@@ -75,8 +130,16 @@ export const ShareScoreCard = forwardRef<ShareScoreCardRef, ShareScoreCardProps>
             )}
           </div>
 
-          <div className="share-card-player">
-            <span className="share-card-player-name">{displayName}</span>
+          <div
+            className="share-card-player"
+            style={{ background: `${colors.primary}22` }}
+          >
+            <span
+              className="share-card-player-name"
+              style={{ color: colors.primary }}
+            >
+              {displayName}
+            </span>
           </div>
 
           <div className="share-card-footer">

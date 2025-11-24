@@ -38,6 +38,7 @@ interface ResultsProps {
   dailyAverageScore?: number;
   calibration?: number;
   performanceHistory?: PerformanceHistoryEntry[];
+  totalParticipants?: number;
 }
 
 // Counter animation component
@@ -80,7 +81,8 @@ export function Results({
   topScoreGlobal,
   dailyAverageScore,
   calibration,
-  performanceHistory
+  performanceHistory,
+  totalParticipants
 }: ResultsProps) {
   const { user } = useAuth();
   const shareCardRef = useRef<ShareScoreCardRef>(null);
@@ -89,6 +91,11 @@ export function Results({
 
   const hits = judgements.filter(j => j.hit).length;
   const total = judgements.length;
+
+  // Calculate percentile: if rank is 1 out of 10, you beat 90% of players
+  const percentile = (dailyRank && totalParticipants && totalParticipants > 0)
+    ? Math.round(((totalParticipants - dailyRank) / totalParticipants) * 100)
+    : undefined;
 
   const handleShare = async () => {
     if (!shareCardRef.current) return;
@@ -171,6 +178,7 @@ export function Results({
         hits={hits}
         total={total}
         calibration={calibration}
+        percentile={percentile}
       />
 
       <DailyScoreCard
