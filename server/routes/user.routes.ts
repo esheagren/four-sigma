@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { requireUser } from '../middleware/auth.js';
 import { getUserById, getUserStats, updateUserProfile } from '../database/users.js';
+import { getDailyStats, getPerformanceHistory } from '../database/sessions.js';
 
 const router = Router();
 
@@ -128,6 +129,37 @@ router.get('/stats', requireUser, async (req: Request, res: Response) => {
   } catch (err) {
     console.error('Get stats error:', err);
     res.status(500).json({ error: 'Failed to get stats' });
+  }
+});
+
+/**
+ * GET /api/user/daily-stats
+ * Get user's daily statistics including rank and community averages
+ */
+router.get('/daily-stats', requireUser, async (req: Request, res: Response) => {
+  try {
+    const dailyStats = await getDailyStats(req.user!.userId);
+    res.json(dailyStats);
+  } catch (err) {
+    console.error('Get daily stats error:', err);
+    res.status(500).json({ error: 'Failed to get daily stats' });
+  }
+});
+
+/**
+ * GET /api/user/performance-history
+ * Get user's performance history for the chart
+ * Query params: days (default 7)
+ */
+router.get('/performance-history', requireUser, async (req: Request, res: Response) => {
+  try {
+    const days = parseInt(req.query.days as string) || 7;
+    const maxDays = 30; // Cap at 30 days
+    const history = await getPerformanceHistory(req.user!.userId, Math.min(days, maxDays));
+    res.json({ history });
+  } catch (err) {
+    console.error('Get performance history error:', err);
+    res.status(500).json({ error: 'Failed to get performance history' });
   }
 });
 

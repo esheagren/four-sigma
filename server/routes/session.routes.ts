@@ -12,6 +12,12 @@ import {
   getLeaderboard,
 } from '../database/storage.js';
 import {
+  recordUserResponse,
+  updateUserStatsAfterSession,
+  getDailyStats,
+  getPerformanceHistory,
+} from '../database/sessions.js';
+import {
   Answer,
   Judgement,
   StartSessionResponse,
@@ -123,8 +129,12 @@ router.post('/finalize', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Session not found' });
     }
 
+    // Get user ID from request (set by auth middleware)
+    const userId = req.user?.userId;
+
     // Compute judgements for each question
     const judgements: Judgement[] = [];
+    let questionsCaptured = 0;
 
     for (const questionId of session.questionIds) {
       const question = await getQuestionById(questionId);
@@ -136,12 +146,29 @@ router.post('/finalize', async (req: Request, res: Response) => {
 
       // A hit is when trueValue is within [lower, upper] inclusive
       const hit = Score.inBounds(answer.lower, answer.upper, question.trueValue);
+      if (hit) questionsCaptured++;
 
       // Calculate individual score using the scoring algorithm
       const individualScore = Score.calculateScore(answer.lower, answer.upper, question.trueValue);
 
-      // Record this score for community statistics
+      // Record this score for community statistics (in-memory)
       recordQuestionScore(questionId, individualScore);
+
+      // Persist to database if user is authenticated
+      if (userId) {
+        try {
+          await recordUserResponse(userId, questionId, {
+            lowerBound: answer.lower,
+            upperBound: answer.upper,
+            score: individualScore,
+            captured: hit,
+            answerValueAtResponse: question.trueValue,
+          });
+        } catch (dbError) {
+          console.error('Failed to persist user response:', dbError);
+          // Continue even if persistence fails
+        }
+      }
 
       // Get community stats for this question
       const communityStats = getQuestionStats(questionId);
@@ -164,13 +191,42 @@ router.post('/finalize', async (req: Request, res: Response) => {
     // Calculate total score
     const score = Score.calculateTotalScore(judgements.map(j => j.score));
 
-    // Add to leaderboard
+    // Add to leaderboard (in-memory)
     addToLeaderboard(sessionId, score);
+
+    // Update user stats and get daily stats if user is authenticated
+    let dailyStats = undefined;
+    let performanceHistory = undefined;
+
+    if (userId) {
+      try {
+        // Update aggregate user stats
+        await updateUserStatsAfterSession(userId, {
+          sessionScore: score,
+          questionsCaptured,
+          questionsAnswered: judgements.length,
+        });
+
+        // Fetch daily stats and performance history
+        const [daily, history] = await Promise.all([
+          getDailyStats(userId),
+          getPerformanceHistory(userId, 7),
+        ]);
+
+        dailyStats = daily;
+        performanceHistory = history;
+      } catch (statsError) {
+        console.error('Failed to update/fetch user stats:', statsError);
+        // Continue even if stats fail
+      }
+    }
 
     const response: FinalizeSessionResponse = {
       judgements,
       score,
       totalQuestions: judgements.length,
+      dailyStats,
+      performanceHistory,
     };
 
     res.json(response);

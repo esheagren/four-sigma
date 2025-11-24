@@ -18,6 +18,14 @@ interface Judgement {
   };
 }
 
+interface PerformanceHistoryEntry {
+  date: string;
+  day: string;
+  userScore: number;
+  avgScore: number;
+  calibration: number;
+}
+
 interface ResultsProps {
   judgements: Judgement[];
   score: number;
@@ -27,6 +35,7 @@ interface ResultsProps {
   averageScore?: number;
   dailyAverageScore?: number;
   calibration?: number;
+  performanceHistory?: PerformanceHistoryEntry[];
 }
 
 // Counter animation component
@@ -69,7 +78,8 @@ export function Results({
   topScoreGlobal,
   averageScore,
   dailyAverageScore,
-  calibration
+  calibration,
+  performanceHistory
 }: ResultsProps) {
   // Calculate interval metrics for visual display
   const getIntervalMetrics = (lower: number, upper: number, trueValue: number, hit: boolean) => {
@@ -99,6 +109,7 @@ export function Results({
         averageScore={averageScore}
         dailyAverageScore={dailyAverageScore}
         calibration={calibration}
+        performanceHistory={performanceHistory}
       />
 
       <div className="judgements-list">

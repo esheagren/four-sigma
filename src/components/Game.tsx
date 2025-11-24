@@ -27,10 +27,29 @@ interface Judgement {
   };
 }
 
+interface DailyStats {
+  dailyRank: number | null;
+  topScoreToday: number | null;
+  todaysAverage: number | null;
+  userScoreToday: number | null;
+  calibrationToday: number | null;
+  totalParticipantsToday: number;
+}
+
+interface PerformanceHistoryEntry {
+  date: string;
+  day: string;
+  userScore: number;
+  avgScore: number;
+  calibration: number;
+}
+
 interface FinalizeResponse {
   judgements: Judgement[];
   score: number;
   totalQuestions: number;
+  dailyStats?: DailyStats;
+  performanceHistory?: PerformanceHistoryEntry[];
 }
 
 export function Game() {
@@ -161,12 +180,29 @@ export function Game() {
   }
 
   if (results) {
+    // Extract daily stats from response
+    const dailyStats = results.dailyStats;
+    const performanceHistory = results.performanceHistory;
+
+    // Calculate calibration from this session's judgements
+    const sessionCalibration = results.judgements.length > 0
+      ? (results.judgements.filter(j => j.hit).length / results.judgements.length) * 100
+      : undefined;
+
+    // Use today's calibration from dailyStats if available, otherwise use session calibration
+    const calibration = dailyStats?.calibrationToday ?? sessionCalibration;
+
     return (
       <div className="game-container">
         <Results
           judgements={results.judgements}
           score={results.score}
           onRestart={startSession}
+          dailyRank={dailyStats?.dailyRank ?? undefined}
+          topScoreGlobal={dailyStats?.topScoreToday ?? undefined}
+          dailyAverageScore={dailyStats?.todaysAverage ?? undefined}
+          calibration={calibration}
+          performanceHistory={performanceHistory}
         />
       </div>
     );

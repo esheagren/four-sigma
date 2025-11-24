@@ -93,10 +93,29 @@ export interface FinalizeSessionRequest {
   sessionId: string;
 }
 
+export interface DailyStats {
+  dailyRank: number | null;
+  topScoreToday: number | null;
+  todaysAverage: number | null;
+  userScoreToday: number | null;
+  calibrationToday: number | null;
+  totalParticipantsToday: number;
+}
+
+export interface PerformanceHistoryEntry {
+  date: string;
+  day: string;
+  userScore: number;
+  avgScore: number;
+  calibration: number;
+}
+
 export interface FinalizeSessionResponse {
   judgements: Judgement[];
   score: number;
   totalQuestions: number;
+  dailyStats?: DailyStats;
+  performanceHistory?: PerformanceHistoryEntry[];
 }
 
 
