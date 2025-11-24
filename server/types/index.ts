@@ -1,4 +1,42 @@
 // Core data types
+
+// User types
+export interface User {
+  id: string;
+  deviceId: string | null;
+  authId: string | null;
+  email: string | null;
+  displayName: string;
+  isAnonymous: boolean;
+  createdAt: Date;
+  lastPlayedAt: Date | null;
+  timezone: string;
+  totalScore: number;
+  averageScore: number;
+  weeklyScore: number;
+  gamesPlayed: number;
+  questionsCaptured: number;
+  calibrationRate: number;
+  currentStreak: number;
+  bestStreak: number;
+  bestSingleScore: number;
+}
+
+export interface AuthUser {
+  userId: string;
+  authId: string | null;
+  isAnonymous: boolean;
+}
+
+// Extend Express Request type
+declare global {
+  namespace Express {
+    interface Request {
+      user?: AuthUser;
+    }
+  }
+}
+
 export interface Question {
   id: string;
   prompt: string;

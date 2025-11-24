@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { QuestionCard } from './QuestionCard';
 import { Results } from './Results';
+import { getDeviceId } from '../lib/device';
+import { useAuth } from '../context/AuthContext';
 
 interface Question {
   id: string;
@@ -32,6 +34,7 @@ interface FinalizeResponse {
 }
 
 export function Game() {
+  const { authToken } = useAuth();
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -39,18 +42,28 @@ export function Game() {
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<FinalizeResponse | null>(null);
 
+  // Helper to get auth headers
+  const getHeaders = (): HeadersInit => {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      'X-Device-Id': getDeviceId(),
+    };
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
+    }
+    return headers;
+  };
+
   const startSession = async () => {
     setIsLoading(true);
     setError(null);
     setResults(null);
     setCurrentQuestionIndex(0);
-    
+
     try {
       const response = await fetch('/api/session/start', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getHeaders(),
       });
       
       if (!response.ok) {
@@ -77,9 +90,7 @@ export function Game() {
     try {
       const response = await fetch('/api/session/answer', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getHeaders(),
         body: JSON.stringify({
           sessionId,
           questionId: questions[currentQuestionIndex].id,
@@ -113,9 +124,7 @@ export function Game() {
     try {
       const response = await fetch('/api/session/finalize', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getHeaders(),
         body: JSON.stringify({ sessionId }),
       });
 

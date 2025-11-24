@@ -9,14 +9,18 @@
     "dev:server": "tsx watch server/server.ts",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "import-questions": "tsx scripts/seed/import-questions.ts",
+    "db:migrate": "echo 'Run the SQL file in Supabase dashboard: scripts/migrations/001_initial_schema.sql'"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.47.10",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

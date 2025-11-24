@@ -11,13 +11,32 @@ interface QuestionCardProps {
   onSubmit: (lower: number, upper: number) => void;
 }
 
+// Format number with commas (e.g., 1000000 -> "1,000,000")
+function formatWithCommas(value: string): string {
+  // Remove existing commas and non-numeric chars except decimal and minus
+  const cleaned = value.replace(/[^0-9.-]/g, '');
+  if (cleaned === '' || cleaned === '-') return cleaned;
+
+  // Split by decimal point
+  const parts = cleaned.split('.');
+  // Format the integer part with commas
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+  return parts.join('.');
+}
+
+// Parse formatted string back to number (e.g., "1,000,000" -> 1000000)
+function parseFormattedNumber(value: string): number {
+  return parseFloat(value.replace(/,/g, ''));
+}
+
 export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
   const [lower, setLower] = useState<string>('');
   const [upper, setUpper] = useState<string>('');
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
-  const lowerNum = parseFloat(lower);
-  const upperNum = parseFloat(upper);
+  const lowerNum = parseFormattedNumber(lower);
+  const upperNum = parseFormattedNumber(upper);
 
   const isLowerValid = lower !== '' && !isNaN(lowerNum);
   const isUpperValid = upper !== '' && !isNaN(upperNum);
@@ -51,9 +70,10 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
           <div className="input-group">
             <input
               id="lower-bound"
-              type="number"
+              type="text"
+              inputMode="decimal"
               value={lower}
-              onChange={(e) => setLower(e.target.value)}
+              onChange={(e) => setLower(formatWithCommas(e.target.value))}
               placeholder="0"
               className="bound-input"
             />
@@ -64,9 +84,10 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
           <div className="input-group">
             <input
               id="upper-bound"
-              type="number"
+              type="text"
+              inputMode="decimal"
               value={upper}
-              onChange={(e) => setUpper(e.target.value)}
+              onChange={(e) => setUpper(formatWithCommas(e.target.value))}
               placeholder="0"
               className="bound-input"
             />

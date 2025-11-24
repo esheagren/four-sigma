@@ -1,28 +1,56 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { HowToPlayModal } from './HowToPlayModal';
+import { AuthModal } from './AuthModal';
+import { useAuth } from '../context/AuthContext';
 
 export function Nav() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { user, isAnonymous, isLoading } = useAuth();
+  const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   return (
     <>
       <nav className="navbar">
         <div className="navbar-container">
           <div className="navbar-brand">
-            <button
-              className="brand-name-button"
-              onClick={() => setIsModalOpen(true)}
-              aria-label="How to play"
-            >
+            <Link to="/" className="brand-name-button">
               4-σ
+            </Link>
+          </div>
+          <div className="navbar-actions">
+            <button
+              className="nav-button how-to-play-button"
+              onClick={() => setIsHowToPlayOpen(true)}
+            >
+              How to Play
             </button>
+            {!isLoading && (
+              isAnonymous ? (
+                <button
+                  className="nav-button sign-in-button"
+                  onClick={() => setIsAuthModalOpen(true)}
+                >
+                  Sign In
+                </button>
+              ) : (
+                <Link to="/profile" className="nav-button profile-link">
+                  {user?.displayName || 'Profile'}
+                </Link>
+              )
+            )}
           </div>
         </div>
       </nav>
 
       <HowToPlayModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isHowToPlayOpen}
+        onClose={() => setIsHowToPlayOpen(false)}
+      />
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
     </>
   );
