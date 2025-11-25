@@ -52,13 +52,9 @@ export function StatisticsModal({ isOpen, onClose }: StatisticsModalProps) {
 
   const stats = [
     { label: 'Games Played', value: user?.gamesPlayed ?? 0 },
-    { label: 'Total Score', value: (user?.totalScore ?? 0).toLocaleString() },
     { label: 'Average Score', value: Math.round(user?.averageScore ?? 0).toLocaleString() },
     { label: 'Best Score', value: (user?.bestSingleScore ?? 0).toLocaleString() },
-    { label: 'Current Streak', value: user?.currentStreak ?? 0 },
-    { label: 'Best Streak', value: user?.bestStreak ?? 0 },
     { label: 'Calibration Rate', value: `${Math.round((user?.calibrationRate ?? 0) * 100)}%` },
-    { label: 'Questions Captured', value: user?.questionsCaptured ?? 0 },
   ];
 
   return (

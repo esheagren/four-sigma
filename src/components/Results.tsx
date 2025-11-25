@@ -304,44 +304,42 @@ export function Results({
                     {judgement.upper.toLocaleString()}
                   </div>
                 </div>
+                {/* Answer positioned below the line at its true position */}
+                {judgement.sourceUrl ? (
+                  <a
+                    href={judgement.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="judgement-answer-below"
+                    style={{ left: `${trueValuePercent}%` }}
+                    title="Click to view source"
+                  >
+                    <span className="judgement-answer-value">{judgement.trueValue.toLocaleString()}</span>
+                    {judgement.unit && <span className="judgement-answer-unit">{judgement.unit}</span>}
+                  </a>
+                ) : (
+                  <div
+                    className="judgement-answer-below"
+                    style={{ left: `${trueValuePercent}%` }}
+                  >
+                    <span className="judgement-answer-value">{judgement.trueValue.toLocaleString()}</span>
+                    {judgement.unit && <span className="judgement-answer-unit">{judgement.unit}</span>}
+                  </div>
+                )}
               </div>
 
-              {judgement.sourceUrl ? (
-                <a
-                  href={judgement.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="judgement-guess-display judgement-answer-link"
-                  title="Click to view source"
-                >
-                  <span className="judgement-guess-value">{judgement.trueValue.toLocaleString()}</span>
-                  {judgement.unit && <div className="judgement-unit">Unit: {judgement.unit}</div>}
-                </a>
-              ) : (
-                <div className="judgement-guess-display">
-                  <span className="judgement-guess-value">{judgement.trueValue.toLocaleString()}</span>
-                  {judgement.unit && <div className="judgement-unit">Unit: {judgement.unit}</div>}
-                </div>
-              )}
-            </div>
-
-            {/* Score display in bottom right */}
-            <div className={`judgement-score-display-bottom ${judgement.hit ? 'score-hit' : 'score-miss'}`}>
-              <div className="judgement-score-value">
-                <AnimatedScore finalScore={Math.round(judgement.score)} delay={0} />
-              </div>
-              <div className="judgement-score-label">
-                points
+              {/* Points centered below */}
+              <div className={`judgement-points-center ${judgement.hit ? 'score-hit' : 'score-miss'}`}>
+                <span className="judgement-points-value">
+                  <AnimatedScore finalScore={Math.round(judgement.score)} delay={0} />
+                </span>
+                <span className="judgement-points-label">pts</span>
               </div>
             </div>
           </div>
         );
       })}
       </div>
-
-      <button onClick={onRestart} className="explore-button">
-        Explore More Questions
-      </button>
     </div>
   );
 }
