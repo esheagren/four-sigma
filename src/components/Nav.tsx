@@ -4,6 +4,7 @@ import { HowToPlayModal } from './HowToPlayModal';
 import { AuthModal } from './AuthModal';
 import { StatisticsModal } from './StatisticsModal';
 import { SettingsModal } from './SettingsModal';
+import { FeedbackModal } from './FeedbackModal';
 import { useAuth } from '../context/AuthContext';
 
 // Icon components
@@ -46,12 +47,21 @@ function SettingsIcon() {
   );
 }
 
+function MessageIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+
 export function Nav() {
   const { isAnonymous, isLoading } = useAuth();
   const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isStatisticsOpen, setIsStatisticsOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
   return (
     <>
@@ -75,6 +85,14 @@ export function Nav() {
             )}
             <button
               className="nav-button nav-icon-button"
+              onClick={() => setIsHowToPlayOpen(true)}
+              aria-label="How to Play"
+              title="How to Play"
+            >
+              <HelpCircleIcon />
+            </button>
+            <button
+              className="nav-button nav-icon-button"
               onClick={() => setIsStatisticsOpen(true)}
               aria-label="Statistics"
               title="Statistics"
@@ -83,11 +101,11 @@ export function Nav() {
             </button>
             <button
               className="nav-button nav-icon-button"
-              onClick={() => setIsHowToPlayOpen(true)}
-              aria-label="How to Play"
-              title="How to Play"
+              onClick={() => setIsFeedbackOpen(true)}
+              aria-label="Send Feedback"
+              title="Send Feedback"
             >
-              <HelpCircleIcon />
+              <MessageIcon />
             </button>
             <button
               className="nav-button nav-icon-button"
@@ -119,6 +137,11 @@ export function Nav() {
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+      />
+
+      <FeedbackModal
+        isOpen={isFeedbackOpen}
+        onClose={() => setIsFeedbackOpen(false)}
       />
     </>
   );

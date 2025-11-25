@@ -4,6 +4,7 @@ import cors from 'cors';
 import sessionRoutes from './routes/session.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
+import feedbackRoutes from './routes/feedback.routes.js';
 import { attachUser } from './middleware/auth.js';
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(attachUser);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/session', sessionRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

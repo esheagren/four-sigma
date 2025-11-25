@@ -118,4 +118,12 @@ export interface FinalizeSessionResponse {
   performanceHistory?: PerformanceHistoryEntry[];
 }
 
-
+// Feedback types
+export interface Feedback {
+  id: string;
+  userId: string | null;
+  feedbackText: string;
+  createdAt: Date;
+  userAgent: string | null;
+  pageUrl: string | null;
+}
