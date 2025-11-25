@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getAuthUser } from './_lib/auth';
-import { createFeedback } from './_lib/feedback';
+import { getAuthUser } from './_lib/auth.js';
+import { createFeedback } from './_lib/feedback.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');

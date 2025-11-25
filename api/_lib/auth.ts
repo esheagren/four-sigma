@@ -1,6 +1,6 @@
 import type { VercelRequest } from '@vercel/node';
-import { supabase } from './supabase';
-import { AuthUser, User } from './types';
+import { supabase } from './supabase.js';
+import { AuthUser, User } from './types.js';
 
 // Helper to convert database row to User type
 export function rowToUser(row: any): User {

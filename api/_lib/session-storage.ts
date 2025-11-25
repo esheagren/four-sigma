@@ -1,5 +1,5 @@
-import { supabase } from './supabase';
-import { Answer } from './types';
+import { supabase } from './supabase.js';
+import { Answer } from './types.js';
 
 /**
  * Generate a unique session ID

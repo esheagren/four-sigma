@@ -3,6 +3,10 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/:path*" }
+    { "source": "/api/auth/:path*", "destination": "/api/auth" },
+    { "source": "/api/session/:path*", "destination": "/api/session" },
+    { "source": "/api/user/:path*", "destination": "/api/user" },
+    { "source": "/api/feedback", "destination": "/api/feedback" },
+    { "source": "/api/health", "destination": "/api/health" }
   ]
 }

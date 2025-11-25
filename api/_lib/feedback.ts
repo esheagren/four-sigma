@@ -1,5 +1,5 @@
-import { supabase } from './supabase';
-import { Feedback } from './types';
+import { supabase } from './supabase.js';
+import { Feedback } from './types.js';
 
 // Helper to convert database row to Feedback type
 function rowToFeedback(row: any): Feedback {

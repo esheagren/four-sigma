@@ -1,5 +1,5 @@
-import { Question } from './types';
-import { supabase } from './supabase';
+import { Question } from './types.js';
+import { supabase } from './supabase.js';
 
 /**
  * Get a question by ID from Supabase

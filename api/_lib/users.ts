@@ -1,6 +1,6 @@
-import { supabase } from './supabase';
-import { User } from './types';
-import { rowToUser, getUserById } from './auth';
+import { supabase } from './supabase.js';
+import { User } from './types.js';
+import { rowToUser, getUserById } from './auth.js';
 
 /**
  * Get or create an anonymous user by device ID
