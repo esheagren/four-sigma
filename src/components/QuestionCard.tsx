@@ -43,6 +43,15 @@ function parseFormattedNumber(value: string): number {
   return parseFloat(value.replace(/,/g, ''));
 }
 
+// Get dynamic font size based on value length
+function getInputFontSize(value: string): string | undefined {
+  const len = value.length;
+  if (len <= 6) return undefined; // Use default CSS
+  if (len <= 8) return '1.1rem';
+  if (len <= 10) return '0.95rem';
+  return '0.8rem';
+}
+
 export const QuestionCard = forwardRef<QuestionCardRef, QuestionCardProps>(
   function QuestionCard({ question, onSubmit, onFocusChange, showNumpad = false }, ref) {
   const [lower, setLower] = useState<string>('');
@@ -157,6 +166,7 @@ export const QuestionCard = forwardRef<QuestionCardRef, QuestionCardProps>(
                 onFocus={() => handleFocus('lower')}
                 placeholder="0"
                 className={`bound-input ${focusedInput === 'lower' && showNumpad ? 'input-focused' : ''}`}
+                style={{ fontSize: getInputFontSize(lower) }}
               />
             </div>
 
@@ -172,6 +182,7 @@ export const QuestionCard = forwardRef<QuestionCardRef, QuestionCardProps>(
                 onFocus={() => handleFocus('upper')}
                 placeholder="0"
                 className={`bound-input ${focusedInput === 'upper' && showNumpad ? 'input-focused' : ''}`}
+                style={{ fontSize: getInputFontSize(upper) }}
               />
             </div>
 
@@ -190,6 +201,7 @@ export const QuestionCard = forwardRef<QuestionCardRef, QuestionCardProps>(
                 onFocus={() => handleFocus('lower')}
                 placeholder="0"
                 className={`bound-input ${focusedInput === 'lower' && showNumpad ? 'input-focused' : ''}`}
+                style={{ fontSize: getInputFontSize(lower) }}
               />
             </div>
 
@@ -206,6 +218,7 @@ export const QuestionCard = forwardRef<QuestionCardRef, QuestionCardProps>(
                 onFocus={() => handleFocus('upper')}
                 placeholder="0"
                 className={`bound-input ${focusedInput === 'upper' && showNumpad ? 'input-focused' : ''}`}
+                style={{ fontSize: getInputFontSize(upper) }}
               />
             </div>
           </div>
