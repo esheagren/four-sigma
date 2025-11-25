@@ -40,12 +40,17 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
 
   const isLowerValid = lower !== '' && !isNaN(lowerNum);
   const isUpperValid = upper !== '' && !isNaN(upperNum);
-  const isRangeValid = isLowerValid && isUpperValid && lowerNum <= upperNum;
-  const isSubmitDisabled = !isRangeValid;
+  const areBothInputsValid = isLowerValid && isUpperValid;
+  const isRangeValid = areBothInputsValid && lowerNum <= upperNum;
+  const isSubmitDisabled = !areBothInputsValid;
 
   const handleSubmit = () => {
     setHasAttemptedSubmit(true);
-    if (!isSubmitDisabled) {
+    if (areBothInputsValid && lowerNum > upperNum) {
+      // Show error but don't submit
+      return;
+    }
+    if (isRangeValid) {
       onSubmit(lowerNum, upperNum);
       setLower('');
       setUpper('');
@@ -66,36 +71,64 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
           )}
         </div>
 
-        <div className="inputs-container">
-          <div className="input-group">
-            <input
-              id="lower-bound"
-              type="text"
-              inputMode="decimal"
-              value={lower}
-              onChange={(e) => setLower(formatWithCommas(e.target.value))}
-              placeholder="0"
-              className="bound-input"
-            />
+        {hasAttemptedSubmit && areBothInputsValid && lowerNum > upperNum ? (
+          <div className="inputs-container-with-error">
+            <div className="input-group">
+              <label htmlFor="lower-bound" className="bound-label">Lower bound</label>
+              <input
+                id="lower-bound"
+                type="text"
+                inputMode="decimal"
+                value={lower}
+                onChange={(e) => setLower(formatWithCommas(e.target.value))}
+                placeholder="0"
+                className="bound-input"
+              />
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="upper-bound" className="bound-label">Upper bound</label>
+              <input
+                id="upper-bound"
+                type="text"
+                inputMode="decimal"
+                value={upper}
+                onChange={(e) => setUpper(formatWithCommas(e.target.value))}
+                placeholder="0"
+                className="bound-input"
+              />
+            </div>
+
+            <p className="validation-error">Lower bound must be ≤ upper bound</p>
           </div>
+        ) : (
+          <div className="inputs-container">
+            <div className="input-group">
+              <input
+                id="lower-bound"
+                type="text"
+                inputMode="decimal"
+                value={lower}
+                onChange={(e) => setLower(formatWithCommas(e.target.value))}
+                placeholder="0"
+                className="bound-input"
+              />
+            </div>
 
-          <div className="input-separator">–</div>
+            <div className="input-separator">–</div>
 
-          <div className="input-group">
-            <input
-              id="upper-bound"
-              type="text"
-              inputMode="decimal"
-              value={upper}
-              onChange={(e) => setUpper(formatWithCommas(e.target.value))}
-              placeholder="0"
-              className="bound-input"
-            />
+            <div className="input-group">
+              <input
+                id="upper-bound"
+                type="text"
+                inputMode="decimal"
+                value={upper}
+                onChange={(e) => setUpper(formatWithCommas(e.target.value))}
+                placeholder="0"
+                className="bound-input"
+              />
+            </div>
           </div>
-        </div>
-
-        {hasAttemptedSubmit && isLowerValid && isUpperValid && lowerNum > upperNum && (
-          <p className="validation-error">Lower bound must be ≤ upper bound</p>
         )}
       </div>
 
