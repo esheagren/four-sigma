@@ -111,11 +111,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser({
           ...data.user,
           email: null,
-          averageScore: 0,
-          bestStreak: 0,
-          questionsCaptured: 0,
-          bestSingleScore: 0,
-          createdAt: new Date().toISOString(),
         });
       }
     } catch (err) {
