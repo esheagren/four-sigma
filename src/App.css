@@ -49,10 +49,12 @@ body {
 
 /* Navigation Bar */
 .navbar {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   z-index: 100;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
   width: 100%;
   /* iOS safe area support */
@@ -79,7 +81,7 @@ body {
 .nav-button {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.8);
   background: none;
   border: none;
   cursor: pointer;
@@ -90,8 +92,8 @@ body {
 }
 
 .nav-button:hover {
-  background: var(--background);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 1);
 }
 
 .sign-in-button {
@@ -125,7 +127,7 @@ body {
 .brand-name-button {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: rgba(255, 255, 255, 0.95);
   letter-spacing: -0.02em;
   background: none;
   border: none;
@@ -137,7 +139,7 @@ body {
 }
 
 .brand-name-button:hover {
-  background: var(--background);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .navbar-links {
@@ -2218,12 +2220,21 @@ body {
   margin-bottom: 1rem;
 }
 
-.scoring-header-row {
+.scoring-column-headers {
+  display: grid;
+  grid-template-columns: 3rem 1fr 4rem;
+  gap: 0.75rem;
   margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
 }
 
-.scoring-header-row .scoring-range-score {
-  font-size: 0.875rem;
+.scoring-column-headers span:first-child {
+  text-align: center;
+}
+
+.scoring-column-headers span:last-child {
   text-align: center;
 }
 

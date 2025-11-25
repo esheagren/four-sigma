@@ -10,7 +10,7 @@
   will-change: transform;
 }
 
-/* Ensure smooth rendering */
+/* Very dark purple background matching canvas top */
 body {
-  background: #f6f9fc;
+  background: #05000a;
 }
