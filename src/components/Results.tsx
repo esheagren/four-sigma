@@ -184,10 +184,7 @@ export function Results({
       <DailyScoreCard
         totalScore={score}
         dailyRank={dailyRank}
-        topScoreGlobal={topScoreGlobal}
-        dailyAverageScore={dailyAverageScore}
         calibration={calibration}
-        performanceHistory={performanceHistory}
         onShare={handleShare}
         isSharing={isSharing}
       />

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { AuthModal } from '../components/AuthModal';
+import { PerformanceChart } from '../components/PerformanceChart';
 
 export function ProfilePage() {
   const { user, isAnonymous, logout, isLoading } = useAuth();
@@ -161,6 +162,11 @@ export function ProfilePage() {
             <div className="stat-label">Best Streak</div>
           </div>
         </div>
+      </div>
+
+      <div className="profile-performance">
+        <h2>7-Day Performance</h2>
+        <PerformanceChart />
       </div>
 
       <AuthModal
