@@ -46,11 +46,12 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
     { lower: 2000, upper: 15000, label: 'Very wide range', color: '#ff6b6b' },
     { lower: 5000, upper: 12000, label: 'Medium range', color: '#ffa500' },
     { lower: 8700, upper: 9000, label: 'Narrow range', color: '#4ecdc4' },
-    { lower: 9500, upper: 12000, label: 'Miss (too high)', color: '#df1b41' },
   ];
+  const missExample = { lower: 9500, upper: 12000, label: 'Miss (too high)', color: '#df1b41' };
+  const wideExample = { lower: 1, upper: 100000000, trueValue: 30, color: '#9ca3af' };
 
   const scaleMin = 0;
-  const scaleMax = 50000;
+  const scaleMax = 20000;
   const scaleRange = scaleMax - scaleMin;
 
   const examplesWithScores = examples.map(ex => ({
@@ -59,6 +60,19 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
     width: ((ex.upper - ex.lower) / scaleRange) * 100,
     offset: ((ex.lower - scaleMin) / scaleRange) * 100,
   }));
+
+  const missWithScore = {
+    ...missExample,
+    score: Math.round(calculateScore(missExample.lower, missExample.upper, trueValue)),
+    width: ((missExample.upper - missExample.lower) / scaleRange) * 100,
+    offset: ((missExample.lower - scaleMin) / scaleRange) * 100,
+  };
+  const trueValuePercent = ((trueValue - scaleMin) / scaleRange) * 100;
+
+  const wideWithScore = {
+    ...wideExample,
+    score: Math.round(calculateScore(wideExample.lower, wideExample.upper, wideExample.trueValue) * 10) / 10,
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -120,12 +134,10 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                     </div>
 
                     <div className="scoring-ranges">
-                      <div className="scoring-range-row scoring-header-row">
-                        <div className="scoring-range-label-left">Guesses</div>
-                        <div className="scoring-range-visualization"></div>
-                        <div className="scoring-range-score" style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>
-                          Points
-                        </div>
+                      <div className="scoring-column-headers">
+                        <span>Guesses</span>
+                        <span></span>
+                        <span>Points</span>
                       </div>
                       {examplesWithScores.map((ex, i) => {
                         const lowerPercent = ex.offset;
@@ -202,9 +214,133 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                   </div>
                 </div>
 
-                <p className="modal-intro" style={{ marginTop: '1.5rem', fontWeight: 600 }}>
+                <p className="modal-intro" style={{ marginTop: '1.5rem' }}>
                   However, if the true answer is outside the bound you gave, you will get no points for that question.
                 </p>
+
+                <div className="scoring-visual" style={{ marginTop: '1rem' }}>
+                  <div className="scoring-scale">
+                    <div className="scoring-ranges">
+                      <div className="scoring-range-row">
+                        <div className="scoring-range-label-left">4</div>
+                        <div className="scoring-range-visualization">
+                          <div className="scoring-range-line" />
+                          <div
+                            className="scoring-range-span"
+                            style={{
+                              left: `${missWithScore.offset}%`,
+                              width: `${missWithScore.width}%`,
+                              background: missWithScore.color,
+                            }}
+                          />
+                          <div
+                            className="scoring-true-answer-marker"
+                            style={{ left: `${trueValuePercent}%` }}
+                          >
+                            <div className="scoring-true-answer-dot" />
+                          </div>
+                          <div
+                            className="scoring-range-bound scoring-range-bound-lower"
+                            style={{ left: `${missWithScore.offset}%` }}
+                          >
+                            <div
+                              className="scoring-range-bound-dot"
+                              style={{ background: missWithScore.color }}
+                            />
+                            <div
+                              className="scoring-range-bound-label"
+                              style={{ background: missWithScore.color }}
+                            >
+                              {missWithScore.lower.toLocaleString()}
+                            </div>
+                          </div>
+                          <div
+                            className="scoring-range-bound scoring-range-bound-upper"
+                            style={{ left: `${missWithScore.offset + missWithScore.width}%` }}
+                          >
+                            <div
+                              className="scoring-range-bound-dot"
+                              style={{ background: missWithScore.color }}
+                            />
+                            <div
+                              className="scoring-range-bound-label"
+                              style={{ background: missWithScore.color }}
+                            >
+                              {missWithScore.upper.toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="scoring-range-score" style={{ color: missWithScore.color }}>
+                          {missWithScore.score}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="modal-intro" style={{ marginTop: '1.5rem' }}>
+                  As an interval becomes increasingly large relative to the answer, your score will approach zero.
+                </p>
+
+                <div className="scoring-visual" style={{ marginTop: '1rem' }}>
+                  <div className="scoring-scale">
+                    <div className="scoring-ranges">
+                      <div className="scoring-range-row">
+                        <div className="scoring-range-label-left">5</div>
+                        <div className="scoring-range-visualization">
+                          <div className="scoring-range-line" />
+                          <div
+                            className="scoring-range-span"
+                            style={{
+                              left: '0%',
+                              width: '100%',
+                              background: wideWithScore.color,
+                            }}
+                          />
+                          <div
+                            className="scoring-true-answer-marker"
+                            style={{ left: `${((wideWithScore.trueValue - wideWithScore.lower) / (wideWithScore.upper - wideWithScore.lower)) * 100}%` }}
+                          >
+                            <div className="scoring-true-answer-dot" />
+                          </div>
+                          <div
+                            className="scoring-range-bound scoring-range-bound-lower"
+                            style={{ left: '0%' }}
+                          >
+                            <div
+                              className="scoring-range-bound-dot"
+                              style={{ background: wideWithScore.color }}
+                            />
+                            <div
+                              className="scoring-range-bound-label"
+                              style={{ background: wideWithScore.color }}
+                            >
+                              {wideWithScore.lower.toLocaleString()}
+                            </div>
+                          </div>
+                          <div
+                            className="scoring-range-bound scoring-range-bound-upper"
+                            style={{ left: '100%' }}
+                          >
+                            <div
+                              className="scoring-range-bound-dot"
+                              style={{ background: wideWithScore.color }}
+                            />
+                            <div
+                              className="scoring-range-bound-label"
+                              style={{ background: wideWithScore.color }}
+                            >
+                              {wideWithScore.upper.toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="scoring-range-score" style={{ color: wideWithScore.color }}>
+                          {wideWithScore.score}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </>
         </div>
