@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react'
+import { useAnimation } from '../context/AnimationContext'
 import './BackgroundAnimation.css'
 
 interface GradientBlob {
   x: number
   y: number
   baseY: number // Starting Y position (bottom of screen)
+  baseX: number // Original X position for reset after explosion
   floatOffset: number // How far up the blob floats
   radius: number
   hue: number
@@ -14,11 +16,49 @@ interface GradientBlob {
   speed: number
 }
 
+interface AnimationParams {
+  speedMultiplier: number
+  saturationBoost: number
+  lightnessBoost: number
+  alphaBoost: number
+  convergenceStrength: number
+  explosionStrength: number
+}
+
 export function BackgroundAnimation() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const blobsRef = useRef<GradientBlob[]>([])
   const animationFrameRef = useRef<number>()
   const timeRef = useRef(0)
+
+  // Animation context for dynamic control
+  const { intensity, convergenceProgress } = useAnimation()
+
+  // Mutable params ref to avoid re-renders during animation
+  const paramsRef = useRef<AnimationParams>({
+    speedMultiplier: 1,
+    saturationBoost: 0,
+    lightnessBoost: 0,
+    alphaBoost: 0,
+    convergenceStrength: 0,
+    explosionStrength: 0,
+  })
+
+  // Update animation params when context values change
+  useEffect(() => {
+    paramsRef.current = {
+      speedMultiplier: 1 + intensity * 2.5,          // 1x -> 3.5x
+      saturationBoost: intensity * 35,               // 0 -> 35%
+      lightnessBoost: intensity * 15,                // 0 -> 15%
+      alphaBoost: intensity * 0.3,                   // 0 -> 0.3
+      convergenceStrength: convergenceProgress < 0.7
+        ? convergenceProgress / 0.7
+        : 0,
+      explosionStrength: convergenceProgress > 0.7
+        ? (convergenceProgress - 0.7) / 0.3
+        : 0,
+    }
+  }, [intensity, convergenceProgress])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -49,8 +89,10 @@ export function BackgroundAnimation() {
         let hue = hueRange.min + Math.random() * (hueRange.max - hueRange.min + (hueRange.max < hueRange.min ? 360 : 0))
         if (hue >= 360) hue -= 360
 
+        const x = Math.random() * canvas.width
         blobs.push({
-          x: Math.random() * canvas.width,
+          x,
+          baseX: x, // Store original position for reset
           baseY: canvas.height + 50 + Math.random() * 150, // Start below screen
           y: canvas.height + 50 + Math.random() * 150,
           floatOffset: 100 + Math.random() * 250, // How high they float up
@@ -78,7 +120,10 @@ export function BackgroundAnimation() {
 
     // Animation loop - dark top with warm pastel glow rising from bottom
     const animate = () => {
-      timeRef.current += 1
+      const params = paramsRef.current
+
+      // Apply speed multiplier to time
+      timeRef.current += 1 * params.speedMultiplier
 
       // Dark gradient - very dark purple at top, color only at very bottom
       const baseGradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
@@ -93,30 +138,54 @@ export function BackgroundAnimation() {
       // Apply blur for smooth, dreamy blending
       ctx.filter = 'blur(120px)'
 
+      // Center point for convergence/explosion
+      const centerX = canvas.width / 2
+      const centerY = canvas.height / 2
+
       // Update and draw blobs rising from bottom
       blobsRef.current.forEach((blob, index) => {
         const time = timeRef.current * blob.speed + blob.phase
 
-        // More dynamic floating motion - varied frequencies per blob
-        const floatY = Math.sin(time * 1.2) * blob.floatOffset * 0.4 +
-                       Math.sin(time * 0.7 + index) * 30
-        const floatX = Math.sin(time * 0.8 + blob.phase) * 60 +
-                       Math.cos(time * 0.5 + index * 0.5) * 40
+        // Check if we're in convergence or explosion mode
+        const isConverging = params.convergenceStrength > 0
+        const isExploding = params.explosionStrength > 0
 
-        // Dynamic shimmer/wobble effect
-        const shimmerX = (Math.random() - 0.5) * 4
-        const shimmerY = (Math.random() - 0.5) * 4
+        if (isConverging) {
+          // Pull blobs toward center
+          const dx = centerX - blob.x
+          const dy = centerY - blob.y
+          blob.x += dx * params.convergenceStrength * 0.08
+          blob.y += dy * params.convergenceStrength * 0.08
+        } else if (isExploding) {
+          // Push blobs outward from center
+          const dx = blob.x - centerX
+          const dy = blob.y - centerY
+          const dist = Math.sqrt(dx * dx + dy * dy) || 1
+          blob.x += (dx / dist) * params.explosionStrength * 35
+          blob.y += (dy / dist) * params.explosionStrength * 35
+        } else {
+          // Normal floating motion
+          const floatY = Math.sin(time * 1.2) * blob.floatOffset * 0.4 +
+                         Math.sin(time * 0.7 + index) * 30
+          const floatX = Math.sin(time * 0.8 + blob.phase) * 60 +
+                         Math.cos(time * 0.5 + index * 0.5) * 40
 
-        // Position blob - anchored at bottom, more active float
-        blob.y = blob.baseY - blob.floatOffset + floatY + shimmerY
-        blob.x += shimmerX * 0.5 + floatX * 0.002
+          // Dynamic shimmer/wobble effect
+          const shimmerX = (Math.random() - 0.5) * 4
+          const shimmerY = (Math.random() - 0.5) * 4
 
-        // Keep blob within horizontal bounds
-        if (blob.x < -blob.radius) blob.x = canvas.width + blob.radius
-        if (blob.x > canvas.width + blob.radius) blob.x = -blob.radius
+          // Position blob - anchored at bottom, more active float
+          blob.y = blob.baseY - blob.floatOffset + floatY + shimmerY
+          blob.x += shimmerX * 0.5 + floatX * 0.002
 
-        // More noticeable pulsing for lifelike feel
-        const pulse = 1 + Math.sin(time * 1.5) * 0.12 + Math.sin(time * 2.3 + index) * 0.08
+          // Keep blob within horizontal bounds
+          if (blob.x < -blob.radius) blob.x = canvas.width + blob.radius
+          if (blob.x > canvas.width + blob.radius) blob.x = -blob.radius
+        }
+
+        // More noticeable pulsing for lifelike feel (amplified during intensity)
+        const pulseAmplitude = 0.12 + params.alphaBoost * 0.15
+        const pulse = 1 + Math.sin(time * 1.5) * pulseAmplitude + Math.sin(time * 2.3 + index) * 0.08
         const currentRadius = blob.radius * pulse
 
         // Create radial gradient for blob
@@ -129,12 +198,16 @@ export function BackgroundAnimation() {
           currentRadius
         )
 
-        // Soft pastel glow effect
-        const alpha = 0.4 + Math.sin(time * 0.5) * 0.1
-        gradient.addColorStop(0, `hsla(${blob.hue}, ${blob.saturation}%, ${blob.lightness}%, ${alpha})`)
-        gradient.addColorStop(0.3, `hsla(${blob.hue}, ${blob.saturation - 5}%, ${blob.lightness}%, ${alpha * 0.8})`)
-        gradient.addColorStop(0.6, `hsla(${blob.hue}, ${blob.saturation - 10}%, ${blob.lightness - 5}%, ${alpha * 0.4})`)
-        gradient.addColorStop(1, `hsla(${blob.hue}, ${blob.saturation - 15}%, ${blob.lightness - 10}%, 0)`)
+        // Apply boosted color values
+        const boostedSaturation = Math.min(blob.saturation + params.saturationBoost, 100)
+        const boostedLightness = Math.min(blob.lightness + params.lightnessBoost, 85)
+        const baseAlpha = 0.4 + Math.sin(time * 0.5) * 0.1
+        const boostedAlpha = Math.min(baseAlpha + params.alphaBoost, 0.9)
+
+        gradient.addColorStop(0, `hsla(${blob.hue}, ${boostedSaturation}%, ${boostedLightness}%, ${boostedAlpha})`)
+        gradient.addColorStop(0.3, `hsla(${blob.hue}, ${boostedSaturation - 5}%, ${boostedLightness}%, ${boostedAlpha * 0.8})`)
+        gradient.addColorStop(0.6, `hsla(${blob.hue}, ${boostedSaturation - 10}%, ${boostedLightness - 5}%, ${boostedAlpha * 0.4})`)
+        gradient.addColorStop(1, `hsla(${blob.hue}, ${boostedSaturation - 15}%, ${boostedLightness - 10}%, 0)`)
 
         ctx.fillStyle = gradient
         ctx.beginPath()

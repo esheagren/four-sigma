@@ -96,6 +96,28 @@ body {
   color: rgba(255, 255, 255, 1);
 }
 
+.how-to-play-button {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.how-to-play-button:hover {
+  border-color: rgba(255, 255, 255, 1);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.how-to-play-button:focus {
+  outline: none;
+}
+
 .sign-in-button {
   background: var(--primary);
   color: white;
@@ -189,6 +211,12 @@ body {
   min-height: 0;
 }
 
+/* When showing results, allow scroll and align to top */
+.game-container:has(.results-wrapper) {
+  justify-content: flex-start;
+  overflow-y: auto;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -197,6 +225,41 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Question Card Fade Out Animation */
+.question-card-wrapper {
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+.question-card-wrapper.fading-out {
+  opacity: 0;
+  transform: scale(0.95) translateY(-10px);
+  pointer-events: none;
+}
+
+.question-card-wrapper.fading-out .submit-button {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* Results Reveal Animation */
+.results-wrapper {
+  opacity: 1;
+  width: 100%;
+}
+
+.results-wrapper.revealing {
+  animation: resultsReveal 400ms ease-out forwards;
+}
+
+@keyframes resultsReveal {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
 
@@ -238,12 +301,12 @@ body {
 .unit-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.625rem;
+  gap: 0.5rem;
   background: var(--background);
-  padding: 0.625rem 1.25rem;
-  border-radius: 8px;
+  padding: 0.4rem 0.875rem;
+  border-radius: 6px;
   border: 1px solid var(--border);
-  font-size: 1rem;
+  font-size: 0.8125rem;
 }
 
 .unit-label {
@@ -1525,17 +1588,23 @@ body {
   }
 
   .question-prompt {
-    font-size: 1.25rem;
+    font-size: 1.375rem;
+    margin-bottom: 0.75rem;
   }
 
   .inputs-container {
     flex-direction: column;
     align-items: stretch;
+    gap: 0;
   }
 
   .input-separator {
     text-align: center;
-    padding: 0.5rem 0;
+    padding: 0.25rem 0;
+  }
+
+  .input-group {
+    margin-bottom: 0;
   }
 
   /* Daily Score Card Mobile */
@@ -1875,10 +1944,10 @@ body {
   max-width: 800px;
   width: 92%;
   max-height: 85vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   animation: slideUp 0.3s ease-out;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
 }
 
 .modal-content::-webkit-scrollbar {
@@ -1916,6 +1985,44 @@ body {
   margin: 0;
 }
 
+.modal-header-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.modal-header-horizontal .modal-title {
+  margin: 0;
+  font-size: 2.5rem;
+}
+
+.modal-subtitle-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.modal-close-button {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 1.75rem;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.modal-close-button:hover {
+  color: var(--text-primary);
+  background: var(--background);
+}
+
 .modal-tabs {
   display: flex;
   gap: 0;
@@ -1951,6 +2058,14 @@ body {
 
 .modal-body {
   padding: 3rem 3.5rem;
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.modal-body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .modal-intro {
@@ -2117,7 +2232,7 @@ body {
 .scoring-visual {
   background: var(--background);
   border-radius: 8px;
-  padding: 2rem 1rem;
+  padding: 2rem 1rem 2rem 2.5rem;
   margin: 1.5rem 0 2rem;
 }
 
@@ -2220,11 +2335,15 @@ body {
   margin-bottom: 1rem;
 }
 
+.scoring-range-row-no-label {
+  grid-template-columns: 1fr 4rem;
+}
+
 .scoring-column-headers {
   display: grid;
   grid-template-columns: 3rem 1fr 4rem;
   gap: 0.75rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: -1rem;
   font-weight: 600;
   font-size: 0.875rem;
   color: var(--text-secondary);
@@ -2236,6 +2355,10 @@ body {
 
 .scoring-column-headers span:last-child {
   text-align: center;
+}
+
+.scoring-column-headers-no-label {
+  grid-template-columns: 1fr 4rem;
 }
 
 .scoring-range-label-left {
@@ -2401,13 +2524,21 @@ body {
 
   /* Scoring visualization */
   .scoring-visual {
-    padding: 1.25rem 0.75rem;
+    padding: 1.25rem 0.75rem 1.25rem 2rem;
   }
 
   .scoring-range-row {
     grid-template-columns: 2rem 1fr 3.5rem;
     gap: 0.5rem;
     margin-bottom: 1.5rem;
+  }
+
+  .scoring-range-row-no-label {
+    grid-template-columns: 1fr 3.5rem;
+  }
+
+  .scoring-column-headers-no-label {
+    grid-template-columns: 1fr 3.5rem;
   }
 
   .scoring-range-label-left {

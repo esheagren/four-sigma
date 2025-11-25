@@ -79,7 +79,7 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
             />
           </div>
 
-          <div className="input-separator">to</div>
+          <div className="input-separator">–</div>
 
           <div className="input-group">
             <input
@@ -104,7 +104,7 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
         disabled={isSubmitDisabled}
         className="submit-button"
       >
-        Submit answer
+        Submit
       </button>
     </>
   );

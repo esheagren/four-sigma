@@ -77,9 +77,16 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
+        <div className="modal-header modal-header-horizontal">
           <h2 className="modal-title">4-σ</h2>
-          <p className="modal-subtitle">Daily Quant Game | 3 Questions | Answers are 95% Confidence Intervals</p>
+          <div className="modal-subtitle-stack">
+            <span>Daily Quant Game</span>
+            <span>3 Questions</span>
+            <span>95% Confidence Intervals</span>
+          </div>
+          <button className="modal-close-button" onClick={onClose} aria-label="Close">
+            ×
+          </button>
         </div>
 
         <div className="modal-body">
@@ -91,7 +98,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
               <div className="how-to-section">
                 <h3>Answers</h3>
                 <p style={{ fontSize: '1.0625rem', lineHeight: '1.7', color: 'var(--text-secondary)' }}>
-                  Answers are given with two numbers, an Upper Bound and a Lower Bound, such that you are 95% sure the true answer lies somewhere between the bounds you gave.
+                  Answers are given with two numbers, an <strong>Upper Bound</strong> and a <strong>Lower Bound</strong>, such that you are 95% sure the true answer lies somewhere between the bounds you gave.
                 </p>
 
                 <div className="answer-visual">
@@ -119,14 +126,15 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
 
               <div className="how-to-section">
                 <h3>Scoring</h3>
-                <p className="modal-intro">
+                <p className="modal-intro" style={{ marginBottom: '1.5rem' }}>
                   If the upper and lower bound you submit contains the true answer, you will get more points the narrower your range.
                 </p>
 
+                <p className="scoring-example-label" style={{ marginBottom: '0' }}>
+                  Example: Height of Mount Everest (8,849m)
+                </p>
+
                 <div className="scoring-visual">
-                  <p className="scoring-example-label">
-                    Example: Height of Mount Everest (8,849m)
-                  </p>
                   <div className="scoring-scale">
                     {/* Correct answer marker */}
                     <div className="correct-answer-indicator" style={{ left: `${((trueValue - scaleMin) / scaleRange) * 100}%` }}>
@@ -134,8 +142,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                     </div>
 
                     <div className="scoring-ranges">
-                      <div className="scoring-column-headers">
-                        <span>Guesses</span>
+                      <div className="scoring-column-headers scoring-column-headers-no-label">
                         <span></span>
                         <span>Points</span>
                       </div>
@@ -145,10 +152,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                         const trueValuePercent = ((trueValue - scaleMin) / scaleRange) * 100;
 
                         return (
-                          <div key={i} className="scoring-range-row">
-                            <div className="scoring-range-label-left">
-                              {i + 1}
-                            </div>
+                          <div key={i} className="scoring-range-row scoring-range-row-no-label">
                             <div className="scoring-range-visualization">
                               <div className="scoring-range-line" />
 
@@ -221,8 +225,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                 <div className="scoring-visual" style={{ marginTop: '1rem' }}>
                   <div className="scoring-scale">
                     <div className="scoring-ranges">
-                      <div className="scoring-range-row">
-                        <div className="scoring-range-label-left">4</div>
+                      <div className="scoring-range-row scoring-range-row-no-label">
                         <div className="scoring-range-visualization">
                           <div className="scoring-range-line" />
                           <div
@@ -285,8 +288,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                 <div className="scoring-visual" style={{ marginTop: '1rem' }}>
                   <div className="scoring-scale">
                     <div className="scoring-ranges">
-                      <div className="scoring-range-row">
-                        <div className="scoring-range-label-left">5</div>
+                      <div className="scoring-range-row scoring-range-row-no-label">
                         <div className="scoring-range-visualization">
                           <div className="scoring-range-line" />
                           <div

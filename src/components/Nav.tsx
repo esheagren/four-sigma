@@ -22,8 +22,9 @@ export function Nav() {
             <button
               className="nav-button how-to-play-button"
               onClick={() => setIsHowToPlayOpen(true)}
+              aria-label="How to Play"
             >
-              How to Play
+              ?
             </button>
             {!isLoading && (
               isAnonymous ? (
