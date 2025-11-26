@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { NumPad } from './NumPad';
 
 interface Question {
   id: string;
@@ -10,6 +11,8 @@ interface QuestionCardProps {
   question: Question;
   onSubmit: (lower: number, upper: number) => void;
 }
+
+type ActiveField = 'lower' | 'upper';
 
 // Format number with commas (e.g., 1000000 -> "1,000,000")
 function formatWithCommas(value: string): string {
@@ -43,6 +46,7 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
   const [lower, setLower] = useState<string>('');
   const [upper, setUpper] = useState<string>('');
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
+  const [activeField, setActiveField] = useState<ActiveField>('lower');
 
   const lowerNum = parseFormattedNumber(lower);
   const upperNum = parseFormattedNumber(upper);
@@ -64,8 +68,58 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
       setLower('');
       setUpper('');
       setHasAttemptedSubmit(false);
+      setActiveField('lower');
     }
   };
+
+  // Handle numpad input
+  const handleNumPadInput = useCallback((digit: string) => {
+    const setValue = activeField === 'lower' ? setLower : setUpper;
+    const currentValue = activeField === 'lower' ? lower : upper;
+
+    // Handle multiplier shortcuts
+    if (digit === 'K' || digit === 'M' || digit === 'B') {
+      const cleanedValue = currentValue.replace(/,/g, '');
+      const numValue = parseFloat(cleanedValue) || 0;
+      let multiplier = 1;
+      if (digit === 'K') multiplier = 1000;
+      if (digit === 'M') multiplier = 1000000;
+      if (digit === 'B') multiplier = 1000000000;
+
+      const newValue = numValue * multiplier;
+      setValue(formatWithCommas(newValue.toString()));
+      return;
+    }
+
+    // Handle decimal point
+    if (digit === '.') {
+      if (currentValue.includes('.')) return; // Already has decimal
+      if (currentValue === '') {
+        setValue('0.');
+        return;
+      }
+    }
+
+    // Append digit
+    const newValue = currentValue.replace(/,/g, '') + digit;
+    setValue(formatWithCommas(newValue));
+  }, [activeField, lower, upper]);
+
+  // Handle backspace
+  const handleBackspace = useCallback(() => {
+    const setValue = activeField === 'lower' ? setLower : setUpper;
+    const currentValue = activeField === 'lower' ? lower : upper;
+
+    const cleanedValue = currentValue.replace(/,/g, '');
+    const newValue = cleanedValue.slice(0, -1);
+    setValue(formatWithCommas(newValue));
+  }, [activeField, lower, upper]);
+
+  // Handle clear
+  const handleClear = useCallback(() => {
+    const setValue = activeField === 'lower' ? setLower : setUpper;
+    setValue('');
+  }, [activeField]);
 
   return (
     <>
@@ -80,70 +134,46 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
           )}
         </div>
 
-        {hasAttemptedSubmit && areBothInputsValid && lowerNum > upperNum ? (
-          <div className="inputs-container-with-error">
-            <div className="input-group">
-              <label htmlFor="lower-bound" className="bound-label">Lower bound</label>
-              <input
-                id="lower-bound"
-                type="text"
-                inputMode="decimal"
-                value={lower}
-                onChange={(e) => setLower(formatWithCommas(e.target.value))}
-                placeholder="0"
-                className="bound-input"
-                style={{ fontSize: getInputFontSize(lower) }}
-              />
-            </div>
-
-            <div className="input-group">
-              <label htmlFor="upper-bound" className="bound-label">Upper bound</label>
-              <input
-                id="upper-bound"
-                type="text"
-                inputMode="decimal"
-                value={upper}
-                onChange={(e) => setUpper(formatWithCommas(e.target.value))}
-                placeholder="0"
-                className="bound-input"
-                style={{ fontSize: getInputFontSize(upper) }}
-              />
-            </div>
-
-            <p className="validation-error">Lower bound must be ≤ upper bound</p>
+        <div className="inputs-container">
+          <div className="input-group">
+            <input
+              id="lower-bound"
+              type="text"
+              readOnly
+              value={lower}
+              onClick={() => setActiveField('lower')}
+              placeholder="0"
+              className={`bound-input ${activeField === 'lower' ? 'bound-input-active' : ''}`}
+              style={{ fontSize: getInputFontSize(lower) }}
+            />
           </div>
-        ) : (
-          <div className="inputs-container">
-            <div className="input-group">
-              <input
-                id="lower-bound"
-                type="text"
-                inputMode="decimal"
-                value={lower}
-                onChange={(e) => setLower(formatWithCommas(e.target.value))}
-                placeholder="0"
-                className="bound-input"
-                style={{ fontSize: getInputFontSize(lower) }}
-              />
-            </div>
 
-            <div className="input-separator">–</div>
+          <div className="input-separator">–</div>
 
-            <div className="input-group">
-              <input
-                id="upper-bound"
-                type="text"
-                inputMode="decimal"
-                value={upper}
-                onChange={(e) => setUpper(formatWithCommas(e.target.value))}
-                placeholder="0"
-                className="bound-input"
-                style={{ fontSize: getInputFontSize(upper) }}
-              />
-            </div>
+          <div className="input-group">
+            <input
+              id="upper-bound"
+              type="text"
+              readOnly
+              value={upper}
+              onClick={() => setActiveField('upper')}
+              placeholder="0"
+              className={`bound-input ${activeField === 'upper' ? 'bound-input-active' : ''}`}
+              style={{ fontSize: getInputFontSize(upper) }}
+            />
           </div>
+        </div>
+
+        {hasAttemptedSubmit && areBothInputsValid && lowerNum > upperNum && (
+          <p className="validation-error">Lower bound must be ≤ upper bound</p>
         )}
       </div>
+
+      <NumPad
+        onInput={handleNumPadInput}
+        onBackspace={handleBackspace}
+        onClear={handleClear}
+      />
 
       <button
         onClick={handleSubmit}

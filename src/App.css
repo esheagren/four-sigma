@@ -4788,3 +4788,118 @@ a.judgement-answer-below:hover .judgement-answer-value {
     height: 20px;
   }
 }
+
+/* NumPad Styles */
+.numpad {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--surface);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  margin-top: 1rem;
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.numpad-row {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.numpad-key {
+  flex: 1;
+  min-width: 60px;
+  height: 52px;
+  font-size: 1.25rem;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.numpad-key:hover {
+  background: var(--background);
+  border-color: var(--text-tertiary);
+}
+
+.numpad-key:active {
+  background: var(--border);
+  transform: scale(0.96);
+}
+
+.numpad-key-action {
+  background: rgba(99, 91, 255, 0.08);
+  color: var(--primary);
+  border-color: rgba(99, 91, 255, 0.2);
+  font-weight: 600;
+}
+
+.numpad-key-action:hover {
+  background: rgba(99, 91, 255, 0.15);
+  border-color: rgba(99, 91, 255, 0.3);
+}
+
+.numpad-key-action:active {
+  background: rgba(99, 91, 255, 0.25);
+}
+
+.numpad-key-clear {
+  background: rgba(223, 27, 65, 0.08);
+  color: var(--error);
+  border-color: rgba(223, 27, 65, 0.2);
+  font-weight: 600;
+}
+
+.numpad-key-clear:hover {
+  background: rgba(223, 27, 65, 0.15);
+  border-color: rgba(223, 27, 65, 0.3);
+}
+
+.numpad-key-clear:active {
+  background: rgba(223, 27, 65, 0.25);
+}
+
+.numpad-key svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Active input indicator */
+.bound-input-active {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.15) !important;
+}
+
+/* Mobile responsiveness for NumPad */
+@media (max-width: 480px) {
+  .numpad {
+    padding: 0.75rem;
+    gap: 0.375rem;
+    max-width: 100%;
+    border-radius: 12px 12px 0 0;
+    margin-top: 0.75rem;
+  }
+
+  .numpad-row {
+    gap: 0.375rem;
+  }
+
+  .numpad-key {
+    min-width: 50px;
+    height: 48px;
+    font-size: 1.125rem;
+    border-radius: 6px;
+  }
+}
