@@ -1795,7 +1795,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   /* Fix question card at top to prevent keyboard shifting */
   .question-card-wrapper {
     position: fixed;
-    top: 70px;
+    top: 90px;
     left: 0;
     right: 0;
     padding: 0 1rem;
