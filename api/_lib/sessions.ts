@@ -306,8 +306,8 @@ export async function getCrowdDataForQuestion(
     return null;
   }
 
-  // Need at least 5 responses to show meaningful crowd data
-  if (!data || data.length < 5) {
+  // Need at least 1 response to show crowd data
+  if (!data || data.length < 1) {
     return null;
   }
 
