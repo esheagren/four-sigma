@@ -3,6 +3,7 @@ import { ShareScoreCard, type ShareScoreCardRef } from './ShareScoreCard';
 import { ResultCard } from './results/ResultCard';
 import { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useAnalytics } from '../context/PostHogContext';
 
 interface CrowdGuess {
   min: number;

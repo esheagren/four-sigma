@@ -170,8 +170,58 @@ export function NumPad({
   }
 
   if (isCalculatorMode) {
+    // Desktop horizontal calculator layout
+    if (!isTouch) {
+      return (
+        <div className="desktop-calc-container">
+          <div className="desktop-calc">
+            <button className="desktop-calc-back" onClick={handleExitCalculator}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5"></path>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+            </button>
+            <div className="desktop-calc-display">
+              <span className="desktop-calc-result">{formatNumber(calcResult)}</span>
+            </div>
+            <button className="desktop-calc-paste" onClick={handleUseResult}>Paste</button>
+            <div className="desktop-calc-keys">
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('7')}>7</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('8')}>8</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('9')}>9</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('4')}>4</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('5')}>5</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('6')}>6</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('1')}>1</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('2')}>2</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('3')}>3</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('0')}>0</button>
+              <button className="desktop-calc-key" onClick={handleCalcDecimal}>.</button>
+              <button className="desktop-calc-key desktop-calc-backspace" onClick={handleCalcBackspace}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+                  <line x1="18" y1="9" x2="12" y2="15"></line>
+                  <line x1="12" y1="9" x2="18" y2="15"></line>
+                </svg>
+              </button>
+            </div>
+            <div className="desktop-calc-ops">
+              <button className="desktop-calc-op" onClick={() => handleCalcOperator('+')}>+</button>
+              <button className="desktop-calc-op" onClick={() => handleCalcOperator('−')}>−</button>
+              <button className="desktop-calc-op" onClick={() => handleCalcOperator('×')}>×</button>
+              <button className="desktop-calc-op" onClick={() => handleCalcOperator('÷')}>÷</button>
+              <button className="desktop-calc-op" onClick={() => handleCalcOperator('^')}>^</button>
+              <button className="desktop-calc-op" onClick={() => handleCalcOperator('√')}>√</button>
+            </div>
+            <button className="desktop-calc-clear" onClick={handleCalcClear}>C</button>
+          </div>
+        </div>
+      );
+    }
+
+    // Mobile vertical calculator layout
     return (
-      <div className={isTouch ? "numpad-container" : "numpad-container numpad-container-desktop"}>
+      <div className="numpad-container">
         <div className="numpad numpad-calculator">
           <button className="calc-back-btn" onClick={handleExitCalculator}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

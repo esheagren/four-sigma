@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { QuestionCard } from './QuestionCard';
 import { Results } from './Results';
 import { LoadingOrb } from './LoadingOrb';
 import { getDeviceId } from '../lib/device';
 import { useAuth } from '../context/AuthContext';
 import { useAnimation } from '../context/AnimationContext';
+import { useAnalytics } from '../context/PostHogContext';
 
 interface Question {
   id: string;
@@ -57,17 +58,23 @@ interface FinalizeResponse {
 export function Game() {
   const { authToken } = useAuth();
   const { animationPhase, triggerRevealAnimation } = useAnimation();
+  const { capture } = useAnalytics();
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<FinalizeResponse | null>(null);
+  const [isFinalizingSession, setIsFinalizingSession] = useState(false);
+
+  // Track response time for each question
+  const questionStartTime = useRef<number>(Date.now());
 
   // Compute render states based on animation phase
   const isFadingOut = animationPhase === 'fadeOut';
   const isRevealing = animationPhase === 'reveal';
-  const showQuestionCard = !results && (animationPhase === 'idle' || isFadingOut);
+  // Hide question card once we start finalizing (prevents flicker if API is slower than animation)
+  const showQuestionCard = !results && !isFinalizingSession && (animationPhase === 'idle' || isFadingOut);
   const showOrb = ['showOrb', 'burst'].includes(animationPhase);
   const isBursting = animationPhase === 'burst';
   const showResults = results && ['reveal', 'idle'].includes(animationPhase);
@@ -95,16 +102,29 @@ export function Game() {
         method: 'POST',
         headers: getHeaders(),
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to start session');
       }
-      
+
       const data = await response.json();
       setSessionId(data.sessionId);
       setQuestions(data.questions);
+
+      // Track session start
+      capture('game_session_started', {
+        sessionId: data.sessionId,
+        questionCount: data.questions.length,
+      });
+
+      // Reset timer for first question
+      questionStartTime.current = Date.now();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
+      capture('game_error', {
+        error: 'session_start_failed',
+        errorMessage: err instanceof Error ? err.message : 'Unknown error',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -114,8 +134,24 @@ export function Game() {
     startSession();
   }, []);
 
+  // Track question views when index changes
+  useEffect(() => {
+    if (sessionId && questions[currentQuestionIndex]) {
+      capture('question_viewed', {
+        sessionId,
+        questionId: questions[currentQuestionIndex].id,
+        questionIndex: currentQuestionIndex,
+        totalQuestions: questions.length,
+      });
+      // Reset timer for new question
+      questionStartTime.current = Date.now();
+    }
+  }, [currentQuestionIndex, sessionId, questions.length]);
+
   const handleSubmitAnswer = async (lower: number, upper: number) => {
     if (!sessionId || !questions[currentQuestionIndex]) return;
+
+    const responseTimeMs = Date.now() - questionStartTime.current;
 
     try {
       const response = await fetch('/api/session/answer', {
@@ -135,11 +171,25 @@ export function Game() {
         throw new Error(errorData.error || 'Failed to submit answer');
       }
 
+      // Track answer submission
+      capture('answer_submitted', {
+        sessionId,
+        questionId: questions[currentQuestionIndex].id,
+        questionIndex: currentQuestionIndex,
+        lowerBound: lower,
+        upperBound: upper,
+        intervalWidth: upper - lower,
+        responseTimeMs,
+        isLastQuestion: currentQuestionIndex === questions.length - 1,
+      });
+
       // Move to next question or finalize
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
       } else {
         // FINAL QUESTION - trigger dramatic reveal animation
+        // Set flag immediately to prevent question from reappearing during transition
+        setIsFinalizingSession(true);
         // Run animation and API call in parallel, wait for both
         await Promise.all([
           triggerRevealAnimation(),
@@ -149,6 +199,11 @@ export function Game() {
     } catch (err) {
       console.error('Submit answer exception:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
+      capture('game_error', {
+        error: 'answer_submit_failed',
+        sessionId,
+        questionIndex: currentQuestionIndex,
+      });
     }
   };
 
@@ -166,10 +221,32 @@ export function Game() {
         throw new Error('Failed to finalize session');
       }
 
-      const data = await response.json();
+      const data: FinalizeResponse = await response.json();
       setResults(data);
+
+      // Track session completion with rich context
+      const hits = data.judgements.filter((j: Judgement) => j.hit).length;
+      const calibration = data.judgements.length > 0
+        ? (hits / data.judgements.length) * 100
+        : 0;
+
+      capture('game_session_completed', {
+        sessionId,
+        totalScore: data.score,
+        hits,
+        misses: data.totalQuestions - hits,
+        totalQuestions: data.totalQuestions,
+        calibration,
+        dailyRank: data.dailyStats?.dailyRank ?? null,
+        topScoreToday: data.dailyStats?.topScoreToday ?? null,
+        totalParticipantsToday: data.dailyStats?.totalParticipantsToday ?? null,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
+      capture('game_error', {
+        error: 'finalize_failed',
+        sessionId,
+      });
     }
   };
 
