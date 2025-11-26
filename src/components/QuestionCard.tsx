@@ -57,7 +57,7 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
   const isRangeValid = areBothInputsValid && lowerNum <= upperNum;
   const isSubmitDisabled = !areBothInputsValid;
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     setHasAttemptedSubmit(true);
     if (areBothInputsValid && lowerNum > upperNum) {
       // Show error but don't submit
@@ -70,26 +70,12 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
       setHasAttemptedSubmit(false);
       setActiveField('lower');
     }
-  };
+  }, [areBothInputsValid, isRangeValid, lowerNum, upperNum, onSubmit]);
 
   // Handle numpad input
   const handleNumPadInput = useCallback((digit: string) => {
     const setValue = activeField === 'lower' ? setLower : setUpper;
     const currentValue = activeField === 'lower' ? lower : upper;
-
-    // Handle multiplier shortcuts
-    if (digit === 'K' || digit === 'M' || digit === 'B') {
-      const cleanedValue = currentValue.replace(/,/g, '');
-      const numValue = parseFloat(cleanedValue) || 0;
-      let multiplier = 1;
-      if (digit === 'K') multiplier = 1000;
-      if (digit === 'M') multiplier = 1000000;
-      if (digit === 'B') multiplier = 1000000000;
-
-      const newValue = numValue * multiplier;
-      setValue(formatWithCommas(newValue.toString()));
-      return;
-    }
 
     // Handle decimal point
     if (digit === '.') {
@@ -115,11 +101,10 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
     setValue(formatWithCommas(newValue));
   }, [activeField, lower, upper]);
 
-  // Handle clear
-  const handleClear = useCallback(() => {
-    const setValue = activeField === 'lower' ? setLower : setUpper;
-    setValue('');
-  }, [activeField]);
+  // Toggle between lower and upper field
+  const handleToggleField = useCallback(() => {
+    setActiveField(prev => prev === 'lower' ? 'upper' : 'lower');
+  }, []);
 
   return (
     <>
@@ -170,18 +155,13 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
       </div>
 
       <NumPad
+        activeField={activeField}
         onInput={handleNumPadInput}
         onBackspace={handleBackspace}
-        onClear={handleClear}
+        onToggleField={handleToggleField}
+        onSubmit={handleSubmit}
+        isSubmitDisabled={isSubmitDisabled}
       />
-
-      <button
-        onClick={handleSubmit}
-        disabled={isSubmitDisabled}
-        className="submit-button"
-      >
-        Submit
-      </button>
     </>
   );
 }
