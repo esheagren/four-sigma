@@ -1,3 +1,4 @@
+// NumPad component with liquid glass design
 interface NumPadProps {
   activeField: 'lower' | 'upper';
   onInput: (digit: string) => void;
