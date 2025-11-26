@@ -1792,6 +1792,20 @@ a.judgement-answer-below:hover .judgement-answer-value {
 }
 
 @media (max-width: 640px) {
+  /* Fix question card at top to prevent keyboard shifting */
+  .question-card-wrapper {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    padding: 0 1rem;
+    z-index: 10;
+  }
+
+  .game-container {
+    overflow: hidden;
+  }
+
   .question-card {
     padding: 1rem 1.25rem;
   }
