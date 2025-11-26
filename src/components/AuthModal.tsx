@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useAnalytics } from '../context/PostHogContext';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -10,12 +11,24 @@ type AuthMode = 'login' | 'signup';
 
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const { login, signup } = useAuth();
+  const { capture } = useAnalytics();
   const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const hasTrackedOpen = useRef(false);
+
+  // Track modal open (only once per open)
+  useEffect(() => {
+    if (isOpen && !hasTrackedOpen.current) {
+      capture('auth_modal_opened', { initialMode: mode });
+      hasTrackedOpen.current = true;
+    } else if (!isOpen) {
+      hasTrackedOpen.current = false;
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -28,6 +41,13 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
       let result;
       if (mode === 'login') {
         result = await login(email, password);
+        if (result.success) {
+          capture('auth_login_completed');
+          handleClose();
+        } else {
+          capture('auth_login_failed', { error: result.error });
+          setError(result.error || 'Login failed');
+        }
       } else {
         if (!displayName.trim()) {
           setError('Display name is required');
@@ -35,14 +55,19 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           return;
         }
         result = await signup(email, password, displayName);
-      }
-
-      if (result.success) {
-        handleClose();
-      } else {
-        setError(result.error || 'An error occurred');
+        if (result.success) {
+          capture('auth_signup_completed', {
+            method: 'email',
+            displayNameLength: displayName.length,
+          });
+          handleClose();
+        } else {
+          capture('auth_signup_failed', { error: result.error });
+          setError(result.error || 'Signup failed');
+        }
       }
     } catch (err) {
+      capture('auth_error', { mode, error: 'unexpected_exception' });
       setError('An unexpected error occurred');
     } finally {
       setIsSubmitting(false);
@@ -59,8 +84,10 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   };
 
   const toggleMode = () => {
-    setMode(mode === 'login' ? 'signup' : 'login');
+    const newMode = mode === 'login' ? 'signup' : 'login';
+    setMode(newMode);
     setError(null);
+    capture('auth_mode_toggled', { newMode });
   };
 
   return (

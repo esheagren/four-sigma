@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useAnalytics } from '../context/PostHogContext';
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -8,10 +9,22 @@ interface FeedbackModalProps {
 
 export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   const { authToken } = useAuth();
+  const { capture } = useAnalytics();
   const [feedbackText, setFeedbackText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const hasTrackedOpen = useRef(false);
+
+  // Track modal open (only once per open)
+  useEffect(() => {
+    if (isOpen && !hasTrackedOpen.current) {
+      capture('feedback_modal_opened');
+      hasTrackedOpen.current = true;
+    } else if (!isOpen) {
+      hasTrackedOpen.current = false;
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -50,10 +63,17 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
         throw new Error(data.error || 'Failed to submit feedback');
       }
 
+      capture('feedback_submitted', {
+        feedbackLength: trimmedFeedback.length,
+      });
+
       setSubmitSuccess(true);
       setFeedbackText('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to submit feedback');
+      capture('feedback_submit_failed', {
+        error: err instanceof Error ? err.message : 'Unknown error',
+      });
     } finally {
       setIsSubmitting(false);
     }

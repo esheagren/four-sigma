@@ -1,15 +1,30 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useAnalytics } from '../context/PostHogContext';
 import { AuthModal } from '../components/AuthModal';
 import { PerformanceChart } from '../components/PerformanceChart';
 
 export function ProfilePage() {
   const { user, isAnonymous, logout, isLoading } = useAuth();
+  const { capture } = useAnalytics();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editDisplayName, setEditDisplayName] = useState('');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const settingsRef = useRef<HTMLDivElement>(null);
+  const hasTrackedView = useRef(false);
+
+  // Track profile page view (once per mount when user is loaded)
+  useEffect(() => {
+    if (!isLoading && user && !hasTrackedView.current) {
+      capture('profile_viewed', {
+        isAnonymous,
+        gamesPlayed: user.gamesPlayed,
+        totalScore: user.totalScore,
+      });
+      hasTrackedView.current = true;
+    }
+  }, [isLoading, user, isAnonymous]);
 
   // Close settings dropdown when clicking outside
   useEffect(() => {
@@ -109,6 +124,7 @@ export function ProfilePage() {
                 <button
                   className="settings-dropdown-item settings-logout"
                   onClick={() => {
+                    capture('auth_logout');
                     logout();
                     setIsSettingsOpen(false);
                   }}

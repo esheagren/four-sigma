@@ -70,6 +70,7 @@ export function Results({
   totalParticipants
 }: ResultsProps) {
   const { user } = useAuth();
+  const { capture } = useAnalytics();
   const shareCardRef = useRef<ShareScoreCardRef>(null);
   const [isSharing, setIsSharing] = useState(false);
   const [shareSuccess, setShareSuccess] = useState(false);
@@ -94,6 +95,8 @@ export function Results({
         throw new Error('Failed to generate image');
       }
 
+      let shareMethod = 'unknown';
+
       // Try to use Web Share API first (works on mobile and some desktop browsers)
       if (navigator.share && navigator.canShare) {
         const file = new File([blob], '4sigma-score.png', { type: 'image/png' });
@@ -101,7 +104,17 @@ export function Results({
 
         if (navigator.canShare(shareData)) {
           await navigator.share(shareData);
+          shareMethod = 'native_share';
           setShareSuccess(true);
+
+          capture('score_shared', {
+            score,
+            shareMethod,
+            hits,
+            total,
+            calibration,
+            percentile,
+          });
           return;
         }
       }
@@ -111,6 +124,7 @@ export function Results({
         await navigator.clipboard.write([
           new ClipboardItem({ 'image/png': blob })
         ]);
+        shareMethod = 'clipboard';
         setShareSuccess(true);
       } catch (clipboardError) {
         // Final fallback: Download the image
@@ -122,10 +136,24 @@ export function Results({
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        shareMethod = 'download';
         setShareSuccess(true);
       }
+
+      capture('score_shared', {
+        score,
+        shareMethod,
+        hits,
+        total,
+        calibration,
+        percentile,
+      });
     } catch (error) {
       console.error('Error sharing:', error);
+      capture('share_failed', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        score,
+      });
     } finally {
       setIsSharing(false);
       // Reset success message after 3 seconds
