@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { NumPad } from './NumPad';
+import { isTouchDevice } from '../lib/device';
 
 interface Question {
   id: string;
@@ -47,6 +48,14 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
   const [upper, setUpper] = useState<string>('');
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   const [activeField, setActiveField] = useState<ActiveField>('lower');
+  const [isTouch, setIsTouch] = useState(true); // Default to touch to avoid flash
+  const lowerInputRef = useRef<HTMLInputElement>(null);
+  const upperInputRef = useRef<HTMLInputElement>(null);
+
+  // Detect device type on mount
+  useEffect(() => {
+    setIsTouch(isTouchDevice());
+  }, []);
 
   const lowerNum = parseFormattedNumber(lower);
   const upperNum = parseFormattedNumber(upper);
@@ -106,6 +115,54 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
     setActiveField(prev => prev === 'lower' ? 'upper' : 'lower');
   }, []);
 
+  // Use calculator result
+  const handleUseCalculatorResult = useCallback((result: string) => {
+    const setValue = activeField === 'lower' ? setLower : setUpper;
+    setValue(formatWithCommas(result));
+  }, [activeField]);
+
+  // Handle direct keyboard input (desktop only)
+  const handleKeyboardInput = useCallback((e: React.ChangeEvent<HTMLInputElement>, field: ActiveField) => {
+    const rawValue = e.target.value;
+    // Only allow numbers, decimal point, and minus sign
+    const cleaned = rawValue.replace(/[^0-9.-]/g, '');
+
+    // Validate the cleaned value
+    if (cleaned === '' || cleaned === '-' || cleaned === '.') {
+      if (field === 'lower') setLower(cleaned);
+      else setUpper(cleaned);
+      return;
+    }
+
+    // Check for valid number format (only one decimal, minus only at start)
+    const parts = cleaned.split('.');
+    if (parts.length > 2) return; // Multiple decimals
+    if (cleaned.indexOf('-') > 0) return; // Minus not at start
+
+    const formatted = formatWithCommas(cleaned);
+    if (field === 'lower') setLower(formatted);
+    else setUpper(formatted);
+  }, []);
+
+  // Handle keyboard shortcuts (Tab to switch fields, Enter to submit)
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !isSubmitDisabled) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  }, [isSubmitDisabled, handleSubmit]);
+
+  // Focus the appropriate input when activeField changes (desktop only)
+  useEffect(() => {
+    if (!isTouch) {
+      if (activeField === 'lower') {
+        lowerInputRef.current?.focus();
+      } else {
+        upperInputRef.current?.focus();
+      }
+    }
+  }, [activeField, isTouch]);
+
   return (
     <>
       <div className="question-card">
@@ -122,11 +179,16 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
         <div className="inputs-container">
           <div className="input-group">
             <input
+              ref={lowerInputRef}
               id="lower-bound"
               type="text"
-              readOnly
+              inputMode={isTouch ? 'none' : 'decimal'}
+              readOnly={isTouch}
               value={lower}
+              onChange={(e) => handleKeyboardInput(e, 'lower')}
+              onFocus={() => setActiveField('lower')}
               onClick={() => setActiveField('lower')}
+              onKeyDown={handleKeyDown}
               placeholder="0"
               className={`bound-input ${activeField === 'lower' ? 'bound-input-active' : ''}`}
               style={{ fontSize: getInputFontSize(lower) }}
@@ -137,11 +199,16 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
 
           <div className="input-group">
             <input
+              ref={upperInputRef}
               id="upper-bound"
               type="text"
-              readOnly
+              inputMode={isTouch ? 'none' : 'decimal'}
+              readOnly={isTouch}
               value={upper}
+              onChange={(e) => handleKeyboardInput(e, 'upper')}
+              onFocus={() => setActiveField('upper')}
               onClick={() => setActiveField('upper')}
+              onKeyDown={handleKeyDown}
               placeholder="0"
               className={`bound-input ${activeField === 'upper' ? 'bound-input-active' : ''}`}
               style={{ fontSize: getInputFontSize(upper) }}
@@ -161,6 +228,8 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
         onToggleField={handleToggleField}
         onSubmit={handleSubmit}
         isSubmitDisabled={isSubmitDisabled}
+        onUseCalculatorResult={handleUseCalculatorResult}
+        isTouch={isTouch}
       />
     </>
   );

@@ -26,3 +26,22 @@ export function clearDeviceId(): void {
 export function hasDeviceId(): boolean {
   return localStorage.getItem(DEVICE_ID_KEY) !== null;
 }
+
+/**
+ * Check if the device is primarily touch-based (mobile/tablet)
+ * Uses multiple heuristics for reliable detection
+ */
+export function isTouchDevice(): boolean {
+  // Check for touch points
+  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+  // Check for coarse pointer (finger) vs fine pointer (mouse)
+  const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+
+  // Check if hover is not available (touch devices don't truly hover)
+  const noHover = window.matchMedia('(hover: none)').matches;
+
+  // A device is considered touch-primary if it has touch AND either coarse pointer or no hover
+  // This correctly identifies tablets and phones while excluding laptops with touchscreens
+  return hasTouch && (hasCoarsePointer || noHover);
+}
