@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 interface Question {
   id: string;
@@ -53,6 +53,14 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
   const isRangeValid = areBothInputsValid && lowerNum <= upperNum;
   const isSubmitDisabled = !areBothInputsValid;
 
+  // Scroll input into view when focused (handles mobile keyboard)
+  const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    // Small delay to let keyboard appear first
+    setTimeout(() => {
+      e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+  }, []);
+
   const handleSubmit = () => {
     setHasAttemptedSubmit(true);
     if (areBothInputsValid && lowerNum > upperNum) {
@@ -90,6 +98,7 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
                 inputMode="decimal"
                 value={lower}
                 onChange={(e) => setLower(formatWithCommas(e.target.value))}
+                onFocus={handleFocus}
                 placeholder="0"
                 className="bound-input"
                 style={{ fontSize: getInputFontSize(lower) }}
@@ -104,6 +113,7 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
                 inputMode="decimal"
                 value={upper}
                 onChange={(e) => setUpper(formatWithCommas(e.target.value))}
+                onFocus={handleFocus}
                 placeholder="0"
                 className="bound-input"
                 style={{ fontSize: getInputFontSize(upper) }}
@@ -121,6 +131,7 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
                 inputMode="decimal"
                 value={lower}
                 onChange={(e) => setLower(formatWithCommas(e.target.value))}
+                onFocus={handleFocus}
                 placeholder="0"
                 className="bound-input"
                 style={{ fontSize: getInputFontSize(lower) }}
@@ -136,6 +147,7 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
                 inputMode="decimal"
                 value={upper}
                 onChange={(e) => setUpper(formatWithCommas(e.target.value))}
+                onFocus={handleFocus}
                 placeholder="0"
                 className="bound-input"
                 style={{ fontSize: getInputFontSize(upper) }}
