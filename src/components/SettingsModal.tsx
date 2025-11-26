@@ -1,28 +1,18 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getUseNumpad, setUseNumpad } from '../lib/preferences';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onNumpadChange?: (enabled: boolean) => void;
 }
 
-export function SettingsModal({ isOpen, onClose, onNumpadChange }: SettingsModalProps) {
+export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { user, isAnonymous, logout, authToken } = useAuth();
   const [displayName, setDisplayName] = useState(user?.displayName ?? '');
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [numpadEnabled, setNumpadEnabled] = useState(() => getUseNumpad());
-
-  const handleNumpadToggle = () => {
-    const newValue = !numpadEnabled;
-    setNumpadEnabled(newValue);
-    setUseNumpad(newValue);
-    onNumpadChange?.(newValue);
-  };
 
   if (!isOpen) return null;
 
@@ -141,24 +131,6 @@ export function SettingsModal({ isOpen, onClose, onNumpadChange }: SettingsModal
                 <span className="settings-value">{user.email}</span>
               </div>
             )}
-          </div>
-
-          <div className="settings-section">
-            <h3 className="settings-section-title">Input</h3>
-            <div className="settings-item settings-toggle-item">
-              <div className="settings-toggle-info">
-                <label className="settings-label">Number Keypad</label>
-                <span className="settings-description">Show on-screen number pad for entering values</span>
-              </div>
-              <button
-                className={`settings-toggle ${numpadEnabled ? 'settings-toggle-on' : ''}`}
-                onClick={handleNumpadToggle}
-                role="switch"
-                aria-checked={numpadEnabled}
-              >
-                <span className="settings-toggle-slider" />
-              </button>
-            </div>
           </div>
 
           {!isAnonymous && (

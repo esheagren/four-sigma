@@ -1826,10 +1826,6 @@ a.judgement-answer-below:hover .judgement-answer-value {
     min-height: 48px;
   }
 
-  .game-container:has(.number-panel) .question-card-wrapper {
-    margin-top: -12vh;
-  }
-
   /* Daily Score Card Mobile */
   .daily-score-card {
     padding: 2rem 1.5rem;
@@ -3855,178 +3851,6 @@ a.judgement-answer-below:hover .judgement-answer-value {
   }
 }
 
-/* Number Panel */
-.number-panel {
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 256px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  padding: 1rem 1.2rem;
-  padding-bottom: max(0.8rem, env(safe-area-inset-bottom));
-  z-index: 50;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-bottom: none;
-  border-radius: 32px 32px 0 0;
-  box-shadow:
-    0 -8px 32px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-}
-
-.number-panel-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.4rem;
-}
-
-.number-panel-button {
-  aspect-ratio: 1.6;
-  font-size: 1rem;
-  font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
-  background: linear-gradient(
-    145deg,
-    rgba(30, 30, 42, 0.8) 0%,
-    rgba(18, 18, 28, 0.88) 50%,
-    rgba(25, 25, 38, 0.84) 100%
-  );
-  color: rgba(255, 255, 255, 0.92);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.25);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.number-panel-button:hover {
-  background: linear-gradient(
-    145deg,
-    rgba(38, 38, 52, 0.82) 0%,
-    rgba(25, 25, 38, 0.9) 50%,
-    rgba(32, 32, 46, 0.86) 100%
-  );
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow:
-    0 6px 20px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.25);
-}
-
-.number-panel-button:active {
-  background: linear-gradient(
-    145deg,
-    rgba(48, 48, 65, 0.85) 0%,
-    rgba(35, 35, 50, 0.92) 50%,
-    rgba(42, 42, 58, 0.88) 100%
-  );
-  transform: scale(0.95);
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 2px 4px rgba(0, 0, 0, 0.25);
-}
-
-.number-panel-backspace {
-  font-size: 0.875rem;
-}
-
-.number-panel-actions {
-  grid-column: 1 / -1;
-  display: flex;
-  gap: 0.3rem;
-  margin-top: 0.3rem;
-}
-
-.number-panel-toggle {
-  flex: 1;
-  aspect-ratio: auto;
-  padding: 0.5rem;
-  font-size: 0.75rem;
-}
-
-.number-panel-toggle:active {
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.3) 0%,
-    rgba(255, 255, 255, 0.2) 50%,
-    rgba(255, 255, 255, 0.25) 100%
-  );
-}
-
-.number-panel-submit {
-  flex: 1;
-  aspect-ratio: auto;
-  padding: 0.5rem;
-  background: linear-gradient(
-    145deg,
-    rgba(99, 91, 255, 0.8) 0%,
-    rgba(99, 91, 255, 0.6) 50%,
-    rgba(99, 91, 255, 0.7) 100%
-  );
-  font-size: 0.75rem;
-  border: 1px solid rgba(140, 130, 255, 0.4);
-  box-shadow:
-    0 4px 16px rgba(99, 91, 255, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-}
-
-.number-panel-submit:hover {
-  background: linear-gradient(
-    145deg,
-    rgba(99, 91, 255, 0.9) 0%,
-    rgba(99, 91, 255, 0.7) 50%,
-    rgba(99, 91, 255, 0.8) 100%
-  );
-  border-color: rgba(140, 130, 255, 0.5);
-  box-shadow:
-    0 6px 20px rgba(99, 91, 255, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-}
-
-.number-panel-submit:active {
-  background: linear-gradient(
-    145deg,
-    rgba(99, 91, 255, 1) 0%,
-    rgba(99, 91, 255, 0.8) 50%,
-    rgba(99, 91, 255, 0.9) 100%
-  );
-  box-shadow:
-    0 2px 8px rgba(99, 91, 255, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.number-panel-submit:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.number-panel-submit:disabled:active {
-  transform: none;
-}
-
-/* Input focus indicator when numpad is shown */
-.bound-input.input-focused {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.2);
-}
-
 /* Settings toggle switch */
 .settings-toggle-item {
   display: flex;
@@ -4078,16 +3902,6 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 .settings-toggle-on .settings-toggle-slider {
   transform: translateX(20px);
-}
-
-/* Adjust game container when numpad is visible */
-.game-container:has(.number-panel) {
-  padding-bottom: 224px;
-}
-
-/* Move question card up when numpad is visible */
-.game-container:has(.number-panel) .question-card-wrapper {
-  margin-top: -5vh;
 }
 
 /* Feedback Modal */

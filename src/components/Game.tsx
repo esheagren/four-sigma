@@ -1,10 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { QuestionCard, QuestionCardRef } from './QuestionCard';
+import { useState, useEffect } from 'react';
+import { QuestionCard } from './QuestionCard';
 import { Results } from './Results';
 import { LoadingOrb } from './LoadingOrb';
-import { NumberPanel } from './NumberPanel';
 import { getDeviceId } from '../lib/device';
-import { getUseNumpad, NUMPAD_CHANGE_EVENT } from '../lib/preferences';
 import { useAuth } from '../context/AuthContext';
 import { useAnimation } from '../context/AnimationContext';
 
@@ -65,20 +63,6 @@ export function Game() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<FinalizeResponse | null>(null);
-  const [useNumpad, setUseNumpadState] = useState(() => getUseNumpad());
-  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
-  const [isOnUpperBound, setIsOnUpperBound] = useState(false);
-  const questionCardRef = useRef<QuestionCardRef>(null);
-
-  // Listen for numpad preference changes from Settings modal
-  useEffect(() => {
-    const handleNumpadChange = (e: Event) => {
-      const customEvent = e as CustomEvent<boolean>;
-      setUseNumpadState(customEvent.detail);
-    };
-    window.addEventListener(NUMPAD_CHANGE_EVENT, handleNumpadChange);
-    return () => window.removeEventListener(NUMPAD_CHANGE_EVENT, handleNumpadChange);
-  }, []);
 
   // Compute render states based on animation phase
   const isFadingOut = animationPhase === 'fadeOut';
@@ -230,46 +214,10 @@ export function Game() {
       {showQuestionCard && currentQuestion && (
         <div className={`question-card-wrapper ${isFadingOut ? 'fading-out' : ''}`}>
           <QuestionCard
-            ref={questionCardRef}
             question={currentQuestion}
             onSubmit={handleSubmitAnswer}
-            showNumpad={useNumpad}
-            onFocusChange={() => {
-              setIsSubmitDisabled(questionCardRef.current?.isSubmitDisabled() ?? true);
-              setIsOnUpperBound(questionCardRef.current?.isOnUpperBound() ?? false);
-            }}
           />
         </div>
-      )}
-
-      {/* Number Panel */}
-      {useNumpad && showQuestionCard && currentQuestion && (
-        <NumberPanel
-          onDigit={(digit) => {
-            questionCardRef.current?.appendDigit(digit);
-            // Defer check until after React state update
-            setTimeout(() => {
-              setIsSubmitDisabled(questionCardRef.current?.isSubmitDisabled() ?? true);
-            }, 0);
-          }}
-          onBackspace={() => {
-            questionCardRef.current?.backspace();
-            // Defer check until after React state update
-            setTimeout(() => {
-              setIsSubmitDisabled(questionCardRef.current?.isSubmitDisabled() ?? true);
-            }, 0);
-          }}
-          onSubmit={() => questionCardRef.current?.submit()}
-          onToggleFocus={() => {
-            questionCardRef.current?.toggleFocus();
-            // Defer check until after React state update
-            setTimeout(() => {
-              setIsOnUpperBound(questionCardRef.current?.isOnUpperBound() ?? false);
-            }, 0);
-          }}
-          isSubmitDisabled={isSubmitDisabled}
-          isOnUpperBound={isOnUpperBound}
-        />
       )}
 
       {/* Loading Orb during transition */}
