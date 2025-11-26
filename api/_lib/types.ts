@@ -49,6 +49,20 @@ export interface Session {
   answers: Answer[];
 }
 
+export interface CrowdGuess {
+  min: number;
+  max: number;
+}
+
+export interface CrowdData {
+  guesses: CrowdGuess[];
+  avgMin: number;
+  avgMax: number;
+  avgHit: boolean;
+  hitRate: number;
+  totalResponses: number;
+}
+
 export interface Judgement {
   questionId: string;
   prompt: string;
@@ -64,6 +78,7 @@ export interface Judgement {
     averageScore: number;
     highestScore: number;
   };
+  crowdData?: CrowdData;
 }
 
 export interface DailyStats {

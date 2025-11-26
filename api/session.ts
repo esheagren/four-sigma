@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { supabase } from './_lib/supabase.js';
 import { getAuthUser } from './_lib/auth.js';
-import { getQuestionsForSession, getQuestionById } from './_lib/questions.js';
+import { getQuestionsForSession, getQuestionById, getDailyQuestions } from './_lib/questions.js';
 import {
   generateSessionId,
   createSession,
@@ -10,7 +10,7 @@ import {
   recordQuestionScore,
   getQuestionStats,
 } from './_lib/session-storage.js';
-import { recordUserResponse, updateUserStatsAfterSession, getDailyStats, getPerformanceHistory } from './_lib/sessions.js';
+import { recordUserResponse, updateUserStatsAfterSession, getDailyStats, getPerformanceHistory, getCrowdDataForQuestion } from './_lib/sessions.js';
 import { Score } from './_lib/scoring.js';
 import { Judgement } from './_lib/types.js';
 
@@ -54,11 +54,17 @@ async function handleStart(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Dev bypass: allow specifying a date for testing different days' questions
+  // Only works in development mode (localhost)
+  const devDate = process.env.NODE_ENV !== 'production'
+    ? (req.body?.devDate || req.query?.devDate) as string | undefined
+    : undefined;
+
   const sessionId = generateSessionId();
-  const selectedQuestions = await getQuestionsForSession(3);
+  const selectedQuestions = await getDailyQuestions(devDate);
 
   if (selectedQuestions.length === 0) {
-    return res.status(500).json({ error: 'No questions available' });
+    return res.status(500).json({ error: 'No daily questions available for today' });
   }
 
   const questionIds = selectedQuestions.map(q => q.id);
@@ -163,6 +169,14 @@ async function handleFinalize(req: VercelRequest, res: VercelResponse) {
 
     const communityStats = getQuestionStats(questionId);
 
+    // Fetch crowd data for visualization (non-blocking, fallback to null)
+    let crowdData = null;
+    try {
+      crowdData = await getCrowdDataForQuestion(questionId, question.trueValue, userId);
+    } catch (crowdError) {
+      console.error('Failed to fetch crowd data:', crowdError);
+    }
+
     judgements.push({
       questionId: question.id,
       prompt: question.prompt,
@@ -175,6 +189,7 @@ async function handleFinalize(req: VercelRequest, res: VercelResponse) {
       source: question.source,
       sourceUrl: question.sourceUrl,
       communityStats: communityStats || undefined,
+      crowdData: crowdData || undefined,
     });
   }
 

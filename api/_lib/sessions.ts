@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { CrowdData } from './types.js';
 
 /**
  * Get UTC date string for "today" (YYYY-MM-DD)
@@ -275,4 +276,73 @@ export async function getPerformanceHistory(
   }
 
   return result;
+}
+
+/**
+ * Get crowd data for a specific question
+ * Returns distribution of other players' guesses for visualization
+ */
+export async function getCrowdDataForQuestion(
+  questionId: string,
+  trueValue: number,
+  excludeUserId?: string
+): Promise<CrowdData | null> {
+  // Query user_responses for this question, excluding the current user
+  let query = supabase
+    .from('user_responses')
+    .select('lower_bound, upper_bound, captured')
+    .eq('question_id', questionId)
+    .order('answered_at', { ascending: false })
+    .limit(60);
+
+  if (excludeUserId) {
+    query = query.neq('user_id', excludeUserId);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Failed to fetch crowd data:', error);
+    return null;
+  }
+
+  // Need at least 5 responses to show meaningful crowd data
+  if (!data || data.length < 5) {
+    return null;
+  }
+
+  // Build guesses array
+  const guesses = data.map(r => ({
+    min: Number(r.lower_bound),
+    max: Number(r.upper_bound),
+  }));
+
+  // Calculate median lower and upper bounds
+  const lowerBounds = guesses.map(g => g.min).sort((a, b) => a - b);
+  const upperBounds = guesses.map(g => g.max).sort((a, b) => a - b);
+  const midIdx = Math.floor(data.length / 2);
+
+  const avgMin = data.length % 2 === 0
+    ? (lowerBounds[midIdx - 1] + lowerBounds[midIdx]) / 2
+    : lowerBounds[midIdx];
+
+  const avgMax = data.length % 2 === 0
+    ? (upperBounds[midIdx - 1] + upperBounds[midIdx]) / 2
+    : upperBounds[midIdx];
+
+  // Check if average bounds would capture the true value
+  const avgHit = trueValue >= avgMin && trueValue <= avgMax;
+
+  // Calculate hit rate from captured column
+  const hitCount = data.filter(r => r.captured).length;
+  const hitRate = hitCount / data.length;
+
+  return {
+    guesses,
+    avgMin,
+    avgMax,
+    avgHit,
+    hitRate,
+    totalResponses: data.length,
+  };
 }

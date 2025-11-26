@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { getQuestionsForSession, getQuestionById } from '../database/questions.js';
+import { getQuestionsForSession, getQuestionById, getDailyQuestions } from '../database/questions.js';
 import { supabase } from '../database/supabase.js';
 import {
   generateSessionId,
@@ -36,13 +36,19 @@ const router = Router();
  */
 router.post('/start', async (req: Request, res: Response) => {
   try {
+    // Dev bypass: allow specifying a date for testing different days' questions
+    // Only works in development mode (localhost)
+    const devDate = process.env.NODE_ENV !== 'production'
+      ? (req.body?.devDate || req.query?.devDate) as string | undefined
+      : undefined;
+
     const sessionId = generateSessionId();
 
-    // Get questions for this session from Supabase
-    const selectedQuestions = await getQuestionsForSession(3);
+    // Get daily questions for today (or dev override date)
+    const selectedQuestions = await getDailyQuestions(devDate);
 
     if (selectedQuestions.length === 0) {
-      return res.status(500).json({ error: 'No questions available' });
+      return res.status(500).json({ error: 'No daily questions available for today' });
     }
 
     const questionIds = selectedQuestions.map(q => q.id);

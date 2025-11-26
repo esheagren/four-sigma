@@ -498,7 +498,7 @@ body {
 .results-container {
   max-width: 900px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 1.5rem 1.5rem 2rem;
   animation: fadeIn 0.4s ease-out;
   overflow-y: auto;
   height: 100%;
@@ -901,6 +901,153 @@ body {
   color: var(--text-secondary);
 }
 
+/* ==========================================
+   NEW SCORE CARD DESIGN
+   ========================================== */
+
+.score-card-new {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.09) 100%
+  );
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.score-card-share-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.15s ease;
+}
+
+.score-card-share-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.score-card-share-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.score-card-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #4ecdc4;
+  margin-bottom: 0.5rem;
+}
+
+.score-card-value {
+  font-size: 5rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin-bottom: 1rem;
+}
+
+.score-card-rank {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: white;
+  margin-bottom: 1.5rem;
+}
+
+.rank-trophy {
+  font-size: 1rem;
+}
+
+/* Calibration Section */
+.score-card-calibration {
+  margin-top: 1rem;
+}
+
+.calibration-bar-track {
+  position: relative;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg,
+    #ef4444 0%,
+    #f97316 25%,
+    #eab308 50%,
+    #84cc16 75%,
+    #22c55e 100%
+  );
+  margin-bottom: 0.75rem;
+}
+
+.calibration-bar-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 2px solid #1a1a2e;
+}
+
+.calibration-score-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: none;
+  border: none;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+
+.calibration-score-label:hover {
+  color: white;
+}
+
+.calibration-info-icon {
+  font-size: 0.875rem;
+}
+
+/* ==========================================
+   DAILY BREAKDOWN SECTION - NEW DESIGN
+   ========================================== */
+
+.breakdown-section-header {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
 /* Judgements List */
 .judgements-list {
   display: flex;
@@ -909,6 +1056,220 @@ body {
   margin-bottom: 2rem;
 }
 
+/* New Breakdown Card Design */
+.breakdown-card {
+  position: relative;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px;
+  padding: 1.25rem;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.breakdown-card::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  z-index: -1;
+}
+
+.breakdown-card.hit::before {
+  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+}
+
+.breakdown-card.miss::before {
+  background: linear-gradient(135deg, #df1b41 0%, #b91c3a 100%);
+}
+
+/* Header: Question */
+.breakdown-header {
+  margin-bottom: 1rem;
+}
+
+.breakdown-question {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
+}
+
+/* Points chip - positioned outside the card */
+.breakdown-points {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.breakdown-points.hit {
+  background: #4ecdc4;
+  color: #0a2540;
+}
+
+.breakdown-points.miss {
+  background: #df1b41;
+  color: white;
+}
+
+/* Bar Container */
+.breakdown-bar-container {
+  position: relative;
+  margin-bottom: 1rem;
+  padding-top: 2.5rem; /* Space for tooltip */
+}
+
+/* Answer Tooltip */
+.breakdown-answer-tooltip {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+
+.breakdown-answer-tooltip.outside {
+  left: 50%;
+}
+
+.breakdown-answer-tooltip.outside.left {
+  left: 0;
+  transform: translateX(0);
+}
+
+.breakdown-answer-tooltip.outside.left .breakdown-answer-arrow {
+  left: 10px;
+  transform: none;
+}
+
+.breakdown-answer-tooltip.outside.right {
+  left: 100%;
+  transform: translateX(-100%);
+}
+
+.breakdown-answer-tooltip.outside.right .breakdown-answer-arrow {
+  left: auto;
+  right: 10px;
+  transform: none;
+}
+
+.breakdown-answer-bubble {
+  background: white;
+  color: var(--text-primary);
+  padding: 0.375rem 0.625rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.breakdown-answer-link {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.breakdown-answer-link:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.breakdown-answer-arrow {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid white;
+}
+
+/* Bar Track */
+.breakdown-bar-track {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  overflow: visible;
+}
+
+.breakdown-bar-range {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  border-radius: 4px;
+  opacity: 0.9;
+}
+
+.breakdown-bar-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--primary);
+}
+
+/* Bound Labels */
+.breakdown-bounds {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+.breakdown-bound-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+}
+
+/* Metadata Row */
+.breakdown-metadata {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.breakdown-meta-label {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.breakdown-meta-divider {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.breakdown-meta-spacer {
+  flex: 1;
+}
+
+.breakdown-meta-unit {
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+}
+
+/* Legacy styles - keeping for backward compatibility */
 .judgement-card {
   background: linear-gradient(
     135deg,
@@ -985,7 +1346,7 @@ body {
   flex-direction: column;
   gap: 0.5rem;
   align-items: center;
-  margin: 0.5rem 0;
+  margin: 0.5rem 0 0.25rem;
 }
 
 .judgement-guess-display {
@@ -1079,7 +1440,7 @@ body {
 .judgement-range-bound {
   position: absolute;
   top: 35px;
-  transform: translateX(-50%);
+  transform: translate(-50%, -100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1092,8 +1453,8 @@ body {
   border-radius: 50%;
   border: 2px solid white;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  margin-top: -4px;
-  margin-bottom: 4px;
+  margin-top: 4px;
+  margin-bottom: -4px;
 }
 
 .judgement-range-bound-label {
@@ -1143,19 +1504,23 @@ a.judgement-answer-below:hover .judgement-answer-value {
   border-radius: 4px;
 }
 
-/* Points centered below the visualization */
+/* Center answer when outside bounds */
+.judgement-answer-below.outside-bounds {
+  left: 50%;
+}
+
+/* Points in bottom right corner */
 .judgement-points-center {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
   display: flex;
   align-items: baseline;
-  justify-content: center;
   gap: 0.25rem;
-  margin-top: 0.5rem;
   background: rgba(255, 255, 255, 0.85);
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
-  width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .judgement-points-center.score-hit {
@@ -4020,4 +4385,406 @@ a.judgement-answer-below:hover .judgement-answer-value {
   background: var(--text-tertiary);
   transform: none;
   box-shadow: none;
+}
+
+/* ==========================================
+   GAUSSIAN LANDSCAPE VISUALIZATION
+   ========================================== */
+
+.gaussian-landscape-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+.gaussian-landscape {
+  width: 100%;
+  height: 128px;
+  display: block;
+}
+
+/* Grid lines */
+.gaussian-landscape .grid-lines line {
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 0.5;
+  stroke-dasharray: 2 2;
+}
+
+/* Baseline */
+.gaussian-landscape .baseline {
+  stroke: rgba(255, 255, 255, 0.25);
+  stroke-width: 0.5;
+}
+
+/* Crowd curves - ghostly wireframe effect */
+.gaussian-landscape .crowd-curve {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 0.5;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Average benchmark curve */
+.gaussian-landscape .avg-curve {
+  fill: none;
+  stroke: #94a3b8;
+  stroke-width: 1.5;
+  stroke-opacity: 0.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.gaussian-landscape .avg-marker {
+  fill: #94a3b8;
+  opacity: 0.8;
+}
+
+/* User hero curve */
+.gaussian-landscape .user-curve {
+  fill: none;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.gaussian-landscape .user-curve.hit {
+  stroke: #10b981;
+}
+
+.gaussian-landscape .user-curve.miss {
+  stroke: #f43f5e;
+}
+
+/* User bound markers */
+.gaussian-landscape .user-marker {
+  fill: white;
+  stroke-width: 2;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.gaussian-landscape .user-marker.hit {
+  stroke: #10b981;
+}
+
+.gaussian-landscape .user-marker.miss {
+  stroke: #f43f5e;
+}
+
+/* True answer marker */
+.gaussian-landscape .answer-marker {
+  fill: #38bdf8;
+  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6));
+}
+
+/* Clamped arrows for off-screen answer */
+.clamped-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.375rem 0.625rem;
+  border-radius: 6px;
+  color: #38bdf8;
+  font-size: 0.75rem;
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  font-weight: 600;
+  z-index: 10;
+}
+
+.clamped-arrow-right {
+  right: 0.5rem;
+}
+
+.clamped-arrow-left {
+  left: 0.5rem;
+}
+
+.clamped-arrow svg {
+  opacity: 0.8;
+}
+
+/* Axis labels */
+.landscape-axis-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.axis-label {
+  font-size: 0.625rem;
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ==========================================
+   NEW RESULT CARD DESIGN
+   ========================================== */
+
+.result-card {
+  position: relative;
+  border-radius: 16px;
+  margin-top: 1.25rem;
+  overflow: visible;
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Points badge - TOP CENTER overlapping border */
+.result-card-points {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 1.25rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.result-card-points.hit {
+  background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%);
+  color: #0a2540;
+}
+
+.result-card-points.miss {
+  background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
+  color: white;
+}
+
+/* Light header section */
+.result-card-header {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1.5rem 1.25rem 1.25rem;
+  border-radius: 16px 16px 0 0;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.result-card-question {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.45;
+  margin: 0 0 0.75rem 0;
+}
+
+.result-card-answer-pill {
+  display: inline-block;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.result-card-answer-link {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.result-card-answer-link:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.result-card-answer-unit {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Dark body section with visualization */
+.result-card-body {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  padding: 1rem 1rem 0.875rem;
+  border-radius: 0 0 16px 16px;
+  position: relative;
+}
+
+/* Info/Legend button */
+.result-card-info-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  z-index: 5;
+}
+
+.result-card-info-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Metadata row */
+.result-card-metadata {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.result-card-meta-label {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.result-card-meta-divider {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ==========================================
+   LEGEND POPUP STYLES
+   ========================================== */
+
+.legend-popup {
+  max-width: 420px;
+  width: 90%;
+}
+
+.legend-popup .modal-header h2 {
+  font-size: 1.125rem;
+}
+
+.legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.legend-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+}
+
+.legend-item:last-child {
+  border-bottom: none;
+}
+
+.legend-icon {
+  width: 48px;
+  height: 24px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.legend-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.legend-text {
+  flex: 1;
+}
+
+.legend-text strong {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.legend-text p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ==========================================
+   RESPONSIVE ADJUSTMENTS
+   ========================================== */
+
+@media (max-width: 480px) {
+  .result-card-header {
+    padding: 1.25rem 1rem 1rem;
+  }
+
+  .result-card-question {
+    font-size: 0.875rem;
+  }
+
+  .result-card-answer-pill {
+    font-size: 0.8125rem;
+    padding: 0.375rem 0.75rem;
+  }
+
+  .result-card-body {
+    padding: 0.875rem 0.75rem 0.75rem;
+  }
+
+  .gaussian-landscape {
+    height: 100px;
+  }
+
+  .result-card-metadata {
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: center;
+  }
+
+  .result-card-meta-divider {
+    display: none;
+  }
+
+  .clamped-arrow {
+    font-size: 0.6875rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .legend-popup {
+    width: 95%;
+  }
+
+  .legend-item {
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+  }
+
+  .legend-icon {
+    width: 40px;
+    height: 20px;
+  }
 }

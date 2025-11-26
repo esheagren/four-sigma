@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "import-questions": "tsx scripts/seed/import-questions.ts",
+    "populate-daily-questions": "tsx scripts/seed/populate-daily-questions.ts",
     "db:migrate": "echo 'Run the SQL file in Supabase dashboard: scripts/migrations/001_initial_schema.sql'"
   },
   "dependencies": {

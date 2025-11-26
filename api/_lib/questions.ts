@@ -70,3 +70,51 @@ export async function getQuestionsForSession(count: number = 3): Promise<Questio
     sourceUrl: q.source_url || '',
   }));
 }
+
+/**
+ * Get the daily questions for a specific date
+ * All users get the same questions for a given day
+ *
+ * @param overrideDate - Optional date string (YYYY-MM-DD) for testing different days
+ */
+export async function getDailyQuestions(overrideDate?: string): Promise<Question[]> {
+  const dateStr = overrideDate || new Date().toISOString().split('T')[0];
+
+  const { data, error } = await supabase
+    .from('daily_questions')
+    .select(`
+      id,
+      display_order,
+      questions!inner (
+        id,
+        question_text,
+        answer_value,
+        answer_explanation,
+        source_url,
+        source_name,
+        units (name)
+      )
+    `)
+    .eq('date', dateStr)
+    .eq('is_published', true)
+    .order('display_order');
+
+  if (error) {
+    console.error('Error fetching daily questions:', error);
+    return [];
+  }
+
+  if (!data || data.length === 0) {
+    console.warn(`No daily questions found for date: ${dateStr}`);
+    return [];
+  }
+
+  return data.map((dq: any) => ({
+    id: dq.questions.id,
+    prompt: dq.questions.question_text,
+    unit: dq.questions.units?.name || '',
+    trueValue: dq.questions.answer_value,
+    source: dq.questions.source_name || '',
+    sourceUrl: dq.questions.source_url || '',
+  }));
+}
