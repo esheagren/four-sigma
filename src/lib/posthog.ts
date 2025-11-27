@@ -1,7 +1,8 @@
 import posthog from 'posthog-js';
 
 const POSTHOG_KEY = import.meta.env.VITE_POSTHOG_KEY;
-const POSTHOG_HOST = import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.com';
+// Use reverse proxy to bypass ad blockers - requests go through our domain
+const POSTHOG_HOST = '/ingest';
 
 export function initPostHog() {
   if (typeof window !== 'undefined' && POSTHOG_KEY) {
