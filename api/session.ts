@@ -13,6 +13,7 @@ import {
 import { recordUserResponse, updateUserStatsAfterSession, getDailyStats, getPerformanceHistory, getCrowdDataForQuestion } from './_lib/sessions.js';
 import { Score } from './_lib/scoring.js';
 import { Judgement } from './_lib/types.js';
+import { trackServerEvent, flushAnalytics } from './_lib/analytics.js';
 
 function setCors(res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -216,6 +217,29 @@ async function handleFinalize(req: VercelRequest, res: VercelResponse) {
     } catch (statsError) {
       console.error('Failed to update/fetch user stats:', statsError);
     }
+  }
+
+  // Server-side tracking (more reliable than client, bypasses ad blockers)
+  const deviceId = req.headers['x-device-id'] as string | undefined;
+  const distinctId = userId || deviceId;
+  if (distinctId) {
+    const calibration = judgements.length > 0
+      ? (questionsCaptured / judgements.length) * 100
+      : 0;
+
+    trackServerEvent(distinctId, 'game_session_completed_server', {
+      sessionId,
+      totalScore: score,
+      hits: questionsCaptured,
+      misses: judgements.length - questionsCaptured,
+      totalQuestions: judgements.length,
+      calibration,
+      isAuthenticated: !!userId,
+      dailyRank: dailyStats?.dailyRank ?? null,
+    });
+
+    // Ensure events are sent before function terminates
+    await flushAnalytics();
   }
 
   return res.json({

@@ -3311,6 +3311,20 @@ a.judgement-answer-below:hover .judgement-answer-value {
     font-size: 1.5rem;
   }
 
+  .modal-header-horizontal {
+    gap: 0.75rem;
+  }
+
+  .modal-header-horizontal .modal-title {
+    font-size: 1.75rem;
+    flex-shrink: 0;
+  }
+
+  .modal-subtitle-stack {
+    font-size: 0.6875rem;
+    min-width: 0;
+  }
+
   .modal-subtitle {
     font-size: 0.9375rem;
   }
@@ -5308,14 +5322,14 @@ a.judgement-answer-below:hover .judgement-answer-value {
   opacity: 0.7;
 }
 
-/* Desktop Calculator - positioned to the right side */
+/* Desktop Calculator - centered above submit bar */
 .numpad-container-desktop {
   position: fixed;
-  top: 50%;
-  bottom: auto;
-  left: auto;
-  right: 2rem;
-  transform: translateY(-50%);
+  top: auto;
+  bottom: 80px;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
   padding: 0;
   width: auto;
 }

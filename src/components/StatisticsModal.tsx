@@ -1,52 +1,12 @@
-import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { PerformanceChart } from './PerformanceChart';
 
 interface StatisticsModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-interface PerformanceHistoryEntry {
-  day: string;
-  userScore: number;
-  avgScore: number;
-  calibration: number;
-}
-
 export function StatisticsModal({ isOpen, onClose }: StatisticsModalProps) {
-  const { user, authToken } = useAuth();
-  const [performanceHistory, setPerformanceHistory] = useState<PerformanceHistoryEntry[] | undefined>();
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-
-  useEffect(() => {
-    if (isOpen && user) {
-      fetchPerformanceHistory();
-    }
-  }, [isOpen, user]);
-
-  async function fetchPerformanceHistory() {
-    setIsLoadingHistory(true);
-    try {
-      const headers: Record<string, string> = {};
-      if (authToken) {
-        headers['Authorization'] = `Bearer ${authToken}`;
-      }
-
-      const response = await fetch('/api/user/performance-history?days=7', {
-        headers,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setPerformanceHistory(data.history);
-      }
-    } catch (err) {
-      console.error('Failed to fetch performance history:', err);
-    } finally {
-      setIsLoadingHistory(false);
-    }
-  }
+  const { user } = useAuth();
 
   if (!isOpen) return null;
 
@@ -77,14 +37,6 @@ export function StatisticsModal({ isOpen, onClose }: StatisticsModalProps) {
             ))}
           </div>
 
-          <div className="statistics-chart-section">
-            <h3 className="statistics-section-title">7-Day Performance</h3>
-            {isLoadingHistory ? (
-              <div className="statistics-chart-loading">Loading...</div>
-            ) : (
-              <PerformanceChart performanceHistory={performanceHistory} />
-            )}
-          </div>
         </div>
 
         <div className="modal-footer">
