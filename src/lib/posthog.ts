@@ -17,8 +17,8 @@ export function initPostHog() {
       // Enable session recording with console log capture
       enable_recording_console_log: true,
 
-      // Respect Do Not Track browser setting
-      respect_dnt: true,
+      // Don't respect Do Not Track (many browsers have it on by default, blocking all analytics)
+      respect_dnt: false,
 
       // Persistence for anonymous users
       persistence: 'localStorage+cookie',
