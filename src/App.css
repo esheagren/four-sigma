@@ -5377,4 +5377,37 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 .numpad-container-desktop .numpad {
   max-width: 320px;
+  padding: 0.75rem;
+}
+
+/* Desktop calculator - larger sizes */
+.numpad-container-desktop .numpad-key {
+  height: 48px;
+  font-size: 1.25rem;
+  border-radius: 10px;
+}
+
+.numpad-container-desktop .calc-grid {
+  gap: 0.5rem;
+  max-width: 320px;
+}
+
+.numpad-container-desktop .calc-display {
+  padding: 0.625rem 1rem;
+  margin-bottom: 0.625rem;
+  max-width: 320px;
+}
+
+.numpad-container-desktop .calc-result {
+  font-size: 1.5rem;
+}
+
+.numpad-container-desktop .calc-back-btn {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 0.5rem;
+}
+
+.numpad-container-desktop .calc-key-op {
+  font-size: 1.25rem !important;
 }
