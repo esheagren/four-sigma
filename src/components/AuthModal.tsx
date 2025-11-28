@@ -93,12 +93,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   return (
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal-content auth-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={handleClose} aria-label="Close">
-          &times;
-        </button>
+        <div className="modal-header">
+          <h2 className="modal-title">{mode === 'login' ? 'Sign In' : 'Create Account'}</h2>
+          <button className="modal-close-button" onClick={handleClose} aria-label="Close">
+            ×
+          </button>
+        </div>
 
-        <h2>{mode === 'login' ? 'Sign In' : 'Create Account'}</h2>
-
+        <div className="modal-body">
         {mode === 'signup' && (
           <p className="auth-modal-subtitle">
             Create an account to save your progress and play on any device.
@@ -177,6 +179,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
               </button>
             </p>
           )}
+        </div>
         </div>
       </div>
     </div>
