@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { HowToPlayModal } from './HowToPlayModal';
 import { AuthModal } from './AuthModal';
@@ -8,26 +8,6 @@ import { FeedbackModal } from './FeedbackModal';
 import { useAuth } from '../context/AuthContext';
 
 // Icon components
-function LightbulbIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 18h6" />
-      <path d="M10 22h4" />
-      <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14" />
-    </svg>
-  );
-}
-
-function BarChartIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="12" y1="20" x2="12" y2="10" />
-      <line x1="18" y1="20" x2="18" y2="4" />
-      <line x1="6" y1="20" x2="6" y2="16" />
-    </svg>
-  );
-}
-
 function HelpCircleIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -38,19 +18,48 @@ function HelpCircleIcon() {
   );
 }
 
-function SettingsIcon() {
+function MenuIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  );
+}
+
+function BarChartIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="20" x2="12" y2="10" />
+      <line x1="18" y1="20" x2="18" y2="4" />
+      <line x1="6" y1="20" x2="6" y2="16" />
     </svg>
   );
 }
 
 function MessageIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+
+function UserIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
+function SettingsIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
     </svg>
   );
 }
@@ -62,6 +71,27 @@ export function Nav() {
   const [isStatisticsOpen, setIsStatisticsOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    }
+
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isMenuOpen]);
+
+  const handleMenuItemClick = (openModal: () => void) => {
+    setIsMenuOpen(false);
+    openModal();
+  };
 
   return (
     <>
@@ -73,16 +103,6 @@ export function Nav() {
             </Link>
           </div>
           <div className="navbar-actions">
-            {!isLoading && isAnonymous && (
-              <button
-                className="nav-button nav-icon-button"
-                onClick={() => setIsAuthModalOpen(true)}
-                aria-label="Sign In"
-                title="Sign In"
-              >
-                <LightbulbIcon />
-              </button>
-            )}
             <button
               className="nav-button nav-icon-button"
               onClick={() => setIsHowToPlayOpen(true)}
@@ -91,30 +111,50 @@ export function Nav() {
             >
               <HelpCircleIcon />
             </button>
-            <button
-              className="nav-button nav-icon-button"
-              onClick={() => setIsStatisticsOpen(true)}
-              aria-label="Statistics"
-              title="Statistics"
-            >
-              <BarChartIcon />
-            </button>
-            <button
-              className="nav-button nav-icon-button"
-              onClick={() => setIsFeedbackOpen(true)}
-              aria-label="Send Feedback"
-              title="Send Feedback"
-            >
-              <MessageIcon />
-            </button>
-            <button
-              className="nav-button nav-icon-button"
-              onClick={() => setIsSettingsOpen(true)}
-              aria-label="Settings"
-              title="Settings"
-            >
-              <SettingsIcon />
-            </button>
+            <div className="nav-menu-container" ref={menuRef}>
+              <button
+                className="nav-button nav-icon-button"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label="Menu"
+                title="Menu"
+              >
+                <MenuIcon />
+              </button>
+              {isMenuOpen && (
+                <div className="nav-dropdown-menu">
+                  <button
+                    className="nav-dropdown-item"
+                    onClick={() => handleMenuItemClick(() => setIsStatisticsOpen(true))}
+                  >
+                    <BarChartIcon />
+                    <span>Statistics</span>
+                  </button>
+                  <button
+                    className="nav-dropdown-item"
+                    onClick={() => handleMenuItemClick(() => setIsFeedbackOpen(true))}
+                  >
+                    <MessageIcon />
+                    <span>Feedback</span>
+                  </button>
+                  {!isLoading && isAnonymous && (
+                    <button
+                      className="nav-dropdown-item"
+                      onClick={() => handleMenuItemClick(() => setIsAuthModalOpen(true))}
+                    >
+                      <UserIcon />
+                      <span>Sign In</span>
+                    </button>
+                  )}
+                  <button
+                    className="nav-dropdown-item"
+                    onClick={() => handleMenuItemClick(() => setIsSettingsOpen(true))}
+                  >
+                    <SettingsIcon />
+                    <span>Settings</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </nav>
