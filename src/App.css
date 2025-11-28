@@ -4880,21 +4880,21 @@ a.judgement-answer-below:hover .judgement-answer-value {
   box-shadow:
     0 -8px 32px rgba(0, 0, 0, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  padding: 0.75rem;
-  padding-top: 1rem;
+  padding: 0.5rem;
+  padding-top: 0.625rem;
 }
 
 .numpad-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-  max-width: 320px;
+  gap: 0.35rem;
+  max-width: 280px;
   margin: 0 auto;
 }
 
 .numpad-key {
-  height: 42px;
-  font-size: 1.25rem;
+  height: 36px;
+  font-size: 1.1rem;
   font-weight: 500;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
@@ -4944,15 +4944,15 @@ a.judgement-answer-below:hover .judgement-answer-value {
 /* NumPad Action Buttons */
 .numpad-actions {
   display: flex;
-  gap: 0.5rem;
-  max-width: 320px;
-  margin: 0.5rem auto 0;
+  gap: 0.35rem;
+  max-width: 280px;
+  margin: 0.35rem auto 0;
 }
 
 .numpad-toggle-btn {
   flex: 1;
-  height: 40px;
-  font-size: 0.875rem;
+  height: 34px;
+  font-size: 0.8125rem;
   font-weight: 600;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
@@ -4981,8 +4981,8 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 .numpad-submit-btn {
   flex: 1;
-  height: 40px;
-  font-size: 0.875rem;
+  height: 34px;
+  font-size: 0.8125rem;
   font-weight: 600;
   border: none;
   border-radius: 12px;
@@ -5067,14 +5067,14 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 /* Calculator Mode Styles */
 .numpad-calculator {
-  padding-top: 0.5rem;
+  padding-top: 0.375rem;
 }
 
 .calc-back-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
@@ -5084,7 +5084,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   justify-content: center;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  margin-bottom: 0.375rem;
+  margin-bottom: 0.25rem;
 }
 
 .calc-back-btn:hover {
@@ -5104,9 +5104,9 @@ a.judgement-answer-below:hover .judgement-answer-value {
 .calc-display {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 10px;
-  padding: 0.5rem 0.875rem;
-  margin-bottom: 0.5rem;
-  max-width: 320px;
+  padding: 0.4rem 0.75rem;
+  margin-bottom: 0.35rem;
+  max-width: 280px;
   margin-left: auto;
   margin-right: auto;
   box-shadow:
@@ -5149,7 +5149,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 .calc-result {
   flex: 1;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: 500;
   font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
   text-align: right;
@@ -5162,8 +5162,8 @@ a.judgement-answer-below:hover .judgement-answer-value {
 .calc-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 0.375rem;
-  max-width: 320px;
+  gap: 0.3rem;
+  max-width: 280px;
   margin: 0 auto;
 }
 
