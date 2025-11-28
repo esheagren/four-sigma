@@ -94,7 +94,7 @@ export function GaussianLandscape({
       <svg
         className="gaussian-landscape"
         viewBox={`0 0 ${SVG_WIDTH} 100`}
-        preserveAspectRatio="none"
+        preserveAspectRatio="xMidYMax meet"
       >
         <defs>
           {/* Gradient for user curve fill */}

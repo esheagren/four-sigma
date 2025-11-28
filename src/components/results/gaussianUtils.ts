@@ -7,7 +7,7 @@
 
 // SVG coordinate constants
 export const BASELINE_Y = 90;
-export const SVG_WIDTH = 100;
+export const SVG_WIDTH = 300;
 export const SVG_HEIGHT = 100;
 
 /**
@@ -56,6 +56,13 @@ export function calculateViewport(
     // Add 5% padding on each side
     vizMin = minPoint - (span * 0.05);
     vizMax = maxPoint + (span * 0.05);
+  }
+
+  // Clamp viewport minimum to zero (values shouldn't be negative)
+  if (vizMin < 0) {
+    const adjustment = -vizMin;
+    vizMin = 0;
+    vizMax += adjustment;
   }
 
   return {
