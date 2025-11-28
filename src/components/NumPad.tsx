@@ -1,5 +1,5 @@
 // NumPad component with liquid glass design
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 
 interface NumPadProps {
   activeField: 'lower' | 'upper';
@@ -24,12 +24,11 @@ export function NumPad({
 }: NumPadProps) {
   const [isCalculatorMode, setIsCalculatorMode] = useState(false);
   const [calcExpression, setCalcExpression] = useState('');
-  const [calcResult, setCalcResult] = useState('0');
+  const [calcResult, setCalcResult] = useState('');
 
-  // Evaluate expression dynamically
-  useEffect(() => {
+  // Evaluate expression when equals is pressed
+  const handleEquals = useCallback(() => {
     if (!calcExpression) {
-      setCalcResult('0');
       return;
     }
 
@@ -44,11 +43,6 @@ export function NumPad({
       // Handle square root: √number -> Math.sqrt(number)
       expr = expr.replace(/√(\d+\.?\d*)/g, 'Math.sqrt($1)');
 
-      // Don't evaluate if ends with operator
-      if (/[+\-*/^]$/.test(expr) || /√$/.test(expr)) {
-        return;
-      }
-
       // Safely evaluate
       const result = Function('"use strict"; return (' + expr + ')')();
 
@@ -56,15 +50,20 @@ export function NumPad({
         // Round to avoid floating point issues
         const rounded = Math.round(result * 1000000000) / 1000000000;
         setCalcResult(String(rounded));
+        setCalcExpression(String(rounded)); // Allow continuing from result
       }
     } catch {
-      // Invalid expression, keep previous result
+      setCalcResult('Error');
     }
   }, [calcExpression]);
 
   const handleCalcDigit = useCallback((digit: string) => {
+    // Clear result when starting new input
+    if (calcResult) {
+      setCalcResult('');
+    }
     setCalcExpression(prev => prev + digit);
-  }, []);
+  }, [calcResult]);
 
   const handleCalcDecimal = useCallback(() => {
     // Check if current number already has decimal
@@ -79,6 +78,11 @@ export function NumPad({
     // Don't allow operator at start (except minus for negative)
     if (!calcExpression && op !== '−') return;
 
+    // Clear result when adding operator (continuing calculation)
+    if (calcResult) {
+      setCalcResult('');
+    }
+
     // Replace last operator if there is one
     const lastChar = calcExpression.slice(-1);
     if (['+', '−', '×', '÷', '^', '√'].includes(lastChar)) {
@@ -86,7 +90,7 @@ export function NumPad({
     } else {
       setCalcExpression(prev => prev + op);
     }
-  }, [calcExpression]);
+  }, [calcExpression, calcResult]);
 
   const handleCalcBackspace = useCallback(() => {
     setCalcExpression(prev => prev.slice(0, -1));
@@ -94,20 +98,23 @@ export function NumPad({
 
   const handleCalcClear = useCallback(() => {
     setCalcExpression('');
-    setCalcResult('0');
+    setCalcResult('');
   }, []);
 
   const handleUseResult = useCallback(() => {
-    onUseCalculatorResult(calcResult);
+    const valueToUse = calcResult || calcExpression;
+    if (valueToUse && valueToUse !== 'Error') {
+      onUseCalculatorResult(valueToUse);
+    }
     setIsCalculatorMode(false);
     setCalcExpression('');
-    setCalcResult('0');
-  }, [calcResult, onUseCalculatorResult]);
+    setCalcResult('');
+  }, [calcResult, calcExpression, onUseCalculatorResult]);
 
   const handleExitCalculator = useCallback(() => {
     setIsCalculatorMode(false);
     setCalcExpression('');
-    setCalcResult('0');
+    setCalcResult('');
   }, []);
 
   // Format display number with commas
@@ -185,7 +192,7 @@ export function NumPad({
               <button className="calc-paste-btn" onClick={handleUseResult}>
                 Paste
               </button>
-              <div className="calc-result">{formatNumber(calcResult)}</div>
+              <div className="calc-result">{calcResult ? formatNumber(calcResult) : (calcExpression || '0')}</div>
             </div>
           </div>
           <div className="calc-grid">
@@ -218,7 +225,7 @@ export function NumPad({
             <button className="numpad-key calc-key-op" onClick={() => handleCalcOperator('^')}>^</button>
             <button className="numpad-key calc-key-op" onClick={() => handleCalcOperator('√')}>√</button>
             <button className="numpad-key calc-key-clear" onClick={handleCalcClear}>C</button>
-            <button className="numpad-key calc-key-equals" onClick={() => {}}>
+            <button className="numpad-key calc-key-equals" onClick={handleEquals}>
               =
             </button>
           </div>
