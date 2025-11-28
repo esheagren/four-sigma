@@ -178,6 +178,7 @@ body {
   cursor: pointer;
   transition: background 0.15s ease;
   text-align: left;
+  white-space: nowrap;
 }
 
 .nav-dropdown-item:hover {
