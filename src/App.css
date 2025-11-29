@@ -5067,12 +5067,12 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 /* Calculator Mode Styles */
 .numpad-calculator {
-  padding-top: 0.375rem;
+  padding-top: 0.25rem;
 }
 
 .calc-back-btn {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border: none;
   border-radius: 8px;
   background: transparent;
@@ -5084,7 +5084,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   justify-content: center;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.15rem;
 }
 
 .calc-back-btn:hover {
@@ -5104,11 +5104,11 @@ a.judgement-answer-below:hover .judgement-answer-value {
 .calc-display {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 10px;
-  padding: 0.4rem 0.75rem;
-  margin-bottom: 0.35rem;
-  max-width: 280px;
-  margin-left: auto;
-  margin-right: auto;
+  padding: 0.25rem 0.5rem;
+  margin-bottom: 0.2rem;
+  max-width: 100%;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
   box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
@@ -5122,11 +5122,11 @@ a.judgement-answer-below:hover .judgement-answer-value {
 }
 
 .calc-paste-btn {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.6875rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.625rem;
   font-weight: 700;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 5px;
   background: white;
   color: var(--text-primary);
   cursor: pointer;
@@ -5149,7 +5149,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 .calc-result {
   flex: 1;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 500;
   font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
   text-align: right;
@@ -5223,17 +5223,18 @@ a.judgement-answer-below:hover .judgement-answer-value {
 .calc-grid-new {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem;
-  max-width: 300px;
+  gap: 0.35rem;
+  max-width: 100%;
   margin: 0 auto;
+  padding: 0 0.5rem;
 }
 
 .calc-key {
-  height: 52px;
-  font-size: 1.375rem;
+  height: 40px;
+  font-size: 1.1rem;
   font-weight: 500;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   background: rgba(45, 50, 65, 0.9);
   color: white;
   cursor: pointer;
@@ -5328,21 +5329,31 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
   .calc-display {
     max-width: 100%;
-    padding: 0.4rem 0.625rem;
-    margin-bottom: 0.3rem;
+    padding: 0.2rem 0.5rem;
+    margin-bottom: 0.15rem;
   }
 
   .calc-expression {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
   }
 
   .calc-result {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
   }
 
   .calc-back-btn {
-    width: 32px;
-    height: 32px;
+    width: 26px;
+    height: 26px;
+  }
+
+  .calc-key {
+    height: 38px;
+    font-size: 1rem;
+    border-radius: 9px;
+  }
+
+  .calc-grid-new {
+    gap: 0.3rem;
   }
 
   .calc-grid {
