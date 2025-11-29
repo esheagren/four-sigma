@@ -236,7 +236,7 @@ export function NumPad({
       );
     }
 
-    // Mobile: full-screen vertical calculator
+    // Mobile: full-screen vertical calculator with new layout
     return (
       <div className="numpad-container">
         <div className="numpad numpad-calculator">
@@ -254,39 +254,35 @@ export function NumPad({
               <div className="calc-result">{calcResult ? formatNumber(calcResult) : (calcExpression || '0')}</div>
             </div>
           </div>
-          <div className="calc-grid">
-            <button className="numpad-key calc-key-op" onClick={() => handleCalcOperator('+')}>+</button>
-            <button className="numpad-key" onClick={() => handleCalcDigit('7')}>7</button>
-            <button className="numpad-key" onClick={() => handleCalcDigit('8')}>8</button>
-            <button className="numpad-key" onClick={() => handleCalcDigit('9')}>9</button>
+          <div className="calc-grid-new">
+            {/* Row 1: C ^ √ ÷ */}
+            <button className="calc-key calc-key-clear" onClick={handleCalcClear}>C</button>
+            <button className="calc-key calc-key-op" onClick={() => handleCalcOperator('^')}>^</button>
+            <button className="calc-key calc-key-op" onClick={() => handleCalcOperator('√')}>√</button>
+            <button className="calc-key calc-key-op" onClick={() => handleCalcOperator('÷')}>÷</button>
 
-            <button className="numpad-key calc-key-op" onClick={() => handleCalcOperator('−')}>-</button>
-            <button className="numpad-key" onClick={() => handleCalcDigit('4')}>4</button>
-            <button className="numpad-key" onClick={() => handleCalcDigit('5')}>5</button>
-            <button className="numpad-key" onClick={() => handleCalcDigit('6')}>6</button>
+            {/* Row 2: 7 8 9 × */}
+            <button className="calc-key" onClick={() => handleCalcDigit('7')}>7</button>
+            <button className="calc-key" onClick={() => handleCalcDigit('8')}>8</button>
+            <button className="calc-key" onClick={() => handleCalcDigit('9')}>9</button>
+            <button className="calc-key calc-key-op" onClick={() => handleCalcOperator('×')}>×</button>
 
-            <button className="numpad-key calc-key-op" onClick={() => handleCalcOperator('×')}>x</button>
-            <button className="numpad-key" onClick={() => handleCalcDigit('1')}>1</button>
-            <button className="numpad-key" onClick={() => handleCalcDigit('2')}>2</button>
-            <button className="numpad-key" onClick={() => handleCalcDigit('3')}>3</button>
+            {/* Row 3: 4 5 6 - */}
+            <button className="calc-key" onClick={() => handleCalcDigit('4')}>4</button>
+            <button className="calc-key" onClick={() => handleCalcDigit('5')}>5</button>
+            <button className="calc-key" onClick={() => handleCalcDigit('6')}>6</button>
+            <button className="calc-key calc-key-op" onClick={() => handleCalcOperator('−')}>−</button>
 
-            <button className="numpad-key calc-key-op" onClick={() => handleCalcOperator('÷')}>÷</button>
-            <button className="numpad-key" onClick={() => handleCalcDigit('0')}>0</button>
-            <button className="numpad-key" onClick={handleCalcDecimal}>.</button>
-            <button className="numpad-key calc-key-backspace" onClick={handleCalcBackspace}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
-                <line x1="18" y1="9" x2="12" y2="15"></line>
-                <line x1="12" y1="9" x2="18" y2="15"></line>
-              </svg>
-            </button>
+            {/* Row 4: 1 2 3 + */}
+            <button className="calc-key" onClick={() => handleCalcDigit('1')}>1</button>
+            <button className="calc-key" onClick={() => handleCalcDigit('2')}>2</button>
+            <button className="calc-key" onClick={() => handleCalcDigit('3')}>3</button>
+            <button className="calc-key calc-key-op" onClick={() => handleCalcOperator('+')}>+</button>
 
-            <button className="numpad-key calc-key-op" onClick={() => handleCalcOperator('^')}>^</button>
-            <button className="numpad-key calc-key-op" onClick={() => handleCalcOperator('√')}>√</button>
-            <button className="numpad-key calc-key-clear" onClick={handleCalcClear}>C</button>
-            <button className="numpad-key calc-key-equals" onClick={handleEquals}>
-              =
-            </button>
+            {/* Row 5: 0 (wide) . = */}
+            <button className="calc-key calc-key-zero" onClick={() => handleCalcDigit('0')}>0</button>
+            <button className="calc-key" onClick={handleCalcDecimal}>.</button>
+            <button className="calc-key calc-key-equals" onClick={handleEquals}>=</button>
           </div>
         </div>
       </div>

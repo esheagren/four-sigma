@@ -5219,6 +5219,75 @@ a.judgement-answer-below:hover .judgement-answer-value {
   background: var(--primary) !important;
 }
 
+/* New Mobile Calculator Grid Layout */
+.calc-grid-new {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.calc-key {
+  height: 52px;
+  font-size: 1.375rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 12px;
+  background: rgba(45, 50, 65, 0.9);
+  color: white;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.calc-key:hover {
+  background: rgba(55, 60, 75, 0.95);
+}
+
+.calc-key:active {
+  background: rgba(35, 40, 55, 0.9);
+  transform: scale(0.96);
+}
+
+.calc-grid-new .calc-key-op {
+  background: rgba(55, 60, 80, 0.9);
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 400;
+}
+
+.calc-grid-new .calc-key-op:hover {
+  background: rgba(65, 70, 90, 0.95);
+}
+
+.calc-grid-new .calc-key-clear {
+  background: rgba(140, 70, 80, 0.9);
+  color: white;
+  font-weight: 500;
+}
+
+.calc-grid-new .calc-key-clear:hover {
+  background: rgba(150, 80, 90, 0.95);
+}
+
+.calc-grid-new .calc-key-zero {
+  grid-column: span 2;
+}
+
+.calc-grid-new .calc-key-equals {
+  background: rgba(130, 90, 180, 0.9);
+  color: white;
+  font-weight: 600;
+}
+
+.calc-grid-new .calc-key-equals:hover {
+  background: rgba(140, 100, 190, 0.95);
+}
+
 /* Mobile responsiveness for NumPad */
 @media (max-width: 480px) {
   .numpad {
