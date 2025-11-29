@@ -177,9 +177,68 @@ export function NumPad({
   }
 
   if (isCalculatorMode) {
-    // Same calculator layout for both, but different container positioning
+    // Desktop: horizontal calculator bar + submit bar below
+    if (!isTouch) {
+      return (
+        <>
+          <div className="desktop-calc-bar">
+            <button className="desktop-calc-close" onClick={handleExitCalculator}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+            <div className="desktop-calc-display">
+              {calcResult ? formatNumber(calcResult) : (calcExpression || '0')}
+            </div>
+            <button className="desktop-calc-paste" onClick={handleUseResult}>Paste</button>
+            <div className="desktop-calc-divider"></div>
+            <div className="desktop-calc-digits">
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('7')}>7</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('8')}>8</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('9')}>9</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('4')}>4</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('5')}>5</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('6')}>6</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('1')}>1</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('2')}>2</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('3')}>3</button>
+              <button className="desktop-calc-key" onClick={() => handleCalcDigit('0')}>0</button>
+              <button className="desktop-calc-key" onClick={handleCalcDecimal}>.</button>
+              <button className="desktop-calc-key desktop-calc-backspace" onClick={handleCalcBackspace}>⌫</button>
+            </div>
+            <div className="desktop-calc-divider"></div>
+            <div className="desktop-calc-ops">
+              <button className="desktop-calc-key desktop-calc-op" onClick={() => handleCalcOperator('+')}>+</button>
+              <button className="desktop-calc-key desktop-calc-op" onClick={() => handleCalcOperator('−')}>−</button>
+              <button className="desktop-calc-key desktop-calc-op" onClick={() => handleCalcOperator('×')}>×</button>
+              <button className="desktop-calc-key desktop-calc-op" onClick={() => handleCalcOperator('÷')}>÷</button>
+              <button className="desktop-calc-key desktop-calc-op" onClick={() => handleCalcOperator('^')}>^</button>
+              <button className="desktop-calc-key desktop-calc-op" onClick={() => handleCalcOperator('√')}>√</button>
+            </div>
+            <div className="desktop-calc-divider"></div>
+            <button className="desktop-calc-key desktop-calc-clear" onClick={handleCalcClear}>C</button>
+            <button className="desktop-calc-key desktop-calc-equals" onClick={handleEquals}>=</button>
+          </div>
+          <div className="desktop-actions-container">
+            <div className="desktop-actions">
+              <button
+                className="desktop-submit-btn"
+                onClick={onSubmit}
+                disabled={isSubmitDisabled}
+              >
+                Submit
+              </button>
+              <span className="desktop-hint">Press Enter to submit</span>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    // Mobile: full-screen vertical calculator
     return (
-      <div className={isTouch ? "numpad-container" : "numpad-container numpad-container-desktop"}>
+      <div className="numpad-container">
         <div className="numpad numpad-calculator">
           <button className="calc-back-btn" onClick={handleExitCalculator}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
