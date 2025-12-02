@@ -4600,6 +4600,9 @@ a.judgement-answer-below:hover .judgement-answer-value {
   overflow: visible;
   animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   opacity: 0;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 @keyframes slideUp {
