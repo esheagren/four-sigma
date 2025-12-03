@@ -5957,6 +5957,38 @@ a.judgement-answer-below:hover .judgement-answer-value {
   pointer-events: none;
   transition: width 0.1s ease;
   border-radius: 12px 0 0 12px;
+  /* Bright white edge on the right side */
+  border-right: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    2px 0 8px rgba(255, 255, 255, 0.5),
+    2px 0 16px rgba(255, 255, 255, 0.3);
+}
+
+/* Initial state - glittering edge to encourage interaction */
+.estimate-uncertainty-fill-initial {
+  border-right: 2px solid rgba(255, 255, 255, 1);
+  box-shadow:
+    2px 0 8px rgba(255, 255, 255, 0.8),
+    2px 0 20px rgba(255, 255, 255, 0.5),
+    0 0 30px rgba(255, 255, 255, 0.3);
+  animation: glitterPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes glitterPulse {
+  0%, 100% {
+    box-shadow:
+      2px 0 8px rgba(255, 255, 255, 0.8),
+      2px 0 20px rgba(255, 255, 255, 0.5),
+      0 0 30px rgba(255, 255, 255, 0.3);
+    border-right-color: rgba(255, 255, 255, 1);
+  }
+  50% {
+    box-shadow:
+      2px 0 12px rgba(255, 255, 255, 1),
+      2px 0 30px rgba(255, 255, 255, 0.7),
+      0 0 40px rgba(255, 255, 255, 0.5);
+    border-right-color: rgba(255, 255, 255, 1);
+  }
 }
 
 .estimate-value-unified {

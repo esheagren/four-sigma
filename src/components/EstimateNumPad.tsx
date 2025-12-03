@@ -242,8 +242,8 @@ export function EstimateNumPad({
         <div className="estimate-display-unified">
           {/* Background fill layer - shows uncertainty visually */}
           <div
-            className="estimate-uncertainty-fill"
-            style={{ width: `${uncertainty}%` }}
+            className={`estimate-uncertainty-fill ${uncertainty === 0 ? 'estimate-uncertainty-fill-initial' : ''}`}
+            style={{ width: uncertainty === 0 ? '3%' : `${uncertainty}%` }}
           />
 
           {/* Number display (on top of fill) */}
