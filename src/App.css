@@ -6207,6 +6207,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 /* Equals Key */
 .calc-key-equals-unified {
+  grid-column: span 2;
   font-size: 1.8rem;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.85);
@@ -6222,7 +6223,6 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 /* Submit Key */
 .calc-key-submit-unified {
-  grid-column: span 2;
   background: linear-gradient(
     135deg,
     rgba(99, 102, 241, 0.7) 0%,
