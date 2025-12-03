@@ -127,6 +127,15 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
     setUpper(formatWithCommas(upperValue));
   }, []);
 
+  // Set a specific bound (from calculator specific guess mode)
+  const handleSetSpecificBound = useCallback((field: 'lower' | 'upper', value: string) => {
+    if (field === 'lower') {
+      setLower(formatWithCommas(value));
+    } else {
+      setUpper(formatWithCommas(value));
+    }
+  }, []);
+
   // Handle direct keyboard input (desktop only)
   const handleKeyboardInput = useCallback((e: React.ChangeEvent<HTMLInputElement>, field: ActiveField) => {
     const rawValue = e.target.value;
@@ -236,6 +245,7 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
         isSubmitDisabled={isSubmitDisabled}
         onUseCalculatorResult={handleUseCalculatorResult}
         onSetBothBounds={handleSetBothBounds}
+        onSetSpecificBound={handleSetSpecificBound}
         isTouch={isTouch}
       />
     </>

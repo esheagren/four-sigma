@@ -10,6 +10,7 @@ interface NumPadProps {
   isSubmitDisabled: boolean;
   onUseCalculatorResult: (result: string) => void;
   onSetBothBounds: (lower: string, upper: string) => void;
+  onSetSpecificBound: (field: 'lower' | 'upper', value: string) => void;
   isTouch: boolean;
 }
 
@@ -22,6 +23,7 @@ export function NumPad({
   isSubmitDisabled,
   onUseCalculatorResult,
   onSetBothBounds,
+  onSetSpecificBound,
   isTouch
 }: NumPadProps) {
   const [isCalculatorMode, setIsCalculatorMode] = useState(false);
@@ -30,6 +32,7 @@ export function NumPad({
   const [tolerance, setTolerance] = useState(0);
   const [previewLower, setPreviewLower] = useState('-');
   const [previewUpper, setPreviewUpper] = useState('-');
+  const [isRangeMode, setIsRangeMode] = useState(true); // true = range mode, false = specific guess mode
 
   // Get the display value (result or expression)
   const displayValue = calcResult || calcExpression;
@@ -50,7 +53,7 @@ export function NumPad({
     }
   }, [displayValue, tolerance]);
 
-  // Transfer both bounds to main inputs
+  // Transfer both bounds to main inputs (range mode)
   const handleTransferBounds = useCallback(() => {
     if (previewLower === '-' || previewUpper === '-') return;
     onSetBothBounds(previewLower, previewUpper);
@@ -59,6 +62,25 @@ export function NumPad({
     setCalcResult('');
     setTolerance(0);
   }, [previewLower, previewUpper, onSetBothBounds]);
+
+  // Transfer to specific bound (specific guess mode)
+  const handleTransferToLower = useCallback(() => {
+    const valueToUse = calcResult || calcExpression;
+    if (!valueToUse || valueToUse === 'Error') return;
+    onSetSpecificBound('lower', valueToUse);
+    setIsCalculatorMode(false);
+    setCalcExpression('');
+    setCalcResult('');
+  }, [calcResult, calcExpression, onSetSpecificBound]);
+
+  const handleTransferToUpper = useCallback(() => {
+    const valueToUse = calcResult || calcExpression;
+    if (!valueToUse || valueToUse === 'Error') return;
+    onSetSpecificBound('upper', valueToUse);
+    setIsCalculatorMode(false);
+    setCalcExpression('');
+    setCalcResult('');
+  }, [calcResult, calcExpression, onSetSpecificBound]);
 
   // Evaluate expression when equals is pressed
   const handleEquals = useCallback(() => {
@@ -271,50 +293,113 @@ export function NumPad({
     }
 
     // Mobile: full-screen vertical calculator with split bounds
+    const hasValue = (calcResult || calcExpression) && calcExpression !== '' && calcResult !== 'Error';
+
     return (
       <div className="numpad-container">
         <div className="numpad numpad-calculator">
-          {/* Back button */}
-          <button className="calc-back-btn" onClick={handleExitCalculator}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5"></path>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-          </button>
-
-          {/* Top: Bounds Preview with Transfer Button */}
-          <div className="calc-bounds-row">
-            <div className="calc-bound-box">
-              <span className="calc-bound-value">{previewLower}</span>
+          {/* Header: Mode Toggle and Close */}
+          <div className="calc-header">
+            <div className="calc-mode-toggle">
+              <button
+                className={`calc-mode-btn ${isRangeMode ? 'calc-mode-btn-active' : ''}`}
+                onClick={() => setIsRangeMode(true)}
+                title="Range mode"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14"></path>
+                  <path d="M5 12l4-4"></path>
+                  <path d="M5 12l4 4"></path>
+                  <path d="M19 12l-4-4"></path>
+                  <path d="M19 12l-4 4"></path>
+                </svg>
+              </button>
+              <button
+                className={`calc-mode-btn ${!isRangeMode ? 'calc-mode-btn-active' : ''}`}
+                onClick={() => setIsRangeMode(false)}
+                title="Specific guess mode"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <circle cx="12" cy="12" r="6"></circle>
+                  <circle cx="12" cy="12" r="2"></circle>
+                </svg>
+              </button>
             </div>
-            <button
-              className="calc-transfer-btn"
-              onClick={handleTransferBounds}
-              disabled={previewLower === '-' || previewUpper === '-'}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 19V5"></path>
-                <polyline points="5 12 12 5 19 12"></polyline>
+            <button className="calc-close-btn" onClick={handleExitCalculator}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
             </button>
-            <div className="calc-bound-box">
-              <span className="calc-bound-value">{previewUpper}</span>
-            </div>
           </div>
 
-          {/* Tolerance Slider */}
-          <div className="calc-tolerance-row">
-            <input
-              type="range"
-              min="0"
-              max="100"
-              step="5"
-              value={tolerance}
-              onChange={(e) => setTolerance(Number(e.target.value))}
-              className="calc-tolerance-slider"
-            />
-            <span className="calc-tolerance-label">± {tolerance}%</span>
-          </div>
+          {/* Range Mode UI */}
+          {isRangeMode ? (
+            <>
+              <div className="calc-bounds-row">
+                <div className="calc-bound-box">
+                  <span className="calc-bound-label">LOWER</span>
+                  <span className="calc-bound-value">{previewLower}</span>
+                </div>
+                <button
+                  className="calc-transfer-btn"
+                  onClick={handleTransferBounds}
+                  disabled={previewLower === '-' || previewUpper === '-'}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 19V5"></path>
+                    <polyline points="5 12 12 5 19 12"></polyline>
+                  </svg>
+                </button>
+                <div className="calc-bound-box">
+                  <span className="calc-bound-label">UPPER</span>
+                  <span className="calc-bound-value">{previewUpper}</span>
+                </div>
+              </div>
+
+              <div className="calc-tolerance-row">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  value={tolerance}
+                  onChange={(e) => setTolerance(Number(e.target.value))}
+                  className="calc-tolerance-slider"
+                />
+                <span className="calc-tolerance-label">± {tolerance}%</span>
+              </div>
+            </>
+          ) : (
+            /* Specific Guess Mode UI */
+            <div className="calc-specific-row">
+              <button
+                className="calc-specific-btn"
+                onClick={handleTransferToLower}
+                disabled={!hasValue}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5"></path>
+                  <polyline points="12 5 5 12 12 19"></polyline>
+                </svg>
+                <span className="calc-specific-label">TO LOWER</span>
+                <span className="calc-specific-value">{hasValue ? formatNumber(calcResult || calcExpression) : '0'}</span>
+              </button>
+              <button
+                className="calc-specific-btn"
+                onClick={handleTransferToUpper}
+                disabled={!hasValue}
+              >
+                <span className="calc-specific-label">TO UPPER</span>
+                <span className="calc-specific-value">{hasValue ? formatNumber(calcResult || calcExpression) : '0'}</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14"></path>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          )}
 
           {/* Calculator Display */}
           <div className="calc-display">

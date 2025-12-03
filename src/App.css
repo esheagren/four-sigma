@@ -5073,7 +5073,66 @@ a.judgement-answer-below:hover .judgement-answer-value {
   padding-top: 0.25rem;
 }
 
-/* Split Bounds UI */
+/* Calculator Header with Mode Toggle */
+.calc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.calc-mode-toggle {
+  display: flex;
+  background: rgba(30, 30, 40, 0.9);
+  border-radius: 20px;
+  padding: 4px;
+  gap: 2px;
+}
+
+.calc-mode-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 16px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.calc-mode-btn:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.calc-mode-btn-active {
+  background: rgba(60, 60, 80, 0.9);
+  color: white;
+}
+
+.calc-close-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.calc-close-btn:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Split Bounds UI (Range Mode) */
 .calc-bounds-row {
   display: flex;
   align-items: center;
@@ -5088,8 +5147,19 @@ a.judgement-answer-below:hover .judgement-answer-value {
   background: rgba(20, 20, 30, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
-  padding: 0.5rem 0.75rem;
+  padding: 0.4rem 0.75rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.calc-bound-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .calc-bound-value {
@@ -5097,6 +5167,65 @@ a.judgement-answer-below:hover .judgement-answer-value {
   font-weight: 600;
   font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
   color: white;
+}
+
+/* Specific Guess Mode UI */
+.calc-specific-row {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.calc-specific-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  background: rgba(99, 91, 255, 0.2);
+  border: 1px solid rgba(99, 91, 255, 0.4);
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.calc-specific-btn:hover:not(:disabled) {
+  background: rgba(99, 91, 255, 0.3);
+  border-color: rgba(99, 91, 255, 0.6);
+}
+
+.calc-specific-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.calc-specific-btn:disabled {
+  background: rgba(60, 60, 80, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.4);
+  cursor: not-allowed;
+}
+
+.calc-specific-btn svg {
+  stroke: currentColor;
+  opacity: 0.7;
+}
+
+.calc-specific-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.8;
+}
+
+.calc-specific-value {
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
 }
 
 .calc-transfer-btn {
