@@ -5916,6 +5916,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   display: flex;
   align-items: center;
   gap: 8px;
+  padding-left: 60px; /* Align left edge with right side for symmetry */
 }
 
 .estimate-display-unified {
