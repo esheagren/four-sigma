@@ -359,16 +359,24 @@ export function NumPad({
               </div>
 
               <div className="calc-tolerance-row">
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  step="5"
-                  value={tolerance}
-                  onChange={(e) => setTolerance(Number(e.target.value))}
-                  className="calc-tolerance-slider"
-                />
-                <span className="calc-tolerance-label">± {tolerance}%</span>
+                <div className="calc-slider-container">
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="5"
+                    value={tolerance}
+                    onChange={(e) => setTolerance(Number(e.target.value))}
+                    className="calc-tolerance-slider"
+                  />
+                  <div
+                    className="calc-slider-thumb-label"
+                    style={{ left: `${tolerance}%` }}
+                  >
+                    {tolerance}
+                  </div>
+                </div>
+                <span className="calc-tolerance-label">%</span>
               </div>
             </>
           ) : (
