@@ -5925,7 +5925,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 6px 12px 6px 24px; /* Extra left padding for easier grip */
+  padding: 6px 12px;
   /* Liquid glass inner panel */
   background: linear-gradient(
     135deg,
