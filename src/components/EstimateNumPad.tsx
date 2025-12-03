@@ -136,8 +136,8 @@ export function EstimateNumPad({
     }
   }, [bounds, uncertainty, hasValidEstimate, estimate, onBoundsChange]);
 
-  // Display value: only show finalized estimate (not currentInput during calculation)
-  const displayValue = estimate || '0';
+  // Display value: show currentInput while typing, or estimate if finalized
+  const displayValue = currentInput || estimate || '0';
 
   // History bar content: show the full expression being built
   const historyDisplay = useMemo(() => {
@@ -265,27 +265,29 @@ export function EstimateNumPad({
   }, [hasValidEstimate, bounds, onSubmit, lowerOverride, upperOverride]);
 
 
-  // Are we mid-calculation (building an expression)?
-  const isCalculating = expression.length > 0 || currentInput !== '';
+  // Are we mid-calculation? Only when we have operators in the expression
+  const isCalculating = expression.length > 0;
 
   return (
     <div className="estimate-numpad-container">
-      {/* Estimate Display - show slider only when NOT calculating */}
-      {!isCalculating ? (
-        <div className="estimate-display-row">
-          <div className="estimate-display-unified">
-            {/* Background fill layer - shows uncertainty visually */}
+      {/* Estimate Display - always same size, just hide slider elements when calculating */}
+      <div className="estimate-display-row">
+        <div className="estimate-display-unified">
+          {/* Background fill layer - only show when NOT calculating */}
+          {!isCalculating && (
             <div
               className={`estimate-uncertainty-fill ${uncertainty === 0 ? 'estimate-uncertainty-fill-initial' : ''}`}
               style={{ width: uncertainty === 0 ? '12px' : `${uncertainty}%` }}
             />
+          )}
 
-            {/* Number display (on top of fill) */}
-            <div className="estimate-value-unified">
-              {displayValue}
-            </div>
+          {/* Number display (on top of fill) */}
+          <div className="estimate-value-unified">
+            {isCalculating ? historyDisplay : displayValue}
+          </div>
 
-            {/* Hidden range input for drag interaction */}
+          {/* Hidden range input for drag interaction - only when NOT calculating */}
+          {!isCalculating && (
             <input
               type="range"
               min="0"
@@ -295,21 +297,14 @@ export function EstimateNumPad({
               onChange={handleSliderChange}
               className="estimate-uncertainty-input"
             />
-          </div>
+          )}
+        </div>
 
-          {/* Percentage label - separate, to the right */}
+        {/* Percentage label - only show when NOT calculating */}
+        {!isCalculating && (
           <span className="uncertainty-percent-label">±{Math.round(uncertainty)}%</span>
-        </div>
-      ) : (
-        /* While calculating, show just the expression in a simpler display */
-        <div className="estimate-display-row">
-          <div className="estimate-display-unified estimate-display-calculating">
-            <div className="estimate-value-unified">
-              {historyDisplay}
-            </div>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Calculator Grid */}
       <div className="calc-grid-unified">
