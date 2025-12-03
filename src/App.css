@@ -5955,7 +5955,6 @@ a.judgement-answer-below:hover .judgement-answer-value {
     rgba(168, 85, 247, 0.2) 100%
   );
   pointer-events: none;
-  transition: width 0.1s ease;
   border-radius: 12px 0 0 12px;
   /* Bright white edge on the right side */
   border-right: 2px solid rgba(255, 255, 255, 0.9);

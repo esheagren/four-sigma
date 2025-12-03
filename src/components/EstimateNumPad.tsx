@@ -259,7 +259,7 @@ export function EstimateNumPad({
             type="range"
             min="0"
             max="100"
-            step="1"
+            step="0.5"
             value={uncertainty}
             onChange={handleSliderChange}
             className="estimate-uncertainty-input"
@@ -267,7 +267,7 @@ export function EstimateNumPad({
         </div>
 
         {/* Percentage label - separate, to the right */}
-        <span className="uncertainty-percent-label">±{uncertainty}%</span>
+        <span className="uncertainty-percent-label">±{Math.round(uncertainty)}%</span>
       </div>
 
       {/* Calculator Grid */}
