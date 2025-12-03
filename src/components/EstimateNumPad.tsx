@@ -136,8 +136,8 @@ export function EstimateNumPad({
     }
   }, [bounds, uncertainty, hasValidEstimate, estimate, onBoundsChange]);
 
-  // Display value: show currentInput while typing, otherwise show estimate
-  const displayValue = currentInput || estimate || '0';
+  // Display value: only show finalized estimate (not currentInput during calculation)
+  const displayValue = estimate || '0';
 
   // History bar content: show the full expression being built
   const historyDisplay = useMemo(() => {
@@ -265,42 +265,49 @@ export function EstimateNumPad({
   }, [hasValidEstimate, bounds, onSubmit, lowerOverride, upperOverride]);
 
 
+  // Are we mid-calculation (building an expression)?
+  const isCalculating = expression.length > 0 || currentInput !== '';
+
   return (
     <div className="estimate-numpad-container">
-      {/* Unified Estimate Display with integrated uncertainty slider */}
-      <div className="estimate-display-row">
-        <div className="estimate-display-unified">
-          {/* Background fill layer - shows uncertainty visually */}
-          <div
-            className={`estimate-uncertainty-fill ${uncertainty === 0 ? 'estimate-uncertainty-fill-initial' : ''}`}
-            style={{ width: uncertainty === 0 ? '12px' : `${uncertainty}%` }}
-          />
+      {/* Estimate Display - show slider only when NOT calculating */}
+      {!isCalculating ? (
+        <div className="estimate-display-row">
+          <div className="estimate-display-unified">
+            {/* Background fill layer - shows uncertainty visually */}
+            <div
+              className={`estimate-uncertainty-fill ${uncertainty === 0 ? 'estimate-uncertainty-fill-initial' : ''}`}
+              style={{ width: uncertainty === 0 ? '12px' : `${uncertainty}%` }}
+            />
 
-          {/* Number display (on top of fill) */}
-          <div className="estimate-value-unified">
-            {displayValue}
+            {/* Number display (on top of fill) */}
+            <div className="estimate-value-unified">
+              {displayValue}
+            </div>
+
+            {/* Hidden range input for drag interaction */}
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="0.5"
+              value={uncertainty}
+              onChange={handleSliderChange}
+              className="estimate-uncertainty-input"
+            />
           </div>
 
-          {/* Hidden range input for drag interaction */}
-          <input
-            type="range"
-            min="0"
-            max="100"
-            step="0.5"
-            value={uncertainty}
-            onChange={handleSliderChange}
-            className="estimate-uncertainty-input"
-          />
+          {/* Percentage label - separate, to the right */}
+          <span className="uncertainty-percent-label">±{Math.round(uncertainty)}%</span>
         </div>
-
-        {/* Percentage label - separate, to the right */}
-        <span className="uncertainty-percent-label">±{Math.round(uncertainty)}%</span>
-      </div>
-
-      {/* History bar - shows the expression being built */}
-      {expression.length > 0 && (
-        <div className="calc-history-bar">
-          {historyDisplay}
+      ) : (
+        /* While calculating, show just the expression in a simpler display */
+        <div className="estimate-display-row">
+          <div className="estimate-display-unified estimate-display-calculating">
+            <div className="estimate-value-unified">
+              {historyDisplay}
+            </div>
+          </div>
         </div>
       )}
 
