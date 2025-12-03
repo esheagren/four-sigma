@@ -329,7 +329,7 @@ export function NumPad({
                   type="range"
                   min="0"
                   max="100"
-                  step="5"
+                  step="1"
                   value={tolerance}
                   onChange={(e) => setTolerance(Number(e.target.value))}
                   className="calc-tolerance-slider"
