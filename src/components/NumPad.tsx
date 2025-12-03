@@ -379,12 +379,6 @@ export function NumPad({
         </div>
         <div className="numpad-actions">
           <button
-            className="numpad-toggle-btn"
-            onClick={onToggleField}
-          >
-            {activeField === 'lower' ? 'Upper Bound' : 'Lower Bound'}
-          </button>
-          <button
             className="numpad-calc-btn"
             onClick={() => setIsCalculatorMode(true)}
           >
