@@ -355,6 +355,7 @@ body {
 
 /* Question Card */
 .question-card {
+  position: relative;
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.25) 0%,
@@ -371,10 +372,46 @@ body {
     inset 0 -1px 0 rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.3);
   max-width: 100%;
+  overflow: hidden;
+}
+
+/* Subtle bell curve background that expands with uncertainty */
+.bell-curve-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+  z-index: 0;
+}
+
+.bell-curve-bg::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Width scales from 10% to 100% based on uncertainty */
+  width: calc(10% + var(--bell-width, 0%) * 0.9);
+  height: 100%;
+  /* Gaussian-like radial gradient - TESTING: dramatically increased opacity */
+  background: radial-gradient(
+    ellipse 100% 150% at 50% 100%,
+    rgba(99, 102, 241, 0.5) 0%,
+    rgba(99, 102, 241, 0.25) 40%,
+    transparent 70%
+  );
+  /* Smooth transition for width changes */
+  transition: width 0.3s ease-out;
 }
 
 /* Question Header */
 .question-header {
+  position: relative;
+  z-index: 1;
   background: rgba(255, 255, 255, 0.85);
   border-radius: 10px;
   padding: 1rem 1.25rem;
@@ -6408,6 +6445,8 @@ a.judgement-answer-below:hover .judgement-answer-value {
    ============================================ */
 
 .bounds-display-question {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
