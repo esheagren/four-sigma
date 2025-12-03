@@ -1,9 +1,25 @@
 // EstimateNumPad - Unified estimate + uncertainty slider component
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
+// Bounds data passed to parent
+export interface BoundsData {
+  lower: number;
+  upper: number;
+  estimate: number;
+  uncertainty: number;
+  hasValidEstimate: boolean;
+}
+
 interface EstimateNumPadProps {
   onSubmit: (lower: number, upper: number) => void;
   isTouch: boolean;
+  // Callback to notify parent of bound changes
+  onBoundsChange?: (bounds: BoundsData | null) => void;
+  // Optional overrides from parent (when user edits bounds directly)
+  lowerOverride?: number | null;
+  upperOverride?: number | null;
+  // Callback when overrides should be cleared (e.g., slider moved)
+  onClearOverrides?: () => void;
 }
 
 // Format number with commas (e.g., 1000000 -> "1,000,000")
@@ -52,7 +68,17 @@ function computeBounds(estimate: string, uncertainty: number): { lower: number; 
   };
 }
 
-export function EstimateNumPad({ onSubmit, isTouch }: EstimateNumPadProps) {
+// Export formatDisplay for use in QuestionCard
+export { formatDisplay };
+
+export function EstimateNumPad({
+  onSubmit,
+  isTouch,
+  onBoundsChange,
+  lowerOverride,
+  upperOverride,
+  onClearOverrides
+}: EstimateNumPadProps) {
   // Core state
   const [estimate, setEstimate] = useState<string>('');
   const [uncertainty, setUncertainty] = useState<number>(0);
@@ -67,6 +93,24 @@ export function EstimateNumPad({ onSubmit, isTouch }: EstimateNumPadProps) {
 
   // Check if we have a valid estimate for submission
   const hasValidEstimate = estimate !== '' && !isNaN(parseFormattedNumber(estimate));
+
+  // Notify parent of bounds changes
+  useEffect(() => {
+    if (onBoundsChange) {
+      if (hasValidEstimate) {
+        const estimateValue = parseFormattedNumber(estimate);
+        onBoundsChange({
+          lower: bounds.lower,
+          upper: bounds.upper,
+          estimate: estimateValue,
+          uncertainty,
+          hasValidEstimate: true
+        });
+      } else {
+        onBoundsChange(null);
+      }
+    }
+  }, [bounds, uncertainty, hasValidEstimate, estimate, onBoundsChange]);
 
   // Scratchpad display (shows pending operation)
   const scratchpad = useMemo(() => {
@@ -164,17 +208,31 @@ export function EstimateNumPad({ onSubmit, isTouch }: EstimateNumPadProps) {
     setIsNewEntry(true);
   }, [estimate, pendingOperator, pendingOperand, calculate]);
 
-  // Handle submit
+  // Handle slider change - clear overrides when slider moves
+  const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setUncertainty(Number(e.target.value));
+    // Clear any manual overrides when slider is adjusted
+    if (onClearOverrides) {
+      onClearOverrides();
+    }
+  }, [onClearOverrides]);
+
+  // Handle submit - use overrides if provided
   const handleSubmit = useCallback(() => {
     if (!hasValidEstimate) return;
-    onSubmit(bounds.lower, bounds.upper);
+
+    // Use overrides if provided, otherwise use computed bounds
+    const finalLower = lowerOverride !== null && lowerOverride !== undefined ? lowerOverride : bounds.lower;
+    const finalUpper = upperOverride !== null && upperOverride !== undefined ? upperOverride : bounds.upper;
+
+    onSubmit(finalLower, finalUpper);
     // Reset for next question
     setEstimate('');
     setUncertainty(0);
     setPendingOperator(null);
     setPendingOperand(null);
     setIsNewEntry(false);
-  }, [hasValidEstimate, bounds, onSubmit]);
+  }, [hasValidEstimate, bounds, onSubmit, lowerOverride, upperOverride]);
 
 
   return (
@@ -187,17 +245,6 @@ export function EstimateNumPad({ onSubmit, isTouch }: EstimateNumPadProps) {
         {scratchpad && (
           <div className="estimate-scratchpad-compact">{scratchpad}</div>
         )}
-      </div>
-
-      {/* Compact Bound Cards */}
-      <div className="bound-cards-compact">
-        <div className={`bound-card-compact ${uncertainty > 0 ? 'bound-card-compact-active-lower' : ''}`}>
-          {hasValidEstimate ? formatDisplay(bounds.lower) : '-'}
-        </div>
-        <div className="bound-separator-compact">–</div>
-        <div className={`bound-card-compact ${uncertainty > 0 ? 'bound-card-compact-active-upper' : ''}`}>
-          {hasValidEstimate ? formatDisplay(bounds.upper) : '-'}
-        </div>
       </div>
 
       {/* Uncertainty Slider with draggable thumb */}
@@ -218,7 +265,7 @@ export function EstimateNumPad({ onSubmit, isTouch }: EstimateNumPadProps) {
             max="100"
             step="1"
             value={uncertainty}
-            onChange={(e) => setUncertainty(Number(e.target.value))}
+            onChange={handleSliderChange}
             className="uncertainty-slider-input"
           />
         </div>
