@@ -1,5 +1,5 @@
 // NumPad component with liquid glass design
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 interface NumPadProps {
   activeField: 'lower' | 'upper';
@@ -33,6 +33,24 @@ export function NumPad({
   const [previewLower, setPreviewLower] = useState('-');
   const [previewUpper, setPreviewUpper] = useState('-');
   const [isRangeMode, setIsRangeMode] = useState(true); // true = range mode, false = specific guess mode
+  const numpadRef = useRef<HTMLDivElement>(null);
+
+  // Handle click outside to close calculator
+  useEffect(() => {
+    if (!isCalculatorMode) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (numpadRef.current && !numpadRef.current.contains(event.target as Node)) {
+        setIsCalculatorMode(false);
+        setCalcExpression('');
+        setCalcResult('');
+        setTolerance(0);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isCalculatorMode]);
 
   // Get the display value (result or expression)
   const displayValue = calcResult || calcExpression;
@@ -297,8 +315,8 @@ export function NumPad({
 
     return (
       <div className="numpad-container">
-        <div className="numpad numpad-calculator">
-          {/* Header: Mode Toggle and Close */}
+        <div className="numpad numpad-calculator" ref={numpadRef}>
+          {/* Header: Mode Toggle */}
           <div className="calc-header">
             <div className="calc-mode-toggle">
               <button
@@ -326,12 +344,6 @@ export function NumPad({
                 </svg>
               </button>
             </div>
-            <button className="calc-close-btn" onClick={handleExitCalculator}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
           </div>
 
           {/* Range Mode UI */}
