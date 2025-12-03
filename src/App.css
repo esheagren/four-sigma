@@ -5905,10 +5905,10 @@ a.judgement-answer-below:hover .judgement-answer-value {
   box-shadow:
     0 -8px 32px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 /* Compact Estimate Display */
@@ -5916,8 +5916,8 @@ a.judgement-answer-below:hover .judgement-answer-value {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 10px 16px;
+  gap: 10px;
+  padding: 6px 12px;
   /* Liquid glass inner panel - higher opacity */
   background: linear-gradient(
     135deg,
@@ -5926,15 +5926,15 @@ a.judgement-answer-below:hover .judgement-answer-value {
     rgba(255, 255, 255, 0.16) 100%
   );
   border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 16px;
-  min-height: 48px;
+  border-radius: 12px;
+  min-height: 36px;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.25),
     inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 }
 
 .estimate-value-compact {
-  font-size: 1.75rem;
+  font-size: 1.35rem;
   font-weight: 300;
   color: rgba(255, 255, 255, 0.95);
   letter-spacing: -0.02em;
@@ -5942,7 +5942,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
 }
 
 .estimate-scratchpad-compact {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
   color: rgba(255, 255, 255, 0.4);
   letter-spacing: 0.03em;
@@ -5953,12 +5953,12 @@ a.judgement-answer-below:hover .judgement-answer-value {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .bound-card-compact {
   flex: 1;
-  max-width: 120px;
+  max-width: 100px;
   /* Liquid glass card - higher opacity */
   background: linear-gradient(
     135deg,
@@ -5966,10 +5966,10 @@ a.judgement-answer-below:hover .judgement-answer-value {
     rgba(255, 255, 255, 0.08) 100%
   );
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 10px;
-  padding: 8px 12px;
+  border-radius: 8px;
+  padding: 4px 8px;
   text-align: center;
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.5);
   transition: all 0.2s ease;
@@ -6004,21 +6004,21 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 .bound-separator-compact {
   color: rgba(255, 255, 255, 0.3);
-  font-size: 0.9rem;
+  font-size: 0.75rem;
 }
 
 /* Compact Uncertainty Slider with draggable thumb */
 .uncertainty-row-compact {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   padding: 0 4px;
 }
 
 .uncertainty-slider-wrapper {
   flex: 1;
   position: relative;
-  height: 24px;
+  height: 20px;
   display: flex;
   align-items: center;
 }
@@ -6045,8 +6045,8 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 .uncertainty-slider-thumb {
   position: absolute;
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   /* Liquid glass thumb */
   background: linear-gradient(
     135deg,
@@ -6055,8 +6055,8 @@ a.judgement-answer-below:hover .judgement-answer-value {
   );
   border-radius: 50%;
   box-shadow:
-    0 0 12px rgba(99, 102, 241, 0.6),
-    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 10px rgba(99, 102, 241, 0.6),
+    0 2px 6px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 1),
     inset 0 -1px 2px rgba(99, 102, 241, 0.3);
   transform: translateX(-50%);
@@ -6077,9 +6077,9 @@ a.judgement-answer-below:hover .judgement-answer-value {
 }
 
 .uncertainty-percent {
-  min-width: 52px;
+  min-width: 44px;
   text-align: right;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
   font-variant-numeric: tabular-nums;
@@ -6089,12 +6089,12 @@ a.judgement-answer-below:hover .judgement-answer-value {
 .calc-grid-unified {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  gap: 6px;
 }
 
 .calc-key-unified {
-  height: 48px;
-  border-radius: 12px;
+  height: 42px;
+  border-radius: 10px;
   /* Liquid glass button - higher opacity */
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: linear-gradient(
