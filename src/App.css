@@ -5916,7 +5916,6 @@ a.judgement-answer-below:hover .judgement-answer-value {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px; /* Extra space before calculator to prevent accidental backspace */
 }
 
 .estimate-display-unified {
