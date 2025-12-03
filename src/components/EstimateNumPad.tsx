@@ -237,28 +237,24 @@ export function EstimateNumPad({
 
   return (
     <div className="estimate-numpad-container">
-      {/* Compact Estimate Display */}
-      <div className="estimate-display-compact">
-        <div className="estimate-value-compact">
-          {estimate ? formatWithCommas(estimate) : '0'}
-        </div>
-        {scratchpad && (
-          <div className="estimate-scratchpad-compact">{scratchpad}</div>
-        )}
-      </div>
-
-      {/* Uncertainty Slider with draggable thumb */}
-      <div className="uncertainty-row-compact">
-        <div className="uncertainty-slider-wrapper">
-          <div className="uncertainty-slider-track" />
+      {/* Unified Estimate Display with integrated uncertainty slider */}
+      <div className="estimate-display-row">
+        <div className="estimate-display-unified">
+          {/* Background fill layer - shows uncertainty visually */}
           <div
-            className="uncertainty-slider-fill-compact"
+            className="estimate-uncertainty-fill"
             style={{ width: `${uncertainty}%` }}
           />
-          <div
-            className="uncertainty-slider-thumb"
-            style={{ left: `${uncertainty}%` }}
-          />
+
+          {/* Number display (on top of fill) */}
+          <div className="estimate-value-unified">
+            {estimate ? formatWithCommas(estimate) : '0'}
+          </div>
+          {scratchpad && (
+            <div className="estimate-scratchpad-unified">{scratchpad}</div>
+          )}
+
+          {/* Hidden range input for drag interaction */}
           <input
             type="range"
             min="0"
@@ -266,10 +262,12 @@ export function EstimateNumPad({
             step="1"
             value={uncertainty}
             onChange={handleSliderChange}
-            className="uncertainty-slider-input"
+            className="estimate-uncertainty-input"
           />
         </div>
-        <span className="uncertainty-percent">±{uncertainty}%</span>
+
+        {/* Percentage label - separate, to the right */}
+        <span className="uncertainty-percent-label">±{uncertainty}%</span>
       </div>
 
       {/* Calculator Grid */}

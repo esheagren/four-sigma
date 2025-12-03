@@ -5911,14 +5911,22 @@ a.judgement-answer-below:hover .judgement-answer-value {
   gap: 6px;
 }
 
-/* Compact Estimate Display */
-.estimate-display-compact {
+/* Unified Estimate Display with Integrated Uncertainty Slider */
+.estimate-display-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.estimate-display-unified {
+  flex: 1;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   padding: 6px 12px;
-  /* Liquid glass inner panel - higher opacity */
+  /* Liquid glass inner panel */
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.22) 0%,
@@ -5931,9 +5939,29 @@ a.judgement-answer-below:hover .judgement-answer-value {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.25),
     inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Clip the fill */
 }
 
-.estimate-value-compact {
+/* Uncertainty fill - background gradient that grows with uncertainty */
+.estimate-uncertainty-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(99, 102, 241, 0.35) 0%,
+    rgba(139, 92, 246, 0.25) 50%,
+    rgba(168, 85, 247, 0.2) 100%
+  );
+  pointer-events: none;
+  transition: width 0.1s ease;
+  border-radius: 12px 0 0 12px;
+}
+
+.estimate-value-unified {
+  position: relative;
+  z-index: 1;
   font-size: 1.35rem;
   font-weight: 300;
   color: rgba(255, 255, 255, 0.95);
@@ -5941,11 +5969,38 @@ a.judgement-answer-below:hover .judgement-answer-value {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-.estimate-scratchpad-compact {
+.estimate-scratchpad-unified {
+  position: relative;
+  z-index: 1;
   font-size: 0.7rem;
   font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
   color: rgba(255, 255, 255, 0.4);
   letter-spacing: 0.03em;
+}
+
+/* Hidden range input for drag interaction */
+.estimate-uncertainty-input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: ew-resize;
+  z-index: 2;
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+/* Percentage label to the right of display */
+.uncertainty-percent-label {
+  min-width: 50px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
 /* Compact Bound Cards */
@@ -6005,84 +6060,6 @@ a.judgement-answer-below:hover .judgement-answer-value {
 .bound-separator-compact {
   color: rgba(255, 255, 255, 0.3);
   font-size: 0.75rem;
-}
-
-/* Compact Uncertainty Slider with draggable thumb */
-.uncertainty-row-compact {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 4px;
-}
-
-.uncertainty-slider-wrapper {
-  flex: 1;
-  position: relative;
-  height: 20px;
-  display: flex;
-  align-items: center;
-}
-
-.uncertainty-slider-track {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 2px;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.uncertainty-slider-fill-compact {
-  position: absolute;
-  left: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #6366f1, #a78bfa);
-  border-radius: 2px;
-  pointer-events: none;
-  box-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
-}
-
-.uncertainty-slider-thumb {
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  /* Liquid glass thumb */
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 255, 255, 0.8) 100%
-  );
-  border-radius: 50%;
-  box-shadow:
-    0 0 10px rgba(99, 102, 241, 0.6),
-    0 2px 6px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 2px rgba(99, 102, 241, 0.3);
-  transform: translateX(-50%);
-  pointer-events: none;
-  border: 2px solid rgba(99, 102, 241, 0.8);
-}
-
-.uncertainty-slider-input {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-  z-index: 2;
-  -webkit-appearance: none;
-  appearance: none;
-  margin: 0;
-}
-
-.uncertainty-percent {
-  min-width: 44px;
-  text-align: right;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
-  font-variant-numeric: tabular-nums;
 }
 
 /* Calculator Grid */
@@ -6264,18 +6241,18 @@ a.judgement-answer-below:hover .judgement-answer-value {
     gap: 6px;
   }
 
-  .estimate-display-compact {
+  .estimate-display-unified {
     padding: 6px 12px;
     min-height: 38px;
   }
 
-  .estimate-value-compact {
+  .estimate-value-unified {
     font-size: 1.5rem;
   }
 
-  .bound-card-compact {
-    padding: 4px 8px;
-    font-size: 0.9rem;
+  .uncertainty-percent-label {
+    min-width: 45px;
+    font-size: 0.8rem;
   }
 
   .calc-key-unified {
@@ -6285,11 +6262,6 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
   .calc-grid-unified {
     gap: 6px;
-  }
-
-  .uncertainty-slider-thumb {
-    width: 18px;
-    height: 18px;
   }
 }
 
