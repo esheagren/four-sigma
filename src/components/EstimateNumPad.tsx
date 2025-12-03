@@ -303,10 +303,46 @@ export function EstimateNumPad({
   // Are we mid-calculation? Only when we have operators in the expression
   const isCalculating = expression.length > 0;
 
+  // Increment/decrement uncertainty by 1%
+  const handleIncrementUncertainty = useCallback(() => {
+    setUncertainty(prev => Math.min(100, prev + 1));
+    if (onClearOverrides) onClearOverrides();
+  }, [onClearOverrides]);
+
+  const handleDecrementUncertainty = useCallback(() => {
+    setUncertainty(prev => Math.max(0, prev - 1));
+    if (onClearOverrides) onClearOverrides();
+  }, [onClearOverrides]);
+
   return (
     <div className="estimate-numpad-container">
       {/* Estimate Display - always same size, just hide slider elements when calculating */}
       <div className="estimate-display-row">
+        {/* Up/down arrows for fine-grained uncertainty adjustment */}
+        <div
+          className="uncertainty-arrows"
+          style={{ visibility: isCalculating ? 'hidden' : 'visible' }}
+        >
+          <button
+            className="uncertainty-arrow-btn"
+            onClick={handleIncrementUncertainty}
+            aria-label="Increase uncertainty"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+          </button>
+          <button
+            className="uncertainty-arrow-btn"
+            onClick={handleDecrementUncertainty}
+            aria-label="Decrease uncertainty"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </div>
+
         <div className="estimate-display-unified">
           {/* Background fill layer - only show when NOT calculating */}
           {!isCalculating && (

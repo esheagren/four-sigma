@@ -5916,7 +5916,52 @@ a.judgement-answer-below:hover .judgement-answer-value {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding-left: 60px; /* Align left edge with right side for symmetry */
+}
+
+/* Up/down arrows for fine-grained uncertainty adjustment */
+.uncertainty-arrows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 28px;
+}
+
+.uncertainty-arrow-btn {
+  width: 28px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.uncertainty-arrow-btn:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.18) 100%
+  );
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.uncertainty-arrow-btn:active {
+  transform: scale(0.95);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
 }
 
 .estimate-display-unified {
