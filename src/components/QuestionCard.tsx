@@ -121,6 +121,12 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
     setValue(formatWithCommas(result));
   }, [activeField]);
 
+  // Set both bounds at once (from calculator split)
+  const handleSetBothBounds = useCallback((lowerValue: string, upperValue: string) => {
+    setLower(formatWithCommas(lowerValue));
+    setUpper(formatWithCommas(upperValue));
+  }, []);
+
   // Handle direct keyboard input (desktop only)
   const handleKeyboardInput = useCallback((e: React.ChangeEvent<HTMLInputElement>, field: ActiveField) => {
     const rawValue = e.target.value;
@@ -229,6 +235,7 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
         onSubmit={handleSubmit}
         isSubmitDisabled={isSubmitDisabled}
         onUseCalculatorResult={handleUseCalculatorResult}
+        onSetBothBounds={handleSetBothBounds}
         isTouch={isTouch}
       />
     </>

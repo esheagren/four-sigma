@@ -5073,6 +5073,122 @@ a.judgement-answer-below:hover .judgement-answer-value {
   padding-top: 0.25rem;
 }
 
+/* Split Bounds UI */
+.calc-bounds-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+  padding: 0 0.5rem;
+}
+
+.calc-bound-box {
+  flex: 1;
+  background: rgba(20, 20, 30, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+}
+
+.calc-bound-value {
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  color: white;
+}
+
+.calc-transfer-btn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(99, 91, 255, 0.4);
+}
+
+.calc-transfer-btn:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: scale(1.05);
+}
+
+.calc-transfer-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.calc-transfer-btn:disabled {
+  background: rgba(100, 100, 120, 0.5);
+  color: rgba(255, 255, 255, 0.4);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.calc-transfer-btn svg {
+  stroke: currentColor;
+}
+
+/* Tolerance Slider */
+.calc-tolerance-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.calc-tolerance-slider {
+  flex: 1;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.calc-tolerance-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(99, 91, 255, 0.4);
+  transition: transform 0.1s ease;
+}
+
+.calc-tolerance-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+.calc-tolerance-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 8px rgba(99, 91, 255, 0.4);
+}
+
+.calc-tolerance-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  min-width: 3.5rem;
+  text-align: right;
+}
+
 .calc-back-btn {
   width: 28px;
   height: 28px;

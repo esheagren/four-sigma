@@ -1,5 +1,5 @@
 // NumPad component with liquid glass design
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 interface NumPadProps {
   activeField: 'lower' | 'upper';
@@ -9,6 +9,7 @@ interface NumPadProps {
   onSubmit: () => void;
   isSubmitDisabled: boolean;
   onUseCalculatorResult: (result: string) => void;
+  onSetBothBounds: (lower: string, upper: string) => void;
   isTouch: boolean;
 }
 
@@ -20,11 +21,44 @@ export function NumPad({
   onSubmit,
   isSubmitDisabled,
   onUseCalculatorResult,
+  onSetBothBounds,
   isTouch
 }: NumPadProps) {
   const [isCalculatorMode, setIsCalculatorMode] = useState(false);
   const [calcExpression, setCalcExpression] = useState('');
   const [calcResult, setCalcResult] = useState('');
+  const [tolerance, setTolerance] = useState(0);
+  const [previewLower, setPreviewLower] = useState('-');
+  const [previewUpper, setPreviewUpper] = useState('-');
+
+  // Get the display value (result or expression)
+  const displayValue = calcResult || calcExpression;
+
+  // Auto-calculate bounds when displayValue or tolerance changes
+  useEffect(() => {
+    const val = parseFloat(displayValue);
+
+    if (!isNaN(val) && isFinite(val)) {
+      const variance = val * (tolerance / 100);
+      const lower = Math.round((val - variance) * 100) / 100;
+      const upper = Math.round((val + variance) * 100) / 100;
+      setPreviewLower(String(lower));
+      setPreviewUpper(String(upper));
+    } else {
+      setPreviewLower('-');
+      setPreviewUpper('-');
+    }
+  }, [displayValue, tolerance]);
+
+  // Transfer both bounds to main inputs
+  const handleTransferBounds = useCallback(() => {
+    if (previewLower === '-' || previewUpper === '-') return;
+    onSetBothBounds(previewLower, previewUpper);
+    setIsCalculatorMode(false);
+    setCalcExpression('');
+    setCalcResult('');
+    setTolerance(0);
+  }, [previewLower, previewUpper, onSetBothBounds]);
 
   // Evaluate expression when equals is pressed
   const handleEquals = useCallback(() => {
@@ -236,16 +270,45 @@ export function NumPad({
       );
     }
 
-    // Mobile: full-screen vertical calculator with new layout
+    // Mobile: full-screen vertical calculator with split bounds
     return (
       <div className="numpad-container">
         <div className="numpad numpad-calculator">
-          <button className="calc-back-btn" onClick={handleExitCalculator}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5"></path>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-          </button>
+          {/* Top: Bounds Preview with Transfer Button */}
+          <div className="calc-bounds-row">
+            <div className="calc-bound-box">
+              <span className="calc-bound-value">{previewLower}</span>
+            </div>
+            <button
+              className="calc-transfer-btn"
+              onClick={handleTransferBounds}
+              disabled={previewLower === '-' || previewUpper === '-'}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 19V5"></path>
+                <polyline points="5 12 12 5 19 12"></polyline>
+              </svg>
+            </button>
+            <div className="calc-bound-box">
+              <span className="calc-bound-value">{previewUpper}</span>
+            </div>
+          </div>
+
+          {/* Tolerance Slider */}
+          <div className="calc-tolerance-row">
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="5"
+              value={tolerance}
+              onChange={(e) => setTolerance(Number(e.target.value))}
+              className="calc-tolerance-slider"
+            />
+            <span className="calc-tolerance-label">± {tolerance}%</span>
+          </div>
+
+          {/* Calculator Display */}
           <div className="calc-display">
             <div className="calc-result-row">
               <button className="calc-paste-btn" onClick={handleUseResult}>
@@ -254,6 +317,8 @@ export function NumPad({
               <div className="calc-result">{calcResult ? formatNumber(calcResult) : (calcExpression || '0')}</div>
             </div>
           </div>
+
+          {/* Calculator Grid */}
           <div className="calc-grid-new">
             {/* Row 1: C ^ √ ÷ */}
             <button className="calc-key calc-key-clear" onClick={handleCalcClear}>C</button>
