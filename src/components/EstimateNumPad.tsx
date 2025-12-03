@@ -250,9 +250,6 @@ export function EstimateNumPad({
           <div className="estimate-value-unified">
             {estimate ? formatWithCommas(estimate) : '0'}
           </div>
-          {scratchpad && (
-            <div className="estimate-scratchpad-unified">{scratchpad}</div>
-          )}
 
           {/* Hidden range input for drag interaction */}
           <input
@@ -269,6 +266,13 @@ export function EstimateNumPad({
         {/* Percentage label - separate, to the right */}
         <span className="uncertainty-percent-label">±{Math.round(uncertainty)}%</span>
       </div>
+
+      {/* History bar - shows when there's a pending operation */}
+      {pendingOperator && pendingOperand && (
+        <div className="calc-history-bar">
+          {formatWithCommas(pendingOperand)} {pendingOperator} {estimate || '?'}
+        </div>
+      )}
 
       {/* Calculator Grid */}
       <div className="calc-grid-unified">
