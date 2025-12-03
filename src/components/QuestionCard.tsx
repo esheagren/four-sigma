@@ -129,13 +129,6 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
   return (
     <>
       <div className="question-card">
-        {/* Subtle bell curve background that expands with uncertainty */}
-        <div
-          className="bell-curve-bg"
-          style={{
-            '--bell-width': `${bounds?.uncertainty ?? 0}%`
-          } as React.CSSProperties}
-        />
         <div className="question-header">
           <h2 className="question-prompt">{question.prompt}</h2>
           {question.unit && (
