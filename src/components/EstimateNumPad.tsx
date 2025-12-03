@@ -112,6 +112,9 @@ export function EstimateNumPad({
   const [expression, setExpression] = useState<string[]>([]); // e.g., ['12', '×', '12', '+']
   const [currentInput, setCurrentInput] = useState<string>(''); // Current number being typed
 
+  // Confirmation modal state
+  const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+
   // Computed bounds - use estimate (the final value)
   const bounds = useMemo(() => computeBounds(estimate, uncertainty), [estimate, uncertainty]);
 
@@ -252,6 +255,12 @@ export function EstimateNumPad({
   const handleSubmit = useCallback(() => {
     if (!hasValidEstimate) return;
 
+    // If uncertainty is 0, show confirmation modal
+    if (uncertainty === 0) {
+      setShowConfirmModal(true);
+      return;
+    }
+
     // Use overrides if provided, otherwise use computed bounds
     const finalLower = lowerOverride !== null && lowerOverride !== undefined ? lowerOverride : bounds.lower;
     const finalUpper = upperOverride !== null && upperOverride !== undefined ? upperOverride : bounds.upper;
@@ -262,7 +271,27 @@ export function EstimateNumPad({
     setUncertainty(0);
     setExpression([]);
     setCurrentInput('');
-  }, [hasValidEstimate, bounds, onSubmit, lowerOverride, upperOverride]);
+  }, [hasValidEstimate, bounds, onSubmit, lowerOverride, upperOverride, uncertainty]);
+
+  // Confirm submission without uncertainty
+  const handleConfirmSubmit = useCallback(() => {
+    setShowConfirmModal(false);
+
+    const finalLower = lowerOverride !== null && lowerOverride !== undefined ? lowerOverride : bounds.lower;
+    const finalUpper = upperOverride !== null && upperOverride !== undefined ? upperOverride : bounds.upper;
+
+    onSubmit(finalLower, finalUpper);
+    // Reset for next question
+    setEstimate('');
+    setUncertainty(0);
+    setExpression([]);
+    setCurrentInput('');
+  }, [bounds, onSubmit, lowerOverride, upperOverride]);
+
+  // Cancel submission
+  const handleCancelSubmit = useCallback(() => {
+    setShowConfirmModal(false);
+  }, []);
 
 
   // Are we mid-calculation? Only when we have operators in the expression
@@ -367,6 +396,44 @@ export function EstimateNumPad({
           </svg>
         </button>
       </div>
+
+      {/* Confirmation Modal - shown when submitting with 0% uncertainty */}
+      {showConfirmModal && (
+        <div className="uncertainty-modal-overlay" onClick={handleCancelSubmit}>
+          <div className="uncertainty-modal" onClick={(e) => e.stopPropagation()}>
+            <h3 className="uncertainty-modal-title">No Uncertainty Set</h3>
+            <p className="uncertainty-modal-text">
+              You're submitting with 0% uncertainty, meaning your lower and upper bounds are the same.
+            </p>
+
+            {/* Visual guide showing how to drag */}
+            <div className="uncertainty-modal-demo">
+              <div className="demo-bar">
+                <div className="demo-fill">
+                  <div className="demo-fill-animated"></div>
+                </div>
+                <div className="demo-value">100</div>
+              </div>
+              <div className="demo-arrow">
+                <svg width="40" height="24" viewBox="0 0 40 24" fill="none">
+                  <path d="M5 12 L35 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M25 6 L35 12 L25 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <p className="demo-hint">Drag across the bar to set your confidence range</p>
+            </div>
+
+            <div className="uncertainty-modal-buttons">
+              <button className="uncertainty-modal-btn uncertainty-modal-btn-cancel" onClick={handleCancelSubmit}>
+                Go Back
+              </button>
+              <button className="uncertainty-modal-btn uncertainty-modal-btn-confirm" onClick={handleConfirmSubmit}>
+                Submit Anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
