@@ -5416,8 +5416,16 @@ a.judgement-answer-below:hover .judgement-answer-value {
   background: rgba(150, 80, 90, 0.95);
 }
 
-.calc-grid-new .calc-key-zero {
-  grid-column: span 2;
+.calc-grid-new .calc-key-backspace {
+  background: rgba(60, 65, 80, 0.9);
+}
+
+.calc-grid-new .calc-key-backspace:hover {
+  background: rgba(70, 75, 90, 0.95);
+}
+
+.calc-grid-new .calc-key-backspace svg {
+  stroke: rgba(255, 255, 255, 0.8);
 }
 
 .calc-grid-new .calc-key-equals {
