@@ -6207,9 +6207,9 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 /* Equals Key */
 .calc-key-equals-unified {
-  font-size: 1.5rem;
-  font-weight: 300;
-  color: rgba(255, 255, 255, 0.75);
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .calc-key-equals-unified:hover {
