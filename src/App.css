@@ -6123,15 +6123,15 @@ a.judgement-answer-below:hover .judgement-answer-value {
 .calc-key-unified {
   height: 42px;
   border-radius: 10px;
-  /* Liquid glass button - higher opacity */
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  /* Liquid glass button - increased opacity for better visibility */
+  border: 1px solid rgba(255, 255, 255, 0.3);
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.18) 0%,
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0.14) 100%
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.22) 100%
   );
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(255, 255, 255, 1);
   font-size: 1.25rem;
   font-weight: 400;
   display: flex;
@@ -6150,11 +6150,11 @@ a.judgement-answer-below:hover .judgement-answer-value {
 .calc-key-unified:hover {
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.25) 0%,
-    rgba(255, 255, 255, 0.15) 50%,
-    rgba(255, 255, 255, 0.2) 100%
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.24) 50%,
+    rgba(255, 255, 255, 0.28) 100%
   );
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .calc-key-unified:active {
