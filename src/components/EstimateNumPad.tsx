@@ -300,10 +300,13 @@ export function EstimateNumPad({
           )}
         </div>
 
-        {/* Percentage label - only show when NOT calculating */}
-        {!isCalculating && (
-          <span className="uncertainty-percent-label">±{Math.round(uncertainty)}%</span>
-        )}
+        {/* Percentage label - always present for consistent width, but invisible when calculating */}
+        <span
+          className="uncertainty-percent-label"
+          style={{ visibility: isCalculating ? 'hidden' : 'visible' }}
+        >
+          ±{Math.round(uncertainty)}%
+        </span>
       </div>
 
       {/* Calculator Grid */}
