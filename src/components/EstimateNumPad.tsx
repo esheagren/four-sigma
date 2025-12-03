@@ -1,5 +1,5 @@
 // EstimateNumPad - Unified estimate + uncertainty slider component
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 
 // Bounds data passed to parent
 export interface BoundsData {
@@ -248,14 +248,48 @@ export function EstimateNumPad({
     setCurrentInput('');
   }, [expression, currentInput]);
 
-  // Handle slider change - clear overrides when slider moves
-  const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setUncertainty(Number(e.target.value));
+  // Ref for the slider container
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
+
+  // Handle slider change from range input
+  const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement> | React.FormEvent<HTMLInputElement>) => {
+    const target = e.target as HTMLInputElement;
+    setUncertainty(Number(target.value));
     // Clear any manual overrides when slider is adjusted
     if (onClearOverrides) {
       onClearOverrides();
     }
   }, [onClearOverrides]);
+
+  // Calculate uncertainty from pointer position
+  const calculateUncertaintyFromPointer = useCallback((clientX: number) => {
+    if (!sliderRef.current) return;
+    const rect = sliderRef.current.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
+    setUncertainty(Math.round(percentage * 2) / 2); // Round to 0.5
+    if (onClearOverrides) {
+      onClearOverrides();
+    }
+  }, [onClearOverrides]);
+
+  // Pointer event handlers for smoother drag
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    isDragging.current = true;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    calculateUncertaintyFromPointer(e.clientX);
+  }, [calculateUncertaintyFromPointer]);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isDragging.current) return;
+    calculateUncertaintyFromPointer(e.clientX);
+  }, [calculateUncertaintyFromPointer]);
+
+  const handlePointerUp = useCallback((e: React.PointerEvent) => {
+    isDragging.current = false;
+    e.currentTarget.releasePointerCapture(e.pointerId);
+  }, []);
 
   // Handle submit - use overrides if provided
   const handleSubmit = useCallback(() => {
@@ -343,7 +377,15 @@ export function EstimateNumPad({
           </button>
         </div>
 
-        <div className="estimate-display-unified">
+        <div
+          ref={sliderRef}
+          className="estimate-display-unified"
+          onPointerDown={!isCalculating ? handlePointerDown : undefined}
+          onPointerMove={!isCalculating ? handlePointerMove : undefined}
+          onPointerUp={!isCalculating ? handlePointerUp : undefined}
+          onPointerCancel={!isCalculating ? handlePointerUp : undefined}
+          style={{ touchAction: isCalculating ? 'auto' : 'none' }}
+        >
           {/* Background fill layer - only show when NOT calculating */}
           {!isCalculating && (
             <div
@@ -356,19 +398,6 @@ export function EstimateNumPad({
           <div className="estimate-value-unified">
             {isCalculating ? historyDisplay : displayValue}
           </div>
-
-          {/* Hidden range input for drag interaction - only when NOT calculating */}
-          {!isCalculating && (
-            <input
-              type="range"
-              min="0"
-              max="100"
-              step="0.5"
-              value={uncertainty}
-              onChange={handleSliderChange}
-              className="estimate-uncertainty-input"
-            />
-          )}
         </div>
 
         {/* Percentage label - always present for consistent width, but invisible when calculating */}
