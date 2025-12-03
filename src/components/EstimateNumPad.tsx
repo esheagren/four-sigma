@@ -68,6 +68,31 @@ function computeBounds(estimate: string, uncertainty: number): { lower: number; 
   };
 }
 
+// Evaluate expression with PEMDAS using JavaScript's native operator precedence
+function evaluateExpression(tokens: string[]): number {
+  if (tokens.length === 0) return 0;
+
+  // Convert display operators to JS operators and remove commas
+  const jsExpr = tokens.join(' ')
+    .replace(/×/g, '*')
+    .replace(/÷/g, '/')
+    .replace(/−/g, '-')
+    .replace(/,/g, ''); // Remove commas from numbers
+
+  // Use Function constructor for safe math evaluation
+  // This handles PEMDAS automatically
+  try {
+    const result = new Function(`return (${jsExpr})`)();
+    if (typeof result === 'number' && isFinite(result)) {
+      // Round to avoid floating point issues
+      return Math.round(result * 1e9) / 1e9;
+    }
+    return 0;
+  } catch {
+    return 0;
+  }
+}
+
 // Export formatDisplay for use in QuestionCard
 export { formatDisplay };
 
@@ -79,16 +104,15 @@ export function EstimateNumPad({
   upperOverride,
   onClearOverrides
 }: EstimateNumPadProps) {
-  // Core state
+  // Core state - the final estimate value (result after =)
   const [estimate, setEstimate] = useState<string>('');
   const [uncertainty, setUncertainty] = useState<number>(0);
 
-  // Calculator state
-  const [pendingOperator, setPendingOperator] = useState<string | null>(null);
-  const [pendingOperand, setPendingOperand] = useState<string | null>(null);
-  const [isNewEntry, setIsNewEntry] = useState<boolean>(false);
+  // Expression builder state
+  const [expression, setExpression] = useState<string[]>([]); // e.g., ['12', '×', '12', '+']
+  const [currentInput, setCurrentInput] = useState<string>(''); // Current number being typed
 
-  // Computed bounds
+  // Computed bounds - use estimate (the final value)
   const bounds = useMemo(() => computeBounds(estimate, uncertainty), [estimate, uncertainty]);
 
   // Check if we have a valid estimate for submission
@@ -112,101 +136,108 @@ export function EstimateNumPad({
     }
   }, [bounds, uncertainty, hasValidEstimate, estimate, onBoundsChange]);
 
-  // Scratchpad display (shows pending operation)
-  const scratchpad = useMemo(() => {
-    if (pendingOperator && pendingOperand) {
-      return `${formatWithCommas(pendingOperand)} ${pendingOperator}`;
+  // Display value: show currentInput while typing, otherwise show estimate
+  const displayValue = currentInput || estimate || '0';
+
+  // History bar content: show the full expression being built
+  const historyDisplay = useMemo(() => {
+    const parts = [...expression];
+    if (currentInput) {
+      parts.push(formatWithCommas(currentInput));
     }
-    return '';
-  }, [pendingOperator, pendingOperand]);
+    return parts.join(' ');
+  }, [expression, currentInput]);
+
+  // Check if last token in expression is an operator
+  const isOperator = (token: string) => ['+', '−', '×', '÷'].includes(token);
 
   // Handle digit input
   const handleDigit = useCallback((digit: string) => {
-    if (isNewEntry) {
-      setEstimate(digit);
-      setIsNewEntry(false);
-    } else {
-      const currentRaw = estimate.replace(/,/g, '');
-      const newValue = currentRaw + digit;
-      setEstimate(formatWithCommas(newValue));
-    }
-  }, [estimate, isNewEntry]);
+    const newInput = currentInput + digit;
+    setCurrentInput(formatWithCommas(newInput.replace(/,/g, '')));
+  }, [currentInput]);
 
   // Handle decimal point
   const handleDecimal = useCallback(() => {
-    if (isNewEntry) {
-      setEstimate('0.');
-      setIsNewEntry(false);
-    } else if (!estimate.includes('.')) {
-      if (estimate === '') {
-        setEstimate('0.');
+    if (!currentInput.includes('.')) {
+      if (currentInput === '') {
+        setCurrentInput('0.');
       } else {
-        setEstimate(estimate + '.');
+        setCurrentInput(currentInput + '.');
       }
     }
-  }, [estimate, isNewEntry]);
+  }, [currentInput]);
 
   // Handle backspace
   const handleBackspace = useCallback(() => {
-    if (isNewEntry) return;
-    const currentRaw = estimate.replace(/,/g, '');
-    const newValue = currentRaw.slice(0, -1);
-    setEstimate(formatWithCommas(newValue));
-  }, [estimate, isNewEntry]);
+    if (currentInput) {
+      // Remove last character from current input
+      const raw = currentInput.replace(/,/g, '');
+      const newValue = raw.slice(0, -1);
+      setCurrentInput(formatWithCommas(newValue));
+    } else if (expression.length > 0) {
+      // Remove last token from expression
+      const lastToken = expression[expression.length - 1];
+      if (isOperator(lastToken)) {
+        // Remove operator
+        setExpression(prev => prev.slice(0, -1));
+      } else {
+        // Put the number back into currentInput for editing
+        setCurrentInput(lastToken);
+        setExpression(prev => prev.slice(0, -1));
+      }
+    }
+  }, [currentInput, expression]);
 
   // Handle clear
   const handleClear = useCallback(() => {
     setEstimate('');
-    setPendingOperator(null);
-    setPendingOperand(null);
-    setIsNewEntry(false);
-  }, []);
-
-  // Perform calculation
-  const calculate = useCallback((a: number, op: string, b: number): number => {
-    let result = 0;
-    switch (op) {
-      case '+': result = a + b; break;
-      case '−': result = a - b; break;
-      case '×': result = a * b; break;
-      case '÷': result = b !== 0 ? a / b : 0; break;
-      default: result = b;
-    }
-    // Round to avoid floating point issues
-    return Math.round(result * 1e9) / 1e9;
+    setExpression([]);
+    setCurrentInput('');
   }, []);
 
   // Handle operator
   const handleOperator = useCallback((op: string) => {
-    const currentValue = parseFormattedNumber(estimate);
-
-    if (pendingOperator && pendingOperand && !isNewEntry) {
-      // Chain calculation: compute previous, then set new operator
-      const prevValue = parseFormattedNumber(pendingOperand);
-      const result = calculate(prevValue, pendingOperator, currentValue);
-      setEstimate(formatWithCommas(String(result)));
-      setPendingOperand(String(result));
-    } else if (estimate !== '' && !isNaN(currentValue)) {
-      setPendingOperand(estimate.replace(/,/g, ''));
+    if (currentInput) {
+      // Add current input and operator to expression
+      setExpression(prev => [...prev, formatWithCommas(currentInput.replace(/,/g, '')), op]);
+      setCurrentInput('');
+    } else if (expression.length > 0) {
+      const lastToken = expression[expression.length - 1];
+      if (isOperator(lastToken)) {
+        // Replace last operator if user changes their mind
+        setExpression(prev => [...prev.slice(0, -1), op]);
+      } else {
+        // Add operator after number
+        setExpression(prev => [...prev, op]);
+      }
+    } else if (estimate) {
+      // Start new expression with previous result
+      setExpression([estimate, op]);
+      setEstimate('');
     }
-
-    setPendingOperator(op);
-    setIsNewEntry(true);
-  }, [estimate, pendingOperator, pendingOperand, isNewEntry, calculate]);
+  }, [currentInput, expression, estimate]);
 
   // Handle equals
   const handleEquals = useCallback(() => {
-    if (!pendingOperator || !pendingOperand) return;
+    // Build full expression
+    let fullExpr = [...expression];
+    if (currentInput) {
+      fullExpr.push(formatWithCommas(currentInput.replace(/,/g, '')));
+    }
 
-    const prevValue = parseFormattedNumber(pendingOperand);
-    const currentValue = parseFormattedNumber(estimate);
-    const result = calculate(prevValue, pendingOperator, currentValue);
+    // Remove trailing operator if present
+    if (fullExpr.length > 0 && isOperator(fullExpr[fullExpr.length - 1])) {
+      fullExpr = fullExpr.slice(0, -1);
+    }
 
+    if (fullExpr.length === 0) return;
+
+    const result = evaluateExpression(fullExpr);
     setEstimate(formatWithCommas(String(result)));
-    setPendingOperator(null);
-    setPendingOperand(null);
-    setIsNewEntry(true);
-  }, [estimate, pendingOperator, pendingOperand, calculate]);
+    setExpression([]);
+    setCurrentInput('');
+  }, [expression, currentInput]);
 
   // Handle slider change - clear overrides when slider moves
   const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -229,9 +260,8 @@ export function EstimateNumPad({
     // Reset for next question
     setEstimate('');
     setUncertainty(0);
-    setPendingOperator(null);
-    setPendingOperand(null);
-    setIsNewEntry(false);
+    setExpression([]);
+    setCurrentInput('');
   }, [hasValidEstimate, bounds, onSubmit, lowerOverride, upperOverride]);
 
 
@@ -248,7 +278,7 @@ export function EstimateNumPad({
 
           {/* Number display (on top of fill) */}
           <div className="estimate-value-unified">
-            {estimate ? formatWithCommas(estimate) : '0'}
+            {displayValue}
           </div>
 
           {/* Hidden range input for drag interaction */}
@@ -267,10 +297,10 @@ export function EstimateNumPad({
         <span className="uncertainty-percent-label">±{Math.round(uncertainty)}%</span>
       </div>
 
-      {/* History bar - shows when there's a pending operation */}
-      {pendingOperator && pendingOperand && (
+      {/* History bar - shows the expression being built */}
+      {expression.length > 0 && (
         <div className="calc-history-bar">
-          {formatWithCommas(pendingOperand)} {pendingOperator} {estimate || '?'}
+          {historyDisplay}
         </div>
       )}
 
@@ -281,7 +311,7 @@ export function EstimateNumPad({
         <button className="calc-key-unified" onClick={() => handleDigit('8')}>8</button>
         <button className="calc-key-unified" onClick={() => handleDigit('9')}>9</button>
         <button
-          className={`calc-key-unified calc-key-op-unified ${pendingOperator === '÷' ? 'calc-key-op-active' : ''}`}
+          className={`calc-key-unified calc-key-op-unified ${expression.length > 0 && expression[expression.length - 1] === '÷' ? 'calc-key-op-active' : ''}`}
           onClick={() => handleOperator('÷')}
         >÷</button>
 
@@ -290,7 +320,7 @@ export function EstimateNumPad({
         <button className="calc-key-unified" onClick={() => handleDigit('5')}>5</button>
         <button className="calc-key-unified" onClick={() => handleDigit('6')}>6</button>
         <button
-          className={`calc-key-unified calc-key-op-unified ${pendingOperator === '×' ? 'calc-key-op-active' : ''}`}
+          className={`calc-key-unified calc-key-op-unified ${expression.length > 0 && expression[expression.length - 1] === '×' ? 'calc-key-op-active' : ''}`}
           onClick={() => handleOperator('×')}
         >×</button>
 
@@ -299,7 +329,7 @@ export function EstimateNumPad({
         <button className="calc-key-unified" onClick={() => handleDigit('2')}>2</button>
         <button className="calc-key-unified" onClick={() => handleDigit('3')}>3</button>
         <button
-          className={`calc-key-unified calc-key-op-unified ${pendingOperator === '−' ? 'calc-key-op-active' : ''}`}
+          className={`calc-key-unified calc-key-op-unified ${expression.length > 0 && expression[expression.length - 1] === '−' ? 'calc-key-op-active' : ''}`}
           onClick={() => handleOperator('−')}
         >−</button>
 
@@ -314,7 +344,7 @@ export function EstimateNumPad({
           </svg>
         </button>
         <button
-          className={`calc-key-unified calc-key-op-unified ${pendingOperator === '+' ? 'calc-key-op-active' : ''}`}
+          className={`calc-key-unified calc-key-op-unified ${expression.length > 0 && expression[expression.length - 1] === '+' ? 'calc-key-op-active' : ''}`}
           onClick={() => handleOperator('+')}
         >+</button>
 
