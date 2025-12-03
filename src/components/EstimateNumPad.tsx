@@ -115,29 +115,35 @@ export function EstimateNumPad({
   // Confirmation modal state
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
 
-  // Computed bounds - use estimate (the final value)
-  const bounds = useMemo(() => computeBounds(estimate, uncertainty), [estimate, uncertainty]);
+  // The effective estimate is either currentInput (while typing) or estimate (after =)
+  const effectiveEstimate = currentInput || estimate;
 
-  // Check if we have a valid estimate for submission
+  // Computed bounds - use effective estimate
+  const bounds = useMemo(() => computeBounds(effectiveEstimate, uncertainty), [effectiveEstimate, uncertainty]);
+
+  // Check if we have a valid estimate for submission (need finalized estimate)
   const hasValidEstimate = estimate !== '' && !isNaN(parseFormattedNumber(estimate));
+
+  // Check if we have any valid number to show bounds for (including currentInput)
+  const hasValidNumber = effectiveEstimate !== '' && !isNaN(parseFormattedNumber(effectiveEstimate));
 
   // Notify parent of bounds changes
   useEffect(() => {
     if (onBoundsChange) {
-      if (hasValidEstimate) {
-        const estimateValue = parseFormattedNumber(estimate);
+      if (hasValidNumber) {
+        const estimateValue = parseFormattedNumber(effectiveEstimate);
         onBoundsChange({
           lower: bounds.lower,
           upper: bounds.upper,
           estimate: estimateValue,
           uncertainty,
-          hasValidEstimate: true
+          hasValidEstimate: hasValidNumber
         });
       } else {
         onBoundsChange(null);
       }
     }
-  }, [bounds, uncertainty, hasValidEstimate, estimate, onBoundsChange]);
+  }, [bounds, uncertainty, hasValidNumber, effectiveEstimate, onBoundsChange]);
 
   // Display value: show currentInput while typing, or estimate if finalized
   const displayValue = currentInput || estimate || '0';
