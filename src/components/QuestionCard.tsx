@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { EstimateNumPad, BoundsData, formatDisplay } from './EstimateNumPad';
+import { ProgressDots } from './ProgressDots';
 import { isTouchDevice } from '../lib/device';
 
 interface Question {
@@ -11,6 +12,8 @@ interface Question {
 interface QuestionCardProps {
   question: Question;
   onSubmit: (lower: number, upper: number) => void;
+  currentQuestionIndex: number;
+  totalQuestions: number;
 }
 
 // Format number with commas for editing
@@ -23,7 +26,7 @@ function parseFormattedNumber(value: string): number {
   return parseFloat(value.replace(/,/g, ''));
 }
 
-export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
+export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQuestions }: QuestionCardProps) {
   const [isTouch, setIsTouch] = useState(true);
 
   // Bounds state from EstimateNumPad
@@ -129,6 +132,7 @@ export function QuestionCard({ question, onSubmit }: QuestionCardProps) {
   return (
     <>
       <div className="question-card">
+        <ProgressDots currentIndex={currentQuestionIndex} total={totalQuestions} />
         <div className="question-header">
           <h2 className="question-prompt">{question.prompt}</h2>
           {question.unit && (

@@ -2247,16 +2247,6 @@ a.judgement-answer-below:hover .judgement-answer-value {
     overflow: hidden;
   }
 
-  /* Fix progress dots at top */
-  .progress-dots {
-    position: fixed;
-    top: 60px;
-    left: 0;
-    right: 0;
-    z-index: 11;
-    margin-bottom: 0;
-  }
-
   /* Fix question card at top to prevent keyboard shifting */
   .question-card-wrapper {
     position: fixed;
