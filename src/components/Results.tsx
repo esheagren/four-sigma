@@ -182,6 +182,8 @@ export function Results({
         calibration={calibration}
         onShare={handleShare}
         isSharing={isSharing}
+        hits={hits}
+        total={total}
       />
 
       <div className="judgements-list">

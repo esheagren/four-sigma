@@ -7,6 +7,8 @@ interface DailyScoreCardProps {
   calibration?: number;
   onShare?: () => void;
   isSharing?: boolean;
+  hits?: number;
+  total?: number;
 }
 
 // Animated counter component for total score with easing
@@ -47,12 +49,29 @@ export function DailyScoreCard({
   dailyRank,
   calibration,
   onShare,
-  isSharing
+  isSharing,
+  hits = 0,
+  total = 3
 }: DailyScoreCardProps) {
   const [showCalibrationPopup, setShowCalibrationPopup] = useState(false);
 
   // Clamp calibration between 0 and 100 for the bar
   const calibrationPercent = calibration !== undefined ? Math.min(100, Math.max(0, calibration)) : 50;
+
+  // Determine share button style based on performance
+  const isTopTen = dailyRank !== undefined && dailyRank <= 10;
+  const isPerfect = hits === total && total > 0;
+
+  let shareButtonClass = 'score-card-share-btn';
+  if (hits === 0) {
+    shareButtonClass += ' share-btn-gray';
+  } else if (isPerfect && isTopTen) {
+    shareButtonClass += ' share-btn-elite';
+  } else if (isPerfect) {
+    shareButtonClass += ' share-btn-perfect';
+  } else {
+    shareButtonClass += ' share-btn-default';
+  }
 
   return (
     <div className="score-card-new">
@@ -120,7 +139,7 @@ export function DailyScoreCard({
       {/* Share Button */}
       {onShare && (
         <button
-          className="score-card-share-btn"
+          className={shareButtonClass}
           onClick={onShare}
           disabled={isSharing}
           aria-label="Share score"
