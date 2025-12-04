@@ -4,7 +4,7 @@
  * Populate Daily Questions Script
  *
  * Populates the daily_questions table with questions that have
- * distribution_tier = 'mind_blowing'. Each day gets 5 questions,
+ * distribution_tier = 'mind_blowing'. Each day gets 3 questions,
  * starting from today and continuing until all questions are used.
  *
  * Usage:
@@ -15,7 +15,7 @@
 
 import { supabase, testConnection } from '../utils/supabase-client.js';
 
-const QUESTIONS_PER_DAY = 5;
+const QUESTIONS_PER_DAY = 3;
 
 interface Question {
   id: string;
