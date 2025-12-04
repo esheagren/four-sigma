@@ -517,7 +517,7 @@ export function EstimateNumPad({
         <button
           className={`calc-key-unified calc-key-op-unified ${expression.length > 0 && (expression[expression.length - 1] === '×' || expression[expression.length - 1] === '^') ? 'calc-key-op-active' : ''}`}
           onClick={() => handleOperator('×')}
-        >×</button>
+        ><span className="calc-key-dual">×<span className="calc-key-secondary">^</span></span></button>
 
         {/* Row 3 */}
         <button className="calc-key-unified" onClick={() => handleDigit('1')}>1</button>

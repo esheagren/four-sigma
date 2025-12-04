@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 interface DailyScoreCardProps {
   totalScore: number;
@@ -55,8 +56,8 @@ export function DailyScoreCard({
 
   return (
     <div className="score-card-new">
-      {/* Calibration Info Popup */}
-      {showCalibrationPopup && (
+      {/* Calibration Info Popup - rendered via portal to escape backdrop-filter containment */}
+      {showCalibrationPopup && createPortal(
         <div className="modal-overlay" onClick={() => setShowCalibrationPopup(false)}>
           <div className="modal-content calibration-popup" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
@@ -81,7 +82,8 @@ export function DailyScoreCard({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Total Score Label */}
