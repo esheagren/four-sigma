@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { QuestionCard } from './QuestionCard';
 import { Results } from './Results';
 import { LoadingOrb } from './LoadingOrb';
+import { ProgressDots } from './ProgressDots';
 import { getDeviceId } from '../lib/device';
 import { useAuth } from '../context/AuthContext';
 import { useAnimation } from '../context/AnimationContext';
@@ -287,6 +288,11 @@ export function Game() {
 
   return (
     <div className="game-container">
+      {/* Progress Dots */}
+      {showQuestionCard && questions.length > 0 && (
+        <ProgressDots currentIndex={currentQuestionIndex} total={questions.length} />
+      )}
+
       {/* Question Card with fade-out animation */}
       {showQuestionCard && currentQuestion && (
         <div className={`question-card-wrapper ${isFadingOut ? 'fading-out' : ''}`}>
