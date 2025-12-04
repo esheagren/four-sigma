@@ -113,14 +113,6 @@ export function DailyScoreCard({
         <AnimatedTotalScore finalScore={Math.round(totalScore)} />
       </div>
 
-      {/* Rank Badge */}
-      {dailyRank && (
-        <div className="score-card-rank">
-          <span className="rank-trophy">🏆</span>
-          <span>Rank #{dailyRank}</span>
-        </div>
-      )}
-
       {/* Calibration Section */}
       <div className="score-card-calibration">
         <button
