@@ -330,7 +330,7 @@ body {
 }
 
 .progress-dot.completed {
-  background: var(--success);
+  background: var(--primary);
 }
 
 /* Question Card Fade Out Animation */
