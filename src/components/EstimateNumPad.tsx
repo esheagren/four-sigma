@@ -20,6 +20,11 @@ interface EstimateNumPadProps {
   upperOverride?: number | null;
   // Callback when overrides should be cleared (e.g., slider moved)
   onClearOverrides?: () => void;
+  // Bound editing props - when user clicks on a bound to edit it directly
+  editingBound?: 'lower' | 'upper' | null;
+  boundEditValue?: string;
+  onBoundEditChange?: (value: string) => void;
+  onBoundEditComplete?: () => void;
 }
 
 // Format number with commas (e.g., 1000000 -> "1,000,000")
@@ -102,7 +107,11 @@ export function EstimateNumPad({
   onBoundsChange,
   lowerOverride,
   upperOverride,
-  onClearOverrides
+  onClearOverrides,
+  editingBound,
+  boundEditValue,
+  onBoundEditChange,
+  onBoundEditComplete
 }: EstimateNumPadProps) {
   // Core state - the final estimate value (result after =)
   const [estimate, setEstimate] = useState<string>('');
@@ -162,12 +171,31 @@ export function EstimateNumPad({
 
   // Handle digit input
   const handleDigit = useCallback((digit: string) => {
+    // Route to bound editing if active
+    if (editingBound && onBoundEditChange) {
+      const currentVal = (boundEditValue || '').replace(/,/g, '');
+      const newVal = currentVal + digit;
+      onBoundEditChange(formatWithCommas(newVal));
+      return;
+    }
     const newInput = currentInput + digit;
     setCurrentInput(formatWithCommas(newInput.replace(/,/g, '')));
-  }, [currentInput]);
+  }, [currentInput, editingBound, boundEditValue, onBoundEditChange]);
 
   // Handle decimal point
   const handleDecimal = useCallback(() => {
+    // Route to bound editing if active
+    if (editingBound && onBoundEditChange) {
+      const currentVal = boundEditValue || '';
+      if (!currentVal.includes('.')) {
+        if (currentVal === '') {
+          onBoundEditChange('0.');
+        } else {
+          onBoundEditChange(currentVal + '.');
+        }
+      }
+      return;
+    }
     if (!currentInput.includes('.')) {
       if (currentInput === '') {
         setCurrentInput('0.');
@@ -175,10 +203,17 @@ export function EstimateNumPad({
         setCurrentInput(currentInput + '.');
       }
     }
-  }, [currentInput]);
+  }, [currentInput, editingBound, boundEditValue, onBoundEditChange]);
 
   // Handle backspace
   const handleBackspace = useCallback(() => {
+    // Route to bound editing if active
+    if (editingBound && onBoundEditChange) {
+      const currentVal = (boundEditValue || '').replace(/,/g, '');
+      const newVal = currentVal.slice(0, -1);
+      onBoundEditChange(formatWithCommas(newVal));
+      return;
+    }
     if (currentInput) {
       // Remove last character from current input
       const raw = currentInput.replace(/,/g, '');
@@ -196,14 +231,19 @@ export function EstimateNumPad({
         setExpression(prev => prev.slice(0, -1));
       }
     }
-  }, [currentInput, expression]);
+  }, [currentInput, expression, editingBound, boundEditValue, onBoundEditChange]);
 
   // Handle clear
   const handleClear = useCallback(() => {
+    // Route to bound editing if active
+    if (editingBound && onBoundEditChange) {
+      onBoundEditChange('');
+      return;
+    }
     setEstimate('');
     setExpression([]);
     setCurrentInput('');
-  }, []);
+  }, [editingBound, onBoundEditChange]);
 
   // Handle operator
   const handleOperator = useCallback((op: string) => {
@@ -229,6 +269,12 @@ export function EstimateNumPad({
 
   // Handle equals
   const handleEquals = useCallback(() => {
+    // Complete bound editing if active
+    if (editingBound && onBoundEditComplete) {
+      onBoundEditComplete();
+      return;
+    }
+
     // Build full expression
     let fullExpr = [...expression];
     if (currentInput) {
@@ -246,7 +292,7 @@ export function EstimateNumPad({
     setEstimate(formatWithCommas(String(result)));
     setExpression([]);
     setCurrentInput('');
-  }, [expression, currentInput]);
+  }, [expression, currentInput, editingBound, onBoundEditComplete]);
 
   // Ref for the slider container
   const sliderRef = useRef<HTMLDivElement>(null);

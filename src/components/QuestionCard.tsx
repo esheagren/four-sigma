@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { EstimateNumPad, BoundsData, formatDisplay } from './EstimateNumPad';
 import { ProgressDots } from './ProgressDots';
 import { isTouchDevice } from '../lib/device';
@@ -39,20 +39,12 @@ export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQu
   // Editing state
   const [editingBound, setEditingBound] = useState<'lower' | 'upper' | null>(null);
   const [editValue, setEditValue] = useState<string>('');
-  const inputRef = useRef<HTMLInputElement>(null);
 
   // Detect device type on mount
   useEffect(() => {
     setIsTouch(isTouchDevice());
   }, []);
 
-  // Focus input when editing starts
-  useEffect(() => {
-    if (editingBound && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [editingBound]);
 
   // Handle bounds change from EstimateNumPad
   const handleBoundsChange = useCallback((newBounds: BoundsData | null) => {
@@ -65,17 +57,22 @@ export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQu
     setUpperOverride(null);
   }, []);
 
-  // Start editing a bound
+  // Start editing a bound - keep current value so user can edit with backspace/digits
   const handleBoundClick = useCallback((which: 'lower' | 'upper') => {
     if (!bounds) return;
 
+    // If already editing this bound, do nothing
+    if (editingBound === which) return;
+
+    // Get the current value to start editing from
     const currentValue = which === 'lower'
       ? (lowerOverride ?? bounds.lower)
       : (upperOverride ?? bounds.upper);
 
     setEditingBound(which);
-    setEditValue(formatWithCommas(currentValue));
-  }, [bounds, lowerOverride, upperOverride]);
+    // Format without abbreviations so user sees full number
+    setEditValue(new Intl.NumberFormat('en-US', { maximumFractionDigits: 10 }).format(currentValue));
+  }, [bounds, editingBound, lowerOverride, upperOverride]);
 
   // Validate and save edited bound
   const handleEditComplete = useCallback(() => {
@@ -113,14 +110,12 @@ export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQu
     setEditingBound(null);
   }, [editingBound, editValue, bounds]);
 
-  // Handle key press in edit input
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+  // Finish bound editing when clicking outside (saves current value)
+  const handleClickOutside = useCallback(() => {
+    if (editingBound) {
       handleEditComplete();
-    } else if (e.key === 'Escape') {
-      setEditingBound(null);
     }
-  }, [handleEditComplete]);
+  }, [editingBound, handleEditComplete]);
 
   // Determine what to display for each bound
   const displayLower = bounds ? (lowerOverride ?? bounds.lower) : 0;
@@ -131,7 +126,7 @@ export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQu
 
   return (
     <>
-      <div className="question-card">
+      <div className="question-card" onClick={handleClickOutside}>
         <ProgressDots currentIndex={currentQuestionIndex} total={totalQuestions} />
         <div className="question-header">
           <h2 className="question-prompt">{question.prompt}</h2>
@@ -147,46 +142,22 @@ export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQu
         {showBounds && (
           <div className="bounds-display-question">
             {/* Lower bound */}
-            {editingBound === 'lower' ? (
-              <input
-                ref={inputRef}
-                type="text"
-                className="bound-input-question"
-                value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                onBlur={handleEditComplete}
-                onKeyDown={handleKeyDown}
-              />
-            ) : (
-              <button
-                className={`bound-card-question bound-card-question-lower ${lowerOverride !== null ? 'bound-card-question-override' : ''}`}
-                onClick={() => handleBoundClick('lower')}
-              >
-                {formatDisplay(displayLower)}
-              </button>
-            )}
+            <button
+              className={`bound-card-question bound-card-question-lower ${lowerOverride !== null ? 'bound-card-question-override' : ''} ${editingBound === 'lower' ? 'bound-card-question-editing' : ''}`}
+              onClick={(e) => { e.stopPropagation(); handleBoundClick('lower'); }}
+            >
+              {editingBound === 'lower' ? (editValue || '0') : formatDisplay(displayLower)}
+            </button>
 
             <div className="bound-separator-question">–</div>
 
             {/* Upper bound */}
-            {editingBound === 'upper' ? (
-              <input
-                ref={inputRef}
-                type="text"
-                className="bound-input-question"
-                value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                onBlur={handleEditComplete}
-                onKeyDown={handleKeyDown}
-              />
-            ) : (
-              <button
-                className={`bound-card-question bound-card-question-upper ${upperOverride !== null ? 'bound-card-question-override' : ''}`}
-                onClick={() => handleBoundClick('upper')}
-              >
-                {formatDisplay(displayUpper)}
-              </button>
-            )}
+            <button
+              className={`bound-card-question bound-card-question-upper ${upperOverride !== null ? 'bound-card-question-override' : ''} ${editingBound === 'upper' ? 'bound-card-question-editing' : ''}`}
+              onClick={(e) => { e.stopPropagation(); handleBoundClick('upper'); }}
+            >
+              {editingBound === 'upper' ? (editValue || '0') : formatDisplay(displayUpper)}
+            </button>
           </div>
         )}
       </div>
@@ -198,6 +169,10 @@ export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQu
         lowerOverride={lowerOverride}
         upperOverride={upperOverride}
         onClearOverrides={handleClearOverrides}
+        editingBound={editingBound}
+        boundEditValue={editValue}
+        onBoundEditChange={setEditValue}
+        onBoundEditComplete={handleEditComplete}
       />
     </>
   );
