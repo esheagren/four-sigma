@@ -67,7 +67,9 @@ function computeBounds(estimate: string, uncertainty: number): { lower: number; 
     return { lower: 0, upper: 0 };
   }
 
-  const margin = Math.abs(value) * (uncertainty / 100);
+  // Round uncertainty to match displayed value (avoids confusing decimals like 10.1 instead of 10)
+  const roundedUncertainty = Math.round(uncertainty);
+  const margin = Math.abs(value) * (roundedUncertainty / 100);
   return {
     lower: value - margin,
     upper: value + margin,
