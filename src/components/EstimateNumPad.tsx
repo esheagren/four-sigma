@@ -85,6 +85,7 @@ function evaluateExpression(tokens: string[]): number {
     .replace(/×/g, '*')
     .replace(/÷/g, '/')
     .replace(/−/g, '-')
+    .replace(/\^/g, '**') // Power operator
     .replace(/,/g, ''); // Remove commas from numbers
 
   // Use Function constructor for safe math evaluation
@@ -171,7 +172,7 @@ export function EstimateNumPad({
   }, [expression, currentInput]);
 
   // Check if last token in expression is an operator
-  const isOperator = (token: string) => ['+', '−', '×', '÷'].includes(token);
+  const isOperator = (token: string) => ['+', '−', '×', '÷', '^'].includes(token);
 
   // Handle digit input
   const handleDigit = useCallback((digit: string) => {
@@ -268,8 +269,13 @@ export function EstimateNumPad({
     } else if (expression.length > 0) {
       const lastToken = expression[expression.length - 1];
       if (isOperator(lastToken)) {
-        // Replace last operator if user changes their mind
-        setExpression(prev => [...prev.slice(0, -1), op]);
+        // Special case: × + × = ^ (power)
+        if (lastToken === '×' && op === '×') {
+          setExpression(prev => [...prev.slice(0, -1), '^']);
+        } else {
+          // Replace last operator if user changes their mind
+          setExpression(prev => [...prev.slice(0, -1), op]);
+        }
       } else {
         // Add operator after number
         setExpression(prev => [...prev, op]);
@@ -509,7 +515,7 @@ export function EstimateNumPad({
         <button className="calc-key-unified" onClick={() => handleDigit('5')}>5</button>
         <button className="calc-key-unified" onClick={() => handleDigit('6')}>6</button>
         <button
-          className={`calc-key-unified calc-key-op-unified ${expression.length > 0 && expression[expression.length - 1] === '×' ? 'calc-key-op-active' : ''}`}
+          className={`calc-key-unified calc-key-op-unified ${expression.length > 0 && (expression[expression.length - 1] === '×' || expression[expression.length - 1] === '^') ? 'calc-key-op-active' : ''}`}
           onClick={() => handleOperator('×')}
         >×</button>
 
