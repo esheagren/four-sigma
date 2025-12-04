@@ -337,6 +337,27 @@ export function EstimateNumPad({
   // Are we mid-calculation? Only when we have operators in the expression
   const isCalculating = expression.length > 0;
 
+  // Calculate dynamic font size based on text length
+  const dynamicFontSize = useMemo(() => {
+    const text = isCalculating ? historyDisplay : displayValue;
+    const charCount = text.length;
+
+    // Base font size is 1.35rem
+    const baseFontSize = 1.35;
+    const minFontSize = 0.75; // Minimum before wrapping
+
+    // Start shrinking after ~12 characters
+    const shrinkStartChars = 12;
+    const shrinkRate = 0.04; // rem per character over threshold
+
+    if (charCount <= shrinkStartChars) {
+      return baseFontSize;
+    }
+
+    const reduction = (charCount - shrinkStartChars) * shrinkRate;
+    return Math.max(minFontSize, baseFontSize - reduction);
+  }, [isCalculating, historyDisplay, displayValue]);
+
   // Increment/decrement uncertainty by 1%
   const handleIncrementUncertainty = useCallback(() => {
     setUncertainty(prev => Math.min(100, prev + 1));
@@ -395,7 +416,10 @@ export function EstimateNumPad({
           )}
 
           {/* Number display (on top of fill) */}
-          <div className="estimate-value-unified">
+          <div
+            className="estimate-value-unified"
+            style={{ fontSize: `${dynamicFontSize}rem` }}
+          >
             {isCalculating ? historyDisplay : displayValue}
           </div>
         </div>

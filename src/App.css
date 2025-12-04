@@ -6047,6 +6047,11 @@ a.judgement-answer-below:hover .judgement-answer-value {
   color: rgba(255, 255, 255, 0.95);
   letter-spacing: -0.02em;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* Support for long expressions */
+  word-break: break-word;
+  text-align: center;
+  line-height: 1.2;
+  transition: font-size 0.1s ease-out;
 }
 
 .estimate-scratchpad-unified {
