@@ -6167,7 +6167,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
   font-variant-numeric: tabular-nums;
-  text-align: right;
+  text-align: center;
 }
 
 /* Compact Bound Cards */
