@@ -121,8 +121,8 @@ export function EstimateNumPad({
   // Computed bounds - use effective estimate
   const bounds = useMemo(() => computeBounds(effectiveEstimate, uncertainty), [effectiveEstimate, uncertainty]);
 
-  // Check if we have a valid estimate for submission (need finalized estimate)
-  const hasValidEstimate = estimate !== '' && !isNaN(parseFormattedNumber(estimate));
+  // Check if we have a valid estimate for submission (any valid number, not just finalized)
+  const hasValidEstimate = effectiveEstimate !== '' && !isNaN(parseFormattedNumber(effectiveEstimate));
 
   // Check if we have any valid number to show bounds for (including currentInput)
   const hasValidNumber = effectiveEstimate !== '' && !isNaN(parseFormattedNumber(effectiveEstimate));
