@@ -39,11 +39,22 @@ export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQu
   // Editing state
   const [editingBound, setEditingBound] = useState<'lower' | 'upper' | null>(null);
   const [editValue, setEditValue] = useState<string>('');
+  const [hasStartedTyping, setHasStartedTyping] = useState(false);
 
   // Detect device type on mount
   useEffect(() => {
     setIsTouch(isTouchDevice());
   }, []);
+
+  // Reset all editing state when question changes
+  useEffect(() => {
+    setBounds(null);
+    setLowerOverride(null);
+    setUpperOverride(null);
+    setEditingBound(null);
+    setEditValue('');
+    setHasStartedTyping(false);
+  }, [question.id]);
 
 
   // Handle bounds change from EstimateNumPad
@@ -57,22 +68,32 @@ export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQu
     setUpperOverride(null);
   }, []);
 
-  // Start editing a bound - keep current value so user can edit with backspace/digits
+  // Start editing a bound - show current value as visual aid
   const handleBoundClick = useCallback((which: 'lower' | 'upper') => {
     if (!bounds) return;
 
     // If already editing this bound, do nothing
     if (editingBound === which) return;
 
-    // Get the current value to start editing from
+    // Get the current value to display as visual aid
     const currentValue = which === 'lower'
       ? (lowerOverride ?? bounds.lower)
       : (upperOverride ?? bounds.upper);
 
     setEditingBound(which);
+    setHasStartedTyping(false); // Reset typing flag
     // Format without abbreviations so user sees full number
     setEditValue(new Intl.NumberFormat('en-US', { maximumFractionDigits: 10 }).format(currentValue));
   }, [bounds, editingBound, lowerOverride, upperOverride]);
+
+  // Handle edit value changes - first keystroke replaces the value entirely
+  const handleBoundEditChange = useCallback((newValue: string) => {
+    if (!hasStartedTyping) {
+      // First keystroke - replace entirely
+      setHasStartedTyping(true);
+    }
+    setEditValue(newValue);
+  }, [hasStartedTyping]);
 
   // Validate and save edited bound
   const handleEditComplete = useCallback(() => {
@@ -117,6 +138,7 @@ export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQu
     }
   }, [editingBound, handleEditComplete]);
 
+
   // Determine what to display for each bound
   const displayLower = bounds ? (lowerOverride ?? bounds.lower) : 0;
   const displayUpper = bounds ? (upperOverride ?? bounds.upper) : 0;
@@ -125,8 +147,15 @@ export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQu
   const showBounds = bounds?.hasValidEstimate && bounds.uncertainty > 0;
 
   return (
-    <>
-      <div className="question-card" onClick={handleClickOutside}>
+    <div className="question-card-container">
+      {/* Invisible overlay to catch clicks outside when editing a bound */}
+      {editingBound && (
+        <div
+          className="bound-edit-overlay"
+          onClick={handleClickOutside}
+        />
+      )}
+      <div className="question-card">
         <ProgressDots currentIndex={currentQuestionIndex} total={totalQuestions} />
         <div className="question-header">
           <h2 className="question-prompt">{question.prompt}</h2>
@@ -162,18 +191,22 @@ export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQu
         )}
       </div>
 
-      <EstimateNumPad
-        onSubmit={onSubmit}
-        isTouch={isTouch}
-        onBoundsChange={handleBoundsChange}
-        lowerOverride={lowerOverride}
-        upperOverride={upperOverride}
-        onClearOverrides={handleClearOverrides}
-        editingBound={editingBound}
-        boundEditValue={editValue}
-        onBoundEditChange={setEditValue}
-        onBoundEditComplete={handleEditComplete}
-      />
-    </>
+      <div onClick={(e) => e.stopPropagation()}>
+        <EstimateNumPad
+          key={question.id}
+          onSubmit={onSubmit}
+          isTouch={isTouch}
+          onBoundsChange={handleBoundsChange}
+          lowerOverride={lowerOverride}
+          upperOverride={upperOverride}
+          onClearOverrides={handleClearOverrides}
+          editingBound={editingBound}
+          boundEditValue={editValue}
+          hasStartedTypingBound={hasStartedTyping}
+          onBoundEditChange={handleBoundEditChange}
+          onBoundEditComplete={handleEditComplete}
+        />
+      </div>
+    </div>
   );
 }

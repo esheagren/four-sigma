@@ -23,6 +23,7 @@ interface EstimateNumPadProps {
   // Bound editing props - when user clicks on a bound to edit it directly
   editingBound?: 'lower' | 'upper' | null;
   boundEditValue?: string;
+  hasStartedTypingBound?: boolean;
   onBoundEditChange?: (value: string) => void;
   onBoundEditComplete?: () => void;
 }
@@ -110,6 +111,7 @@ export function EstimateNumPad({
   onClearOverrides,
   editingBound,
   boundEditValue,
+  hasStartedTypingBound,
   onBoundEditChange,
   onBoundEditComplete
 }: EstimateNumPadProps) {
@@ -173,19 +175,29 @@ export function EstimateNumPad({
   const handleDigit = useCallback((digit: string) => {
     // Route to bound editing if active
     if (editingBound && onBoundEditChange) {
-      const currentVal = (boundEditValue || '').replace(/,/g, '');
-      const newVal = currentVal + digit;
-      onBoundEditChange(formatWithCommas(newVal));
+      // If user hasn't started typing yet, replace the displayed value entirely
+      if (!hasStartedTypingBound) {
+        onBoundEditChange(digit);
+      } else {
+        const currentVal = (boundEditValue || '').replace(/,/g, '');
+        const newVal = currentVal + digit;
+        onBoundEditChange(formatWithCommas(newVal));
+      }
       return;
     }
     const newInput = currentInput + digit;
     setCurrentInput(formatWithCommas(newInput.replace(/,/g, '')));
-  }, [currentInput, editingBound, boundEditValue, onBoundEditChange]);
+  }, [currentInput, editingBound, boundEditValue, hasStartedTypingBound, onBoundEditChange]);
 
   // Handle decimal point
   const handleDecimal = useCallback(() => {
     // Route to bound editing if active
     if (editingBound && onBoundEditChange) {
+      // If user hasn't started typing yet, start fresh with "0."
+      if (!hasStartedTypingBound) {
+        onBoundEditChange('0.');
+        return;
+      }
       const currentVal = boundEditValue || '';
       if (!currentVal.includes('.')) {
         if (currentVal === '') {
@@ -203,7 +215,7 @@ export function EstimateNumPad({
         setCurrentInput(currentInput + '.');
       }
     }
-  }, [currentInput, editingBound, boundEditValue, onBoundEditChange]);
+  }, [currentInput, editingBound, boundEditValue, hasStartedTypingBound, onBoundEditChange]);
 
   // Handle backspace
   const handleBackspace = useCallback(() => {

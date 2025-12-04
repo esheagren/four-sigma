@@ -390,6 +390,26 @@ body {
   text-transform: uppercase;
 }
 
+/* Question Card Container - wraps card and numpad, handles click-outside */
+.question-card-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  max-width: 600px;
+}
+
+/* Invisible overlay to catch clicks when editing bounds */
+.bound-edit-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  /* Transparent - just catches clicks */
+}
+
 /* Question Card */
 .question-card {
   background: linear-gradient(
@@ -6473,6 +6493,8 @@ a.judgement-answer-below:hover .judgement-answer-value {
     inset 0 1px 0 rgba(255, 255, 255, 0.2),
     0 2px 8px rgba(0, 0, 0, 0.15);
   -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 10;
 }
 
 .bound-card-question:hover {
