@@ -61,7 +61,7 @@ export function DailyScoreCard({
         <div className="modal-overlay" onClick={() => setShowCalibrationPopup(false)}>
           <div className="modal-content calibration-popup" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Your Calibration: {calibration !== undefined ? `${calibration.toFixed(0)}%` : '—'}</h2>
+              <h2 className="modal-title">Your Calibration: {calibration !== undefined ? `${calibration.toFixed(0)}%` : '—'}</h2>
             </div>
             <div className="modal-body">
               <p>
