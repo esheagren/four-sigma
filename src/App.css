@@ -1040,23 +1040,48 @@ body {
 .score-card-share-btn {
   margin: 1.5rem auto 0;
   padding: 0.75rem 1.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #7c3aed 100%);
+  background-size: 200% 200%;
+  border: none;
   border-radius: 8px;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.7);
-  transition: all 0.15s ease;
+  color: white;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  box-shadow: 0 0 12px rgba(78, 205, 196, 0.15);
+  box-shadow:
+    0 0 20px rgba(168, 85, 247, 0.4),
+    0 0 40px rgba(124, 58, 237, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+    box-shadow:
+      0 0 20px rgba(168, 85, 247, 0.4),
+      0 0 40px rgba(124, 58, 237, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    background-position: 100% 50%;
+    box-shadow:
+      0 0 30px rgba(168, 85, 247, 0.6),
+      0 0 60px rgba(124, 58, 237, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
 }
 
 .score-card-share-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  box-shadow: 0 0 16px rgba(78, 205, 196, 0.25);
+  background: linear-gradient(135deg, #8b5cf6 0%, #c084fc 50%, #8b5cf6 100%);
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 30px rgba(168, 85, 247, 0.6),
+    0 0 60px rgba(124, 58, 237, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .score-card-share-btn:disabled {
