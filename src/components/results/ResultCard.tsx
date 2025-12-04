@@ -1,20 +1,6 @@
 import { useState, useEffect } from 'react';
 import { GaussianLandscape } from './GaussianLandscape';
 
-interface CrowdGuess {
-  min: number;
-  max: number;
-}
-
-interface CrowdData {
-  guesses: CrowdGuess[];
-  avgMin: number;
-  avgMax: number;
-  avgHit: boolean;
-  hitRate: number;
-  totalResponses: number;
-}
-
 interface Judgement {
   questionId: string;
   prompt: string;
@@ -26,7 +12,6 @@ interface Judgement {
   score: number;
   source?: string;
   sourceUrl?: string;
-  crowdData?: CrowdData;
 }
 
 interface ResultCardProps {
@@ -75,13 +60,7 @@ export function ResultCard({ judgement, index }: ResultCardProps) {
     hit,
     score,
     sourceUrl,
-    crowdData,
   } = judgement;
-
-  // Format hit rate as percentage
-  const hitRatePercent = crowdData
-    ? Math.round(crowdData.hitRate * 100)
-    : null;
 
   return (
     <div
@@ -116,31 +95,12 @@ export function ResultCard({ judgement, index }: ResultCardProps) {
 
       {/* Dark body section with visualization */}
       <div className="result-card-body">
-        {/* Gaussian Landscape Visualization */}
         <GaussianLandscape
           userMin={lower}
           userMax={upper}
           trueValue={trueValue}
           hit={hit}
-          crowdData={crowdData}
         />
-
-        {/* Metadata row */}
-        <div className="result-card-metadata">
-          <span className="result-card-meta-item">
-            <span className="result-card-meta-label">Your range:</span>{' '}
-            {lower.toLocaleString()} – {upper.toLocaleString()}
-          </span>
-          {hitRatePercent !== null && (
-            <>
-              <span className="result-card-meta-divider">|</span>
-              <span className="result-card-meta-item">
-                <span className="result-card-meta-label">Crowd:</span>{' '}
-                {hitRatePercent}% hit
-              </span>
-            </>
-          )}
-        </div>
       </div>
     </div>
   );

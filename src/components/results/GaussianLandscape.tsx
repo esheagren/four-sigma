@@ -2,33 +2,16 @@ import { useMemo } from 'react';
 import {
   calculateViewport,
   valueToX,
-  generateBezierPath,
-  generateClosedBezierPath,
   formatNumber,
   BASELINE_Y,
   SVG_WIDTH,
 } from './gaussianUtils';
-
-interface CrowdGuess {
-  min: number;
-  max: number;
-}
-
-interface CrowdData {
-  guesses: CrowdGuess[];
-  avgMin: number;
-  avgMax: number;
-  avgHit: boolean;
-  hitRate: number;
-  totalResponses: number;
-}
 
 interface GaussianLandscapeProps {
   userMin: number;
   userMax: number;
   trueValue: number;
   hit: boolean;
-  crowdData?: CrowdData;
 }
 
 export function GaussianLandscape({
@@ -36,7 +19,6 @@ export function GaussianLandscape({
   userMax,
   trueValue,
   hit,
-  crowdData,
 }: GaussianLandscapeProps) {
   // Calculate viewport bounds
   const viewport = useMemo(
@@ -46,48 +28,21 @@ export function GaussianLandscape({
 
   const { viewportMin, viewportRange, isWildMissLeft, isWildMissRight } = viewport;
 
-  // Generate crowd curve paths (memoized for performance)
-  const crowdPaths = useMemo(() => {
-    if (!crowdData?.guesses) return [];
-
-    return crowdData.guesses
-      .map((guess, index) => ({
-        key: index,
-        path: generateBezierPath(guess.min, guess.max, viewportMin, viewportRange),
-      }))
-      .filter(p => p.path !== '');
-  }, [crowdData, viewportMin, viewportRange]);
-
-  // Average player curve
-  const avgPath = useMemo(() => {
-    if (!crowdData) return '';
-    return generateBezierPath(crowdData.avgMin, crowdData.avgMax, viewportMin, viewportRange);
-  }, [crowdData, viewportMin, viewportRange]);
-
-  // User curve paths
-  const userPath = useMemo(
-    () => generateBezierPath(userMin, userMax, viewportMin, viewportRange),
-    [userMin, userMax, viewportMin, viewportRange]
-  );
-
-  const userFilledPath = useMemo(
-    () => generateClosedBezierPath(userMin, userMax, viewportMin, viewportRange),
-    [userMin, userMax, viewportMin, viewportRange]
-  );
-
   // Calculate marker positions
   const userStartX = valueToX(userMin, viewportMin, viewportRange);
   const userEndX = valueToX(userMax, viewportMin, viewportRange);
   const trueValueX = valueToX(trueValue, viewportMin, viewportRange);
-  const avgStartX = crowdData ? valueToX(crowdData.avgMin, viewportMin, viewportRange) : 0;
-  const avgEndX = crowdData ? valueToX(crowdData.avgMax, viewportMin, viewportRange) : 0;
 
-  // Color based on hit/miss
-  const userColor = hit ? '#10b981' : '#f43f5e';
-  const gradientId = `user-gradient-${Math.random().toString(36).substr(2, 9)}`;
+  // Convert SVG X coordinates to percentages for label positioning
+  const userStartPercent = (userStartX / SVG_WIDTH) * 100;
+  const userEndPercent = (userEndX / SVG_WIDTH) * 100;
+  const trueValuePercent = (trueValueX / SVG_WIDTH) * 100;
 
   // Check if true value is visible on screen
   const trueValueVisible = !isWildMissLeft && !isWildMissRight;
+
+  // Color based on hit/miss
+  const userColor = hit ? '#10b981' : '#f43f5e';
 
   return (
     <div className="gaussian-landscape-container">
@@ -96,21 +51,6 @@ export function GaussianLandscape({
         viewBox={`0 0 ${SVG_WIDTH} 100`}
         preserveAspectRatio="xMidYMax meet"
       >
-        <defs>
-          {/* Gradient for user curve fill */}
-          <linearGradient id={gradientId} x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor={userColor} stopOpacity="0.4" />
-            <stop offset="100%" stopColor={userColor} stopOpacity="0" />
-          </linearGradient>
-        </defs>
-
-        {/* Grid lines */}
-        <g className="grid-lines">
-          <line x1="25" y1="0" x2="25" y2="100" />
-          <line x1="50" y1="0" x2="50" y2="100" />
-          <line x1="75" y1="0" x2="75" y2="100" />
-        </g>
-
         {/* Baseline */}
         <line
           className="baseline"
@@ -120,67 +60,67 @@ export function GaussianLandscape({
           y2={BASELINE_Y}
         />
 
-        {/* Layer 1: Crowd wireframe curves */}
-        {crowdPaths.length > 0 && (
-          <g className="crowd-curves">
-            {crowdPaths.map(({ key, path }) => (
-              <path key={key} d={path} className="crowd-curve" />
-            ))}
-          </g>
-        )}
+        {/* User interval line */}
+        <line
+          className={`user-line ${hit ? 'hit' : 'miss'}`}
+          x1={userStartX}
+          y1={BASELINE_Y}
+          x2={userEndX}
+          y2={BASELINE_Y}
+          stroke={userColor}
+        />
 
-        {/* Layer 2: Average player curve */}
-        {crowdData && avgPath && (
-          <g className="avg-benchmark">
-            <path d={avgPath} className="avg-curve" />
-            {/* Diamond markers for average bounds */}
-            <polygon
-              className="avg-marker"
-              points={`${avgStartX},${BASELINE_Y - 3} ${avgStartX + 3},${BASELINE_Y} ${avgStartX},${BASELINE_Y + 3} ${avgStartX - 3},${BASELINE_Y}`}
-            />
-            <polygon
-              className="avg-marker"
-              points={`${avgEndX},${BASELINE_Y - 3} ${avgEndX + 3},${BASELINE_Y} ${avgEndX},${BASELINE_Y + 3} ${avgEndX - 3},${BASELINE_Y}`}
-            />
-          </g>
-        )}
+        {/* User bound markers (circles) */}
+        <circle
+          cx={userStartX}
+          cy={BASELINE_Y}
+          r="4"
+          className={`user-marker ${hit ? 'hit' : 'miss'}`}
+        />
+        <circle
+          cx={userEndX}
+          cy={BASELINE_Y}
+          r="4"
+          className={`user-marker ${hit ? 'hit' : 'miss'}`}
+        />
 
-        {/* Layer 3: User hero curve */}
-        <g className="user-curve-group">
-          {/* Filled area with gradient */}
-          <path d={userFilledPath} fill={`url(#${gradientId})`} />
-          {/* Stroke outline */}
-          <path
-            d={userPath}
-            className={`user-curve ${hit ? 'hit' : 'miss'}`}
-          />
-          {/* User bound markers (circles) */}
-          <circle
-            cx={userStartX}
-            cy={BASELINE_Y}
-            r="4"
-            className={`user-marker ${hit ? 'hit' : 'miss'}`}
-          />
-          <circle
-            cx={userEndX}
-            cy={BASELINE_Y}
-            r="4"
-            className={`user-marker ${hit ? 'hit' : 'miss'}`}
-          />
-        </g>
-
-        {/* Layer 4: True answer marker (only if visible) */}
+        {/* True answer marker (only if visible) */}
         {trueValueVisible && (
-          <g className="answer-marker-group">
-            <circle
-              cx={trueValueX}
-              cy={BASELINE_Y}
-              r="5"
-              className="answer-marker"
-            />
-          </g>
+          <circle
+            cx={trueValueX}
+            cy={BASELINE_Y}
+            r="5"
+            className="answer-marker"
+          />
         )}
       </svg>
+
+      {/* Value labels */}
+      <div className="value-labels">
+        {/* User bound labels (below baseline) */}
+        <div
+          className={`value-label value-label-user ${hit ? 'hit' : 'miss'}`}
+          style={{ left: `${userStartPercent}%` }}
+        >
+          {formatNumber(userMin)}
+        </div>
+        <div
+          className={`value-label value-label-user ${hit ? 'hit' : 'miss'}`}
+          style={{ left: `${userEndPercent}%` }}
+        >
+          {formatNumber(userMax)}
+        </div>
+
+        {/* Answer label (above baseline) */}
+        {trueValueVisible && (
+          <div
+            className="value-label value-label-answer"
+            style={{ left: `${trueValuePercent}%` }}
+          >
+            {formatNumber(trueValue)}
+          </div>
+        )}
+      </div>
 
       {/* Clamped arrows for off-screen answer */}
       {isWildMissRight && (

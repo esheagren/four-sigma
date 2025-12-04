@@ -1,7 +1,7 @@
 /**
- * Gaussian Landscape Utility Functions
+ * Interval Visualization Utility Functions
  *
- * Provides viewport calculation and SVG path generation for the
+ * Provides viewport calculation and coordinate conversion for the
  * confidence interval visualization.
  */
 
@@ -83,74 +83,6 @@ export function valueToX(
   viewportRange: number
 ): number {
   return ((value - viewportMin) / viewportRange) * SVG_WIDTH;
-}
-
-/**
- * Calculate the peak height for a curve based on interval width
- * Narrower intervals = taller peaks, wider = flatter
- */
-export function calculatePeakHeight(
-  intervalWidth: number,
-  viewportRange: number
-): number {
-  // Normalize width relative to viewport
-  const normalizedWidth = (intervalWidth / viewportRange) * SVG_WIDTH;
-  // Height formula: narrower = taller, with sensible min/max
-  const height = Math.min(BASELINE_Y - 5, Math.max(10, 800 / (normalizedWidth + 1)));
-  return height;
-}
-
-/**
- * Generate a quadratic bezier path for a confidence interval curve
- * Creates a bell-shaped curve from startX to endX
- */
-export function generateBezierPath(
-  min: number,
-  max: number,
-  viewportMin: number,
-  viewportRange: number
-): string {
-  const startX = valueToX(min, viewportMin, viewportRange);
-  const endX = valueToX(max, viewportMin, viewportRange);
-
-  // Skip paths that are completely off-screen
-  if (endX < 0 || startX > SVG_WIDTH) {
-    return '';
-  }
-
-  const width = endX - startX;
-  const height = calculatePeakHeight(max - min, viewportRange);
-  const midX = startX + (width / 2);
-  const controlY = BASELINE_Y - height;
-
-  // Quadratic bezier: M startX,BASELINE_Y Q midX,controlY endX,BASELINE_Y
-  return `M ${startX} ${BASELINE_Y} Q ${midX} ${controlY} ${endX} ${BASELINE_Y}`;
-}
-
-/**
- * Generate a closed path for fill effect (with gradient)
- * Creates the same curve but closed at the bottom for fill
- */
-export function generateClosedBezierPath(
-  min: number,
-  max: number,
-  viewportMin: number,
-  viewportRange: number
-): string {
-  const startX = valueToX(min, viewportMin, viewportRange);
-  const endX = valueToX(max, viewportMin, viewportRange);
-
-  if (endX < 0 || startX > SVG_WIDTH) {
-    return '';
-  }
-
-  const width = endX - startX;
-  const height = calculatePeakHeight(max - min, viewportRange);
-  const midX = startX + (width / 2);
-  const controlY = BASELINE_Y - height;
-
-  // Closed path for fill
-  return `M ${startX} ${BASELINE_Y} Q ${midX} ${controlY} ${endX} ${BASELINE_Y} L ${endX} ${BASELINE_Y} L ${startX} ${BASELINE_Y} Z`;
 }
 
 /**
