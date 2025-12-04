@@ -14,6 +14,11 @@ interface GaussianLandscapeProps {
   hit: boolean;
 }
 
+// Label dimensions in SVG coordinate space
+const LABEL_WIDTH = 60;
+const LABEL_HEIGHT = 24;
+const LABEL_GAP = 6;
+
 export function GaussianLandscape({
   userMin,
   userMax,
@@ -28,18 +33,27 @@ export function GaussianLandscape({
 
   const { viewportMin, viewportRange, isWildMissLeft, isWildMissRight } = viewport;
 
-  // Calculate marker positions
+  // Calculate marker positions in SVG coordinates
   const userStartX = valueToX(userMin, viewportMin, viewportRange);
   const userEndX = valueToX(userMax, viewportMin, viewportRange);
   const trueValueX = valueToX(trueValue, viewportMin, viewportRange);
 
-  // Convert SVG X coordinates to percentages for label positioning
-  const userStartPercent = (userStartX / SVG_WIDTH) * 100;
-  const userEndPercent = (userEndX / SVG_WIDTH) * 100;
-  const trueValuePercent = (trueValueX / SVG_WIDTH) * 100;
-
   // Check if true value is visible on screen
   const trueValueVisible = !isWildMissLeft && !isWildMissRight;
+
+  // Calculate overlap - does answer label overlap with either user bound label?
+  const answerOverlapsStart = trueValueVisible && Math.abs(trueValueX - userStartX) < LABEL_WIDTH;
+  const answerOverlapsEnd = trueValueVisible && Math.abs(trueValueX - userEndX) < LABEL_WIDTH;
+  const answerNeedsElevation = answerOverlapsStart || answerOverlapsEnd;
+
+  // Y positions for labels
+  const userLabelY = BASELINE_Y + LABEL_GAP;
+  const answerLabelY = answerNeedsElevation
+    ? BASELINE_Y - LABEL_HEIGHT - LABEL_GAP - 20 // elevated higher
+    : BASELINE_Y - LABEL_HEIGHT - LABEL_GAP;
+
+  // Clamp label X positions to stay within SVG bounds
+  const clampX = (x: number) => Math.max(LABEL_WIDTH / 2, Math.min(SVG_WIDTH - LABEL_WIDTH / 2, x));
 
   // Color based on hit/miss
   const userColor = hit ? '#10b981' : '#f43f5e';
@@ -48,8 +62,8 @@ export function GaussianLandscape({
     <div className="gaussian-landscape-container">
       <svg
         className="gaussian-landscape"
-        viewBox={`0 0 ${SVG_WIDTH} 100`}
-        preserveAspectRatio="xMidYMax meet"
+        viewBox={`0 0 ${SVG_WIDTH} 130`}
+        preserveAspectRatio="xMidYMid meet"
       >
         {/* Baseline */}
         <line
@@ -93,34 +107,45 @@ export function GaussianLandscape({
             className="answer-marker"
           />
         )}
-      </svg>
 
-      {/* Value labels */}
-      <div className="value-labels">
-        {/* User bound labels (below baseline) */}
-        <div
-          className={`value-label value-label-user ${hit ? 'hit' : 'miss'}`}
-          style={{ left: `${userStartPercent}%` }}
+        {/* User start label */}
+        <foreignObject
+          x={clampX(userStartX) - LABEL_WIDTH / 2}
+          y={userLabelY}
+          width={LABEL_WIDTH}
+          height={LABEL_HEIGHT}
         >
-          {formatNumber(userMin)}
-        </div>
-        <div
-          className={`value-label value-label-user ${hit ? 'hit' : 'miss'}`}
-          style={{ left: `${userEndPercent}%` }}
-        >
-          {formatNumber(userMax)}
-        </div>
-
-        {/* Answer label (above baseline) */}
-        {trueValueVisible && (
-          <div
-            className="value-label value-label-answer"
-            style={{ left: `${trueValuePercent}%` }}
-          >
-            {formatNumber(trueValue)}
+          <div className={`svg-label svg-label-user ${hit ? 'hit' : 'miss'}`}>
+            {formatNumber(userMin)}
           </div>
+        </foreignObject>
+
+        {/* User end label */}
+        <foreignObject
+          x={clampX(userEndX) - LABEL_WIDTH / 2}
+          y={userLabelY}
+          width={LABEL_WIDTH}
+          height={LABEL_HEIGHT}
+        >
+          <div className={`svg-label svg-label-user ${hit ? 'hit' : 'miss'}`}>
+            {formatNumber(userMax)}
+          </div>
+        </foreignObject>
+
+        {/* Answer label (only if visible) */}
+        {trueValueVisible && (
+          <foreignObject
+            x={clampX(trueValueX) - LABEL_WIDTH / 2}
+            y={answerLabelY}
+            width={LABEL_WIDTH}
+            height={LABEL_HEIGHT}
+          >
+            <div className="svg-label svg-label-answer">
+              {formatNumber(trueValue)}
+            </div>
+          </foreignObject>
         )}
-      </div>
+      </svg>
 
       {/* Clamped arrows for off-screen answer */}
       {isWildMissRight && (

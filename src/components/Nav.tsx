@@ -64,6 +64,8 @@ function SettingsIcon() {
   );
 }
 
+const HAS_SEEN_HOW_TO_PLAY_KEY = 'four_sigma_has_seen_how_to_play';
+
 export function Nav() {
   const { isAnonymous, isLoading } = useAuth();
   const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
@@ -73,6 +75,17 @@ export function Nav() {
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Show How to Play modal for first-time visitors
+  useEffect(() => {
+    if (isLoading) return;
+
+    const hasSeenHowToPlay = localStorage.getItem(HAS_SEEN_HOW_TO_PLAY_KEY);
+    if (!hasSeenHowToPlay) {
+      setIsHowToPlayOpen(true);
+      localStorage.setItem(HAS_SEEN_HOW_TO_PLAY_KEY, 'true');
+    }
+  }, [isLoading]);
 
   // Close menu when clicking outside
   useEffect(() => {
