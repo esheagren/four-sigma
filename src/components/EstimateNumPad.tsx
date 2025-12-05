@@ -435,14 +435,17 @@ export function EstimateNumPad({
     if (onClearOverrides) onClearOverrides();
   }, [onClearOverrides]);
 
+  // Show uncertainty controls only when there's a valid estimate and not calculating
+  const showUncertaintyControls = hasValidEstimate && !isCalculating;
+
   return (
     <div className="estimate-numpad-container">
-      {/* Estimate Display - always same size, just hide slider elements when calculating */}
+      {/* Estimate Display - always same size, just hide slider elements when calculating or no estimate */}
       <div className="estimate-display-row">
         {/* Up/down arrows for fine-grained uncertainty adjustment */}
         <div
           className="uncertainty-arrows"
-          style={{ visibility: isCalculating ? 'hidden' : 'visible' }}
+          style={{ visibility: showUncertaintyControls ? 'visible' : 'hidden' }}
         >
           <button
             className="uncertainty-arrow-btn"
@@ -467,14 +470,14 @@ export function EstimateNumPad({
         <div
           ref={sliderRef}
           className="estimate-display-unified"
-          onPointerDown={!isCalculating ? handlePointerDown : undefined}
-          onPointerMove={!isCalculating ? handlePointerMove : undefined}
-          onPointerUp={!isCalculating ? handlePointerUp : undefined}
-          onPointerCancel={!isCalculating ? handlePointerUp : undefined}
-          style={{ touchAction: isCalculating ? 'auto' : 'none' }}
+          onPointerDown={showUncertaintyControls ? handlePointerDown : undefined}
+          onPointerMove={showUncertaintyControls ? handlePointerMove : undefined}
+          onPointerUp={showUncertaintyControls ? handlePointerUp : undefined}
+          onPointerCancel={showUncertaintyControls ? handlePointerUp : undefined}
+          style={{ touchAction: showUncertaintyControls ? 'none' : 'auto' }}
         >
-          {/* Background fill layer - only show when NOT calculating */}
-          {!isCalculating && (
+          {/* Background fill layer - only show when uncertainty controls are visible */}
+          {showUncertaintyControls && (
             <div
               className={`estimate-uncertainty-fill ${uncertainty === 0 ? 'estimate-uncertainty-fill-initial' : ''}`}
               style={{ width: uncertainty === 0 ? '12px' : `${uncertainty}%` }}
@@ -490,10 +493,10 @@ export function EstimateNumPad({
           </div>
         </div>
 
-        {/* Percentage label - always present for consistent width, but invisible when calculating */}
+        {/* Percentage label - always present for consistent width, but invisible until estimate entered */}
         <span
           className="uncertainty-percent-label"
-          style={{ visibility: isCalculating ? 'hidden' : 'visible' }}
+          style={{ visibility: showUncertaintyControls ? 'visible' : 'hidden' }}
         >
           ±{Math.round(uncertainty)}%
         </span>

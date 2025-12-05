@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { GaussianLandscape } from './GaussianLandscape';
+import { IntervalVisualization } from './IntervalVisualization';
 
 interface Judgement {
   questionId: string;
@@ -95,7 +95,7 @@ export function ResultCard({ judgement, index }: ResultCardProps) {
 
       {/* Dark body section with visualization */}
       <div className="result-card-body">
-        <GaussianLandscape
+        <IntervalVisualization
           userMin={lower}
           userMax={upper}
           trueValue={trueValue}

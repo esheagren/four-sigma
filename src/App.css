@@ -4672,7 +4672,179 @@ a.judgement-answer-below:hover .judgement-answer-value {
 }
 
 /* ==========================================
-   GAUSSIAN LANDSCAPE VISUALIZATION
+   INTERVAL VISUALIZATION (New HTML/CSS version)
+   ========================================== */
+
+.interval-viz {
+  position: relative;
+  width: 100%;
+  padding: 1rem 1rem 0.5rem;
+}
+
+.interval-answer-elevated {
+  position: relative;
+  height: 45px;
+  margin-bottom: 0.5rem;
+}
+
+.interval-answer-elevated .interval-label {
+  position: absolute;
+  top: 0;
+}
+
+.interval-connector {
+  position: absolute;
+  top: 28px;
+  width: 2px;
+  height: 25px;
+  background: #38bdf8;
+  transform: translateX(-50%);
+  opacity: 0.6;
+}
+
+.interval-track {
+  position: relative;
+  height: 4px;
+  margin: 0.75rem 0;
+}
+
+.interval-baseline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-50%);
+}
+
+.interval-user-range {
+  position: absolute;
+  height: 4px;
+  top: 0;
+  border-radius: 2px;
+}
+
+.interval-user-range.hit {
+  background: #10b981;
+}
+
+.interval-user-range.miss {
+  background: #f43f5e;
+}
+
+.interval-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2.5px solid;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.interval-marker.user.hit {
+  border-color: #10b981;
+}
+
+.interval-marker.user.miss {
+  border-color: #f43f5e;
+}
+
+.interval-marker.answer {
+  background: #38bdf8;
+  border-color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+}
+
+.interval-labels {
+  position: relative;
+  height: 36px;
+  margin-top: 0.5rem;
+}
+
+.interval-label {
+  position: absolute;
+  transform: translateX(-50%);
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.interval-label.user {
+  top: 0;
+  color: white;
+}
+
+.interval-label.user.hit {
+  background: #10b981;
+}
+
+.interval-label.user.miss {
+  background: #f43f5e;
+}
+
+.interval-label.answer {
+  top: 0;
+  background: #38bdf8;
+  color: #0c4a6e;
+}
+
+.interval-offscreen {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 10px;
+  background: #38bdf8;
+  color: #0c4a6e;
+  border-radius: 6px;
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.interval-offscreen.right {
+  right: 0;
+}
+
+.interval-offscreen.left {
+  left: 0;
+}
+
+.interval-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+}
+
+/* Mobile adjustments for interval viz */
+@media (max-width: 640px) {
+  .interval-label {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .interval-marker {
+    width: 10px;
+    height: 10px;
+  }
+
+  .interval-axis {
+    font-size: 11px;
+  }
+}
+
+/* ==========================================
+   GAUSSIAN LANDSCAPE VISUALIZATION (Legacy)
    ========================================== */
 
 .gaussian-landscape-container {
@@ -4908,13 +5080,13 @@ a.judgement-answer-below:hover .judgement-answer-value {
 /* Dark body section with visualization */
 .result-card-body {
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  padding: 1.5rem 1rem;
+  padding: 1rem;
   border-radius: 0 0 16px 16px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 140px;
+  min-height: 160px;
 }
 
 /* Info/Legend button */
@@ -4962,10 +5134,11 @@ a.judgement-answer-below:hover .judgement-answer-value {
   }
 
   .result-card-body {
-    padding: 1.25rem 0.75rem;
-    min-height: 120px;
+    padding: 0.75rem;
+    min-height: 140px;
   }
 
+  /* Legacy gaussian landscape styles */
   .gaussian-landscape {
     height: 90px;
   }
