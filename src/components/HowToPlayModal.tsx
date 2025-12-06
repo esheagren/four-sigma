@@ -60,7 +60,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
     const rect = sliderRef.current.getBoundingClientRect();
     const x = clientX - rect.left;
     const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    setDemoUncertainty(Math.round(percentage));
+    setDemoUncertainty(percentage); // Don't round during drag for smoothness
   }, []);
 
   // Pointer event handlers
@@ -212,7 +212,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                               />
                               <div className="demo-slider-value">8,849</div>
                             </div>
-                            <div className="demo-slider-percent">±{demoUncertainty}%</div>
+                            <div className="demo-slider-percent">±{Math.round(demoUncertainty)}%</div>
                           </div>
                           {demoStep === 'uncertainty' && (
                             <div className="demo-drag-hint">

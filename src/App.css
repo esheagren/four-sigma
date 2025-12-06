@@ -3155,7 +3155,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   border-radius: 10px 0 0 10px;
   border-right: 2px solid var(--accent);
   pointer-events: none;
-  transition: width 0.05s linear;
+  /* No transition for immediate response during drag */
 }
 
 .demo-slider-fill-initial {
