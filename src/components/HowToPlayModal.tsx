@@ -1,12 +1,13 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
+import { EstimateNumPad, BoundsData, formatDisplay } from './EstimateNumPad';
 
 interface HowToPlayModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-// Interactive demo step type
-type DemoStep = 'estimate' | 'uncertainty' | 'complete';
+// Tutorial step type
+type TutorialStep = 'typing' | 'uncertainty' | 'complete';
 
 // Scoring function matching server-side algorithm
 function calculateScore(lower: number, upper: number, answer: number): number {
@@ -41,62 +42,33 @@ function calculateScore(lower: number, upper: number, answer: number): number {
 }
 
 export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
-  // Interactive demo state
-  const [demoStep, setDemoStep] = useState<DemoStep>('estimate');
-  const [demoUncertainty, setDemoUncertainty] = useState<number>(0);
-  const sliderRef = useRef<HTMLDivElement>(null);
-  const isDragging = useRef(false);
+  // Tutorial state using real EstimateNumPad
+  const [tutorialStep, setTutorialStep] = useState<TutorialStep>('typing');
+  const [bounds, setBounds] = useState<BoundsData | null>(null);
+  const [resetKey, setResetKey] = useState(0);
+  const [finalBounds, setFinalBounds] = useState<{ lower: number; upper: number } | null>(null);
 
-  // Demo values
-  const demoEstimate = 8849;
-  const demoBounds = {
-    lower: Math.round(demoEstimate * (1 - demoUncertainty / 100)),
-    upper: Math.round(demoEstimate * (1 + demoUncertainty / 100)),
-  };
+  // Handle bounds changes from the real EstimateNumPad
+  const handleBoundsChange = useCallback((newBounds: BoundsData | null) => {
+    setBounds(newBounds);
+    // Advance to uncertainty step when user has typed an estimate and starts dragging
+    if (newBounds?.hasValidEstimate && newBounds.uncertainty > 0 && tutorialStep === 'typing') {
+      setTutorialStep('uncertainty');
+    }
+  }, [tutorialStep]);
 
-  // Calculate uncertainty from pointer position
-  const calculateUncertaintyFromPointer = useCallback((clientX: number) => {
-    if (!sliderRef.current) return;
-    const rect = sliderRef.current.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    setDemoUncertainty(percentage); // Don't round during drag for smoothness
+  // Handle submit from the real EstimateNumPad
+  const handleSubmit = useCallback((lower: number, upper: number) => {
+    setFinalBounds({ lower, upper });
+    setTutorialStep('complete');
   }, []);
 
-  // Pointer event handlers
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    if (demoStep !== 'uncertainty') return;
-    isDragging.current = true;
-    e.currentTarget.setPointerCapture(e.pointerId);
-    calculateUncertaintyFromPointer(e.clientX);
-  }, [demoStep, calculateUncertaintyFromPointer]);
-
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (!isDragging.current || demoStep !== 'uncertainty') return;
-    calculateUncertaintyFromPointer(e.clientX);
-  }, [demoStep, calculateUncertaintyFromPointer]);
-
-  const handlePointerUp = useCallback((e: React.PointerEvent) => {
-    if (!isDragging.current) return;
-    isDragging.current = false;
-    e.currentTarget.releasePointerCapture(e.pointerId);
-    // If they've dragged to at least 5%, advance to complete step
-    if (demoUncertainty >= 5) {
-      setDemoStep('complete');
-    }
-  }, [demoUncertainty]);
-
-  // Handle step 1 click (entering estimate)
-  const handleEstimateClick = useCallback(() => {
-    if (demoStep === 'estimate') {
-      setDemoStep('uncertainty');
-    }
-  }, [demoStep]);
-
-  // Reset demo
-  const resetDemo = useCallback(() => {
-    setDemoStep('estimate');
-    setDemoUncertainty(0);
+  // Reset tutorial
+  const resetTutorial = useCallback(() => {
+    setTutorialStep('typing');
+    setBounds(null);
+    setFinalBounds(null);
+    setResetKey(k => k + 1); // Force EstimateNumPad to remount with fresh state
   }, []);
 
   if (!isOpen) return null;
@@ -163,101 +135,82 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                 </p>
 
                 <div className="answer-visual">
-                  <div className="answer-diagram">
-                    <div className="answer-question-example">
-                      Height of Mount Everest
-                    </div>
-                    <div className="answer-unit-example">
-                      Unit: <span className="unit-value">meters</span>
-                    </div>
-
-                    {/* Interactive stepped demo */}
-                    <div className="demo-steps">
-                      {/* Step 1: Enter estimate */}
-                      <div className={`demo-step ${demoStep === 'estimate' ? 'demo-step-active' : ''} ${demoStep !== 'estimate' ? 'demo-step-complete' : ''}`}>
-                        <div className="demo-step-number">1</div>
-                        <div className="demo-step-content">
-                          <div className="demo-step-label">Enter your estimate</div>
-                          {demoStep === 'estimate' ? (
-                            <button className="demo-estimate-input demo-estimate-input-clickable" onClick={handleEstimateClick}>
-                              <span className="demo-typing-cursor">|</span>
-                              <span className="demo-tap-hint">Tap to enter 8,849</span>
-                            </button>
-                          ) : (
-                            <div className="demo-estimate-input demo-estimate-input-filled">
-                              8,849
-                            </div>
-                          )}
-                        </div>
+                  <div className="tutorial-container">
+                    {/* Question display */}
+                    <div className="tutorial-question">
+                      <div className="answer-question-example">
+                        Height of Mount Everest
                       </div>
-
-                      {/* Step 2: Drag uncertainty */}
-                      <div className={`demo-step ${demoStep === 'uncertainty' ? 'demo-step-active' : ''} ${['bounds', 'complete'].includes(demoStep) ? 'demo-step-complete' : ''}`}>
-                        <div className="demo-step-number">2</div>
-                        <div className="demo-step-content">
-                          <div className="demo-step-label">Drag to set uncertainty</div>
-                          <div className="demo-slider-row">
-                            <div
-                              ref={sliderRef}
-                              className={`demo-slider-bar ${demoStep === 'uncertainty' ? 'demo-slider-bar-active' : ''}`}
-                              onPointerDown={handlePointerDown}
-                              onPointerMove={handlePointerMove}
-                              onPointerUp={handlePointerUp}
-                              onPointerCancel={handlePointerUp}
-                              style={{ touchAction: demoStep === 'uncertainty' ? 'none' : 'auto' }}
-                            >
-                              <div
-                                className={`demo-slider-fill ${demoStep === 'uncertainty' && demoUncertainty === 0 ? 'demo-slider-fill-initial' : ''}`}
-                                style={{ width: demoUncertainty === 0 ? '8px' : `${demoUncertainty}%` }}
-                              />
-                              <div className="demo-slider-value">8,849</div>
-                            </div>
-                            <div className="demo-slider-percent">±{Math.round(demoUncertainty)}%</div>
-                          </div>
-                          {demoStep === 'uncertainty' && (
-                            <div className="demo-drag-hint">
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M5 12h14M15 6l6 6-6 6"/>
-                              </svg>
-                              <span>Drag across the bar</span>
-                            </div>
-                          )}
-                        </div>
+                      <div className="answer-unit-example">
+                        Unit: <span className="unit-value">meters</span>
                       </div>
-
-                      {/* Step 3: Bounds appear */}
-                      <div className={`demo-step ${demoStep === 'complete' ? 'demo-step-active demo-step-highlight' : ''}`}>
-                        <div className="demo-step-number">3</div>
-                        <div className="demo-step-content">
-                          <div className="demo-step-label">Your bounds are calculated</div>
-                          {demoStep === 'complete' && demoUncertainty > 0 ? (
-                            <div className="demo-bounds-display demo-bounds-display-animate">
-                              <span className="demo-bound-value">{demoBounds.lower.toLocaleString()}</span>
-                              <span className="demo-bound-separator">–</span>
-                              <span className="demo-bound-value">{demoBounds.upper.toLocaleString()}</span>
-                            </div>
-                          ) : (
-                            <div className="demo-bounds-placeholder">
-                              Lower – Upper
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
                     </div>
 
-                    {/* Final explanation */}
-                    {demoStep === 'complete' && demoUncertainty > 0 && (
-                      <p className="demo-final-note">
-                        These bounds are then graded based on whether they contain the true answer.
-                      </p>
+                    {/* Progressive step indicators */}
+                    <div className="tutorial-steps">
+                      {/* Step 1: Always visible */}
+                      <div className={`tutorial-step ${tutorialStep === 'typing' ? 'tutorial-step-active' : 'tutorial-step-complete'}`}>
+                        <div className="tutorial-step-number">1</div>
+                        <div className="tutorial-step-label">Enter your estimate</div>
+                      </div>
+
+                      {/* Step 2: Appears after estimate entered */}
+                      {bounds?.hasValidEstimate && (
+                        <div className={`tutorial-step ${tutorialStep === 'uncertainty' ? 'tutorial-step-active' : tutorialStep === 'complete' ? 'tutorial-step-complete' : ''}`}>
+                          <div className="tutorial-step-number">2</div>
+                          <div className="tutorial-step-label">Drag across bar to set uncertainty</div>
+                        </div>
+                      )}
+
+                      {/* Step 3: Appears after uncertainty set */}
+                      {tutorialStep === 'complete' && (
+                        <div className="tutorial-step tutorial-step-active">
+                          <div className="tutorial-step-number">3</div>
+                          <div className="tutorial-step-label">Bounds submitted!</div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Bounds display - shows when uncertainty > 0 */}
+                    {bounds?.hasValidEstimate && bounds.uncertainty > 0 && tutorialStep !== 'complete' && (
+                      <div className="tutorial-bounds-display">
+                        <span className="tutorial-bound-value">{formatDisplay(bounds.lower)}</span>
+                        <span className="tutorial-bound-separator">–</span>
+                        <span className="tutorial-bound-value">{formatDisplay(bounds.upper)}</span>
+                      </div>
                     )}
 
-                    {/* Reset button */}
-                    {demoStep === 'complete' && (
-                      <button className="demo-reset-button" onClick={resetDemo}>
-                        Try again
-                      </button>
+                    {/* Final bounds after submit */}
+                    {tutorialStep === 'complete' && finalBounds && (
+                      <div className="tutorial-bounds-display tutorial-bounds-final">
+                        <span className="tutorial-bound-value">{formatDisplay(finalBounds.lower)}</span>
+                        <span className="tutorial-bound-separator">–</span>
+                        <span className="tutorial-bound-value">{formatDisplay(finalBounds.upper)}</span>
+                      </div>
+                    )}
+
+                    {/* Real EstimateNumPad - hidden when complete */}
+                    {tutorialStep !== 'complete' && (
+                      <div className="tutorial-numpad-wrapper">
+                        <EstimateNumPad
+                          key={resetKey}
+                          onSubmit={handleSubmit}
+                          isTouch={true}
+                          onBoundsChange={handleBoundsChange}
+                        />
+                      </div>
+                    )}
+
+                    {/* Completion state */}
+                    {tutorialStep === 'complete' && (
+                      <div className="tutorial-complete">
+                        <p className="tutorial-complete-text">
+                          These bounds are then graded based on whether they contain the true answer.
+                        </p>
+                        <button className="tutorial-reset-button" onClick={resetTutorial}>
+                          Try again
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
