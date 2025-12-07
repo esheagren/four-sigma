@@ -138,8 +138,8 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                     <div className="answer-step-content">
                       <div className="answer-step-title">Enter your estimate</div>
                       <div className="answer-step-desc">Use the number pad to type your best guess</div>
-                      <div className="mini-question">The height of Mount Everest in meters?</div>
                       <div className="mini-numpad">
+                        <div className="mini-question">The height of Mount Everest in meters?</div>
                         <div className="mini-numpad-display">
                           <span className="mini-numpad-value">8,849</span>
                         </div>
