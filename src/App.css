@@ -3048,6 +3048,14 @@ a.judgement-answer-below:hover .judgement-answer-value {
   max-width: 200px;
 }
 
+.mini-question {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
 .mini-numpad-display {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.1) 100%);
   border: 1px solid rgba(255, 255, 255, 0.2);
