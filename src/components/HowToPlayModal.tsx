@@ -149,24 +149,31 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                     </div>
                   </div>
 
-                  {/* Step 3: Submit button */}
+                  {/* Step 3: Bounds calculated */}
                   <div className="answer-step">
                     <div className="answer-step-number">3</div>
                     <div className="answer-step-content">
+                      <div className="answer-step-title">Bounds calculated automatically</div>
+                      <div className="answer-step-desc">Your lower and upper bounds appear based on your uncertainty</div>
+                      <div className="mini-bounds">
+                        <div className="mini-bounds-value">7,964</div>
+                        <div className="mini-bounds-separator">–</div>
+                        <div className="mini-bounds-value">9,734</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 4: Submit button */}
+                  <div className="answer-step">
+                    <div className="answer-step-number">4</div>
+                    <div className="answer-step-content">
                       <div className="answer-step-title">Submit your bounds</div>
                       <div className="answer-step-desc">Your range is graded against the true answer</div>
-                      <div className="mini-submit">
-                        <div className="mini-submit-bounds">
-                          <span>7,964</span>
-                          <span className="mini-submit-separator">–</span>
-                          <span>9,734</span>
-                        </div>
-                        <div className="mini-submit-button">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                            <polyline points="12 5 19 12 12 19"></polyline>
-                          </svg>
-                        </div>
+                      <div className="mini-submit-arrow">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <line x1="5" y1="12" x2="19" y2="12"></line>
+                          <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
                       </div>
                     </div>
                   </div>

@@ -3204,6 +3204,47 @@ a.judgement-answer-below:hover .judgement-answer-value {
   box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
 }
 
+/* Mini Bounds Display */
+.mini-bounds {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, rgba(30, 35, 50, 0.95) 0%, rgba(40, 45, 60, 0.9) 100%);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  max-width: 200px;
+}
+
+.mini-bounds-value {
+  padding: 0.375rem 0.625rem;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.mini-bounds-separator {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+/* Mini Submit Arrow Only */
+.mini-submit-arrow {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #16a34a;
+  border: 1px solid #15803d;
+  border-radius: 10px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+}
+
 .how-to-section {
   margin-bottom: 2.5rem;
 }
