@@ -96,25 +96,78 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
               <div className="how-to-section">
                 <h3>Answers</h3>
                 <div className="answer-steps">
+                  {/* Step 1: Number pad */}
                   <div className="answer-step">
                     <div className="answer-step-number">1</div>
                     <div className="answer-step-content">
                       <div className="answer-step-title">Enter your estimate</div>
                       <div className="answer-step-desc">Use the number pad to type your best guess</div>
+                      <div className="mini-numpad">
+                        <div className="mini-numpad-display">
+                          <span className="mini-numpad-value">8,849</span>
+                        </div>
+                        <div className="mini-numpad-grid">
+                          <div className="mini-key">7</div>
+                          <div className="mini-key">8</div>
+                          <div className="mini-key">9</div>
+                          <div className="mini-key mini-key-op">÷</div>
+                          <div className="mini-key">4</div>
+                          <div className="mini-key">5</div>
+                          <div className="mini-key">6</div>
+                          <div className="mini-key mini-key-op">×</div>
+                          <div className="mini-key">1</div>
+                          <div className="mini-key">2</div>
+                          <div className="mini-key">3</div>
+                          <div className="mini-key mini-key-op">−</div>
+                          <div className="mini-key">.</div>
+                          <div className="mini-key">0</div>
+                          <div className="mini-key mini-key-backspace">⌫</div>
+                          <div className="mini-key mini-key-op">+</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Step 2: Uncertainty slider */}
                   <div className="answer-step">
                     <div className="answer-step-number">2</div>
                     <div className="answer-step-content">
                       <div className="answer-step-title">Set your uncertainty</div>
-                      <div className="answer-step-desc">Drag across the estimate bar to widen your range</div>
+                      <div className="answer-step-desc">Drag across the bar to widen your range</div>
+                      <div className="mini-slider">
+                        <div className="mini-slider-bar">
+                          <div className="mini-slider-fill"></div>
+                          <div className="mini-slider-value">8,849</div>
+                        </div>
+                        <div className="mini-slider-percent">±10%</div>
+                        <div className="mini-slider-arrow">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M5 12h14M15 6l6 6-6 6"/>
+                          </svg>
+                        </div>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Step 3: Submit button */}
                   <div className="answer-step">
                     <div className="answer-step-number">3</div>
                     <div className="answer-step-content">
                       <div className="answer-step-title">Submit your bounds</div>
-                      <div className="answer-step-desc">Your lower and upper bounds are graded against the true answer</div>
+                      <div className="answer-step-desc">Your range is graded against the true answer</div>
+                      <div className="mini-submit">
+                        <div className="mini-submit-bounds">
+                          <span>7,964</span>
+                          <span className="mini-submit-separator">–</span>
+                          <span>9,734</span>
+                        </div>
+                        <div className="mini-submit-button">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                          </svg>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
