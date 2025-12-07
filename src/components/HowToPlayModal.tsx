@@ -1,13 +1,7 @@
-import { useState, useCallback } from 'react';
-import { EstimateNumPad, BoundsData, formatDisplay } from './EstimateNumPad';
-
 interface HowToPlayModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
-// Tutorial step type
-type TutorialStep = 'typing' | 'uncertainty' | 'complete';
 
 // Scoring function matching server-side algorithm
 function calculateScore(lower: number, upper: number, answer: number): number {
@@ -42,35 +36,6 @@ function calculateScore(lower: number, upper: number, answer: number): number {
 }
 
 export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
-  // Tutorial state using real EstimateNumPad
-  const [tutorialStep, setTutorialStep] = useState<TutorialStep>('typing');
-  const [bounds, setBounds] = useState<BoundsData | null>(null);
-  const [resetKey, setResetKey] = useState(0);
-  const [finalBounds, setFinalBounds] = useState<{ lower: number; upper: number } | null>(null);
-
-  // Handle bounds changes from the real EstimateNumPad
-  const handleBoundsChange = useCallback((newBounds: BoundsData | null) => {
-    setBounds(newBounds);
-    // Advance to uncertainty step when user has typed an estimate and starts dragging
-    if (newBounds?.hasValidEstimate && newBounds.uncertainty > 0 && tutorialStep === 'typing') {
-      setTutorialStep('uncertainty');
-    }
-  }, [tutorialStep]);
-
-  // Handle submit from the real EstimateNumPad
-  const handleSubmit = useCallback((lower: number, upper: number) => {
-    setFinalBounds({ lower, upper });
-    setTutorialStep('complete');
-  }, []);
-
-  // Reset tutorial
-  const resetTutorial = useCallback(() => {
-    setTutorialStep('typing');
-    setBounds(null);
-    setFinalBounds(null);
-    setResetKey(k => k + 1); // Force EstimateNumPad to remount with fresh state
-  }, []);
-
   if (!isOpen) return null;
 
   // Example scoring scenarios
@@ -130,88 +95,27 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
 
               <div className="how-to-section">
                 <h3>Answers</h3>
-                <p style={{ fontSize: '1.0625rem', lineHeight: '1.7', color: 'var(--text-secondary)' }}>
-                  For each question, you'll enter an estimate and set your uncertainty. Try it below!
-                </p>
-
-                <div className="answer-visual">
-                  <div className="tutorial-container">
-                    {/* Question display */}
-                    <div className="tutorial-question">
-                      <div className="answer-question-example">
-                        Height of Mount Everest
-                      </div>
-                      <div className="answer-unit-example">
-                        Unit: <span className="unit-value">meters</span>
-                      </div>
+                <div className="answer-steps">
+                  <div className="answer-step">
+                    <div className="answer-step-number">1</div>
+                    <div className="answer-step-content">
+                      <div className="answer-step-title">Enter your estimate</div>
+                      <div className="answer-step-desc">Use the number pad to type your best guess</div>
                     </div>
-
-                    {/* Progressive step indicators */}
-                    <div className="tutorial-steps">
-                      {/* Step 1: Always visible */}
-                      <div className={`tutorial-step ${tutorialStep === 'typing' ? 'tutorial-step-active' : 'tutorial-step-complete'}`}>
-                        <div className="tutorial-step-number">1</div>
-                        <div className="tutorial-step-label">Enter your estimate</div>
-                      </div>
-
-                      {/* Step 2: Appears after estimate entered */}
-                      {bounds?.hasValidEstimate && (
-                        <div className={`tutorial-step ${tutorialStep === 'uncertainty' ? 'tutorial-step-active' : tutorialStep === 'complete' ? 'tutorial-step-complete' : ''}`}>
-                          <div className="tutorial-step-number">2</div>
-                          <div className="tutorial-step-label">Drag across bar to set uncertainty</div>
-                        </div>
-                      )}
-
-                      {/* Step 3: Appears after uncertainty set */}
-                      {tutorialStep === 'complete' && (
-                        <div className="tutorial-step tutorial-step-active">
-                          <div className="tutorial-step-number">3</div>
-                          <div className="tutorial-step-label">Bounds submitted!</div>
-                        </div>
-                      )}
+                  </div>
+                  <div className="answer-step">
+                    <div className="answer-step-number">2</div>
+                    <div className="answer-step-content">
+                      <div className="answer-step-title">Set your uncertainty</div>
+                      <div className="answer-step-desc">Drag across the estimate bar to widen your range</div>
                     </div>
-
-                    {/* Bounds display - shows when uncertainty > 0 */}
-                    {bounds?.hasValidEstimate && bounds.uncertainty > 0 && tutorialStep !== 'complete' && (
-                      <div className="tutorial-bounds-display">
-                        <span className="tutorial-bound-value">{formatDisplay(bounds.lower)}</span>
-                        <span className="tutorial-bound-separator">–</span>
-                        <span className="tutorial-bound-value">{formatDisplay(bounds.upper)}</span>
-                      </div>
-                    )}
-
-                    {/* Final bounds after submit */}
-                    {tutorialStep === 'complete' && finalBounds && (
-                      <div className="tutorial-bounds-display tutorial-bounds-final">
-                        <span className="tutorial-bound-value">{formatDisplay(finalBounds.lower)}</span>
-                        <span className="tutorial-bound-separator">–</span>
-                        <span className="tutorial-bound-value">{formatDisplay(finalBounds.upper)}</span>
-                      </div>
-                    )}
-
-                    {/* Real EstimateNumPad - hidden when complete */}
-                    {tutorialStep !== 'complete' && (
-                      <div className="tutorial-numpad-wrapper">
-                        <EstimateNumPad
-                          key={resetKey}
-                          onSubmit={handleSubmit}
-                          isTouch={true}
-                          onBoundsChange={handleBoundsChange}
-                        />
-                      </div>
-                    )}
-
-                    {/* Completion state */}
-                    {tutorialStep === 'complete' && (
-                      <div className="tutorial-complete">
-                        <p className="tutorial-complete-text">
-                          These bounds are then graded based on whether they contain the true answer.
-                        </p>
-                        <button className="tutorial-reset-button" onClick={resetTutorial}>
-                          Try again
-                        </button>
-                      </div>
-                    )}
+                  </div>
+                  <div className="answer-step">
+                    <div className="answer-step-number">3</div>
+                    <div className="answer-step-content">
+                      <div className="answer-step-title">Submit your bounds</div>
+                      <div className="answer-step-desc">Your lower and upper bounds are graded against the true answer</div>
+                    </div>
                   </div>
                 </div>
               </div>
