@@ -19,6 +19,7 @@ export interface User {
   currentStreak: number;
   bestStreak: number;
   bestSingleScore: number;
+  themePreference: string;
 }
 
 export interface AuthUser {

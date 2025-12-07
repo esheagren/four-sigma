@@ -23,6 +23,7 @@ export function rowToUser(row: any): User {
     currentStreak: row.current_streak,
     bestStreak: row.best_streak,
     bestSingleScore: Number(row.best_single_score),
+    themePreference: row.theme_preference || 'default',
   };
 }
 

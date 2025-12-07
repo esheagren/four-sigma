@@ -58,6 +58,7 @@ async function handleProfile(req: VercelRequest, res: VercelResponse, userId: st
         isAnonymous: stats.user.isAnonymous,
         createdAt: stats.user.createdAt,
         lastPlayedAt: stats.user.lastPlayedAt,
+        themePreference: stats.user.themePreference,
       },
       stats: {
         totalScore: stats.user.totalScore,
@@ -90,7 +91,7 @@ async function handleProfile(req: VercelRequest, res: VercelResponse, userId: st
   }
 
   if (req.method === 'PATCH') {
-    const { displayName, timezone } = req.body;
+    const { displayName, timezone, themePreference } = req.body;
 
     if (displayName !== undefined) {
       if (typeof displayName !== 'string' || displayName.trim().length < 1) {
@@ -104,6 +105,7 @@ async function handleProfile(req: VercelRequest, res: VercelResponse, userId: st
     const user = await updateUserProfile(userId, {
       displayName: displayName?.trim(),
       timezone,
+      themePreference,
     });
 
     return res.json({
@@ -111,6 +113,7 @@ async function handleProfile(req: VercelRequest, res: VercelResponse, userId: st
         id: user.id,
         displayName: user.displayName,
         timezone: user.timezone,
+        themePreference: user.themePreference,
       },
     });
   }

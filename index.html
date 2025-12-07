@@ -6,7 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>four-sigma</title>
   </head>
-  <body>
+  <body class="no-transition">
+    <script>
+      // FOUC prevention: Apply saved theme immediately before React hydrates
+      (function() {
+        var theme = localStorage.getItem('four_sigma_theme') || 'default';
+        document.body.classList.add('theme-' + theme);
+        // Remove no-transition class after a brief delay to enable transitions
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            document.body.classList.remove('no-transition');
+          });
+        });
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

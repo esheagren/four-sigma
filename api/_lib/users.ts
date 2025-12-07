@@ -141,7 +141,7 @@ export async function mergeUsers(anonymousUserId: string, authenticatedUserId: s
  */
 export async function updateUserProfile(
   userId: string,
-  updates: { displayName?: string; timezone?: string }
+  updates: { displayName?: string; timezone?: string; themePreference?: string }
 ): Promise<User> {
   const updateData: any = {};
   if (updates.displayName !== undefined) {
@@ -149,6 +149,9 @@ export async function updateUserProfile(
   }
   if (updates.timezone !== undefined) {
     updateData.timezone = updates.timezone;
+  }
+  if (updates.themePreference !== undefined) {
+    updateData.theme_preference = updates.themePreference;
   }
 
   const { data, error } = await supabase
