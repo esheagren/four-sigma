@@ -1,3 +1,5 @@
+import { useState, useRef, useCallback } from 'react';
+
 interface HowToPlayModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -36,7 +38,41 @@ function calculateScore(lower: number, upper: number, answer: number): number {
 }
 
 export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
+  // Interactive slider state
+  const [demoUncertainty, setDemoUncertainty] = useState(10);
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
+
+  const handleSliderInteraction = useCallback((clientX: number) => {
+    if (!sliderRef.current) return;
+    const rect = sliderRef.current.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
+    setDemoUncertainty(percentage);
+  }, []);
+
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    isDragging.current = true;
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    handleSliderInteraction(e.clientX);
+  }, [handleSliderInteraction]);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isDragging.current) return;
+    handleSliderInteraction(e.clientX);
+  }, [handleSliderInteraction]);
+
+  const handlePointerUp = useCallback(() => {
+    isDragging.current = false;
+  }, []);
+
   if (!isOpen) return null;
+
+  // Calculate demo bounds based on uncertainty
+  const demoEstimate = 8849;
+  const uncertaintyFraction = demoUncertainty / 100;
+  const demoLower = Math.round(demoEstimate * (1 - uncertaintyFraction));
+  const demoUpper = Math.round(demoEstimate * (1 + uncertaintyFraction));
 
   // Example scoring scenarios
   const trueValue = 8849; // Mount Everest height
@@ -135,16 +171,18 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                       <div className="answer-step-title">Set your uncertainty</div>
                       <div className="answer-step-desc">Drag across the bar to widen your range</div>
                       <div className="mini-slider">
-                        <div className="mini-slider-bar">
-                          <div className="mini-slider-fill"></div>
-                          <div className="mini-slider-value">8,849</div>
+                        <div
+                          className="mini-slider-bar mini-slider-bar-interactive"
+                          ref={sliderRef}
+                          onPointerDown={handlePointerDown}
+                          onPointerMove={handlePointerMove}
+                          onPointerUp={handlePointerUp}
+                          onPointerLeave={handlePointerUp}
+                        >
+                          <div className="mini-slider-fill" style={{ width: `${demoUncertainty}%` }}></div>
+                          <div className="mini-slider-value">{demoEstimate.toLocaleString()}</div>
                         </div>
-                        <div className="mini-slider-percent">±10%</div>
-                        <div className="mini-slider-arrow">
-                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M5 12h14M15 6l6 6-6 6"/>
-                          </svg>
-                        </div>
+                        <div className="mini-slider-percent">±{Math.round(demoUncertainty)}%</div>
                       </div>
                     </div>
                   </div>
@@ -156,9 +194,9 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
                       <div className="answer-step-title">Bounds calculated automatically</div>
                       <div className="answer-step-desc">Your lower and upper bounds appear based on your uncertainty</div>
                       <div className="mini-bounds">
-                        <div className="mini-bounds-value">7,964</div>
+                        <div className="mini-bounds-value">{demoLower.toLocaleString()}</div>
                         <div className="mini-bounds-separator">–</div>
-                        <div className="mini-bounds-value">9,734</div>
+                        <div className="mini-bounds-value">{demoUpper.toLocaleString()}</div>
                       </div>
                     </div>
                   </div>

@@ -3142,9 +3142,15 @@ a.judgement-answer-below:hover .judgement-answer-value {
 .mini-slider-percent {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--accent);
+  color: rgba(255, 255, 255, 0.95);
   min-width: 36px;
   text-align: right;
+}
+
+.mini-slider-bar-interactive {
+  cursor: ew-resize;
+  touch-action: none;
+  user-select: none;
 }
 
 .mini-slider-arrow {
