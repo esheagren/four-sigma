@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -9,7 +8,6 @@ interface SettingsModalProps {
 
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { user, isAnonymous, logout, authToken } = useAuth();
-  const { currentTheme, themes, setTheme, isLoading: isThemeLoading } = useTheme();
   const [displayName, setDisplayName] = useState(user?.displayName ?? '');
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -133,44 +131,6 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 <span className="settings-value">{user.email}</span>
               </div>
             )}
-          </div>
-
-          <div className="settings-section">
-            <h3 className="settings-section-title">Appearance</h3>
-            <div className="settings-item">
-              <label className="settings-label">Theme</label>
-              <div className="theme-picker">
-                {themes.map((theme) => (
-                  <button
-                    key={theme.id}
-                    className={`theme-option ${currentTheme.id === theme.id ? 'active' : ''}`}
-                    onClick={() => setTheme(theme.id)}
-                    disabled={isThemeLoading}
-                    title={theme.description}
-                  >
-                    <div className="theme-preview">
-                      <div
-                        className="theme-swatch"
-                        style={{
-                          background: theme.preview.background,
-                          borderColor: theme.preview.primary,
-                        }}
-                      >
-                        <div
-                          className="theme-swatch-surface"
-                          style={{ background: theme.preview.surface }}
-                        />
-                        <div
-                          className="theme-swatch-accent"
-                          style={{ background: theme.preview.primary }}
-                        />
-                      </div>
-                    </div>
-                    <span className="theme-name">{theme.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
 
           {!isAnonymous && (
