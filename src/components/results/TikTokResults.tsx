@@ -32,6 +32,7 @@ interface TikTokResultsProps {
   calibration?: number;
   dailyRank?: number;
   totalParticipants?: number;
+  calibrationHistory?: number[];
 }
 
 export function TikTokResults({
@@ -40,6 +41,7 @@ export function TikTokResults({
   calibration,
   dailyRank,
   totalParticipants,
+  calibrationHistory,
 }: TikTokResultsProps) {
   const { user } = useAuth();
   const { capture } = useAnalytics();
@@ -138,6 +140,7 @@ export function TikTokResults({
         <SummarySlide
           totalScore={score}
           calibration={calibration}
+          calibrationHistory={calibrationHistory}
           hits={hits}
           total={total}
           percentile={percentile}

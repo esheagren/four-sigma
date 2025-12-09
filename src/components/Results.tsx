@@ -58,6 +58,7 @@ export function Results({
   score,
   dailyRank,
   calibration,
+  performanceHistory,
   totalParticipants
 }: ResultsProps) {
   return (
@@ -67,6 +68,7 @@ export function Results({
       calibration={calibration}
       dailyRank={dailyRank}
       totalParticipants={totalParticipants}
+      calibrationHistory={performanceHistory?.map(p => p.calibration)}
     />
   );
 }

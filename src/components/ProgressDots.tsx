@@ -5,13 +5,8 @@ interface ProgressDotsProps {
 
 export function ProgressDots({ currentIndex, total }: ProgressDotsProps) {
   return (
-    <div className="progress-dots">
-      {Array.from({ length: total }, (_, i) => (
-        <div
-          key={i}
-          className={`progress-dot ${i < currentIndex ? 'completed' : ''} ${i === currentIndex ? 'active' : ''}`}
-        />
-      ))}
+    <div className="progress-fraction">
+      {currentIndex + 1}/{total}
     </div>
   );
 }

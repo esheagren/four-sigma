@@ -307,41 +307,17 @@ body {
   }
 }
 
-/* Progress Dots */
-.progress-dots {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 1rem;
-}
-
-.progress-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--border);
-  transition: all 0.3s ease;
-}
-
-.progress-dot.active {
-  background: var(--primary);
-  box-shadow: 0 0 8px rgba(99, 91, 255, 0.4);
-  animation: pulse-dot 2s ease-in-out infinite;
-}
-
-@keyframes pulse-dot {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 0 8px rgba(99, 91, 255, 0.4);
-  }
-  50% {
-    transform: scale(1.3);
-    box-shadow: 0 0 12px rgba(99, 91, 255, 0.7), 0 0 20px rgba(99, 91, 255, 0.3);
-  }
-}
-
-.progress-dot.completed {
-  background: var(--primary);
+/* Progress Fraction - positioned in upper left of question card */
+.progress-fraction {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  background: rgba(255, 255, 255, 0.6);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
 }
 
 /* Question Card Fade Out Animation */
@@ -412,6 +388,7 @@ body {
 
 /* Question Card */
 .question-card {
+  position: relative;
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.25) 0%,
@@ -7732,24 +7709,44 @@ a.judgement-answer-below:hover .judgement-answer-value {
   margin-bottom: 1.5rem;
 }
 
-.summary-calibration {
+/* Calibration Section - Dial + History Chart */
+.calibration-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
   margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* Circular Calibration */
-.calibration-circle {
+.calibration-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.calibration-section-label {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.calibration-right {
+  flex: 1;
+  max-width: 160px;
+}
+
+/* Calibration Dial (smaller version) */
+.calibration-dial {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.calibration-glow {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: rgba(16, 185, 129, 0.1);
-  filter: blur(20px);
 }
 
 .calibration-svg {
@@ -7763,7 +7760,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.5));
 }
 
-.calibration-center {
+.calibration-dial-center {
   position: absolute;
   inset: 0;
   display: flex;
@@ -7772,8 +7769,8 @@ a.judgement-answer-below:hover .judgement-answer-value {
   justify-content: center;
 }
 
-.calibration-value {
-  font-size: 2rem;
+.calibration-dial-value {
+  font-size: 1.125rem;
   font-weight: 700;
   font-family: 'SF Mono', 'Monaco', monospace;
   color: white;
@@ -7781,13 +7778,34 @@ a.judgement-answer-below:hover .judgement-answer-value {
   line-height: 1;
 }
 
-.calibration-label {
-  font-size: 0.625rem;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
+/* Calibration History Chart */
+.calibration-history-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.calibration-chart-svg {
+  width: 100%;
+  height: 60px;
+}
+
+.calibration-chart-empty {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.7rem;
+  text-align: center;
+}
+
+.calibration-target-label {
+  font-size: 0.6rem;
   color: #10b981;
-  margin-top: 0.25rem;
-  opacity: 0.8;
+  text-align: right;
+  opacity: 0.7;
+  margin-bottom: 2px;
 }
 
 .summary-score-section {
@@ -7885,6 +7903,14 @@ a.judgement-answer-below:hover .judgement-answer-value {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+}
+
+.summary-share-btn.icon-only {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
 }
 
 /* Mobile adjustments */
