@@ -59,7 +59,8 @@ export function Results({
   dailyRank,
   calibration,
   performanceHistory,
-  totalParticipants
+  totalParticipants,
+  topScoreGlobal,
 }: ResultsProps) {
   return (
     <TikTokResults
@@ -68,7 +69,8 @@ export function Results({
       calibration={calibration}
       dailyRank={dailyRank}
       totalParticipants={totalParticipants}
-      calibrationHistory={performanceHistory?.map(p => p.calibration)}
+      topScoreToday={topScoreGlobal}
+      performanceHistory={performanceHistory}
     />
   );
 }
