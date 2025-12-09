@@ -26,8 +26,6 @@ export function DailyStatsSlide({
 }: DailyStatsSlideProps) {
   return (
     <div className="tiktok-slide daily-stats-slide">
-      <div className="summary-grid-bg" />
-
       <div className="daily-stats-content">
         <div className="daily-stats-header">Session Complete</div>
 

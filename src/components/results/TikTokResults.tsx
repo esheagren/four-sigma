@@ -3,6 +3,7 @@ import { QuestionSlide } from './QuestionSlide';
 import { DailyStatsSlide } from './DailyStatsSlide';
 import { UserStatsSlide } from './UserStatsSlide';
 import { ShareScoreCard, type ShareScoreCardRef } from '../ShareScoreCard';
+import { BackgroundAnimation } from '../BackgroundAnimation';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../context/PostHogContext';
 
@@ -141,6 +142,9 @@ export function TikTokResults({
 
   return (
     <div className="tiktok-results">
+      {/* Animated background */}
+      <BackgroundAnimation />
+
       {/* Hidden share card for image generation */}
       <ShareScoreCard
         ref={shareCardRef}

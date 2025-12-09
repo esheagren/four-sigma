@@ -238,8 +238,20 @@ export function EstimateNumPad({
       // Remove last token from expression
       const lastToken = expression[expression.length - 1];
       if (isOperator(lastToken)) {
-        // Remove operator
-        setExpression(prev => prev.slice(0, -1));
+        // Remove operator and put previous number back into currentInput for editing
+        const newExpression = expression.slice(0, -1);
+        if (newExpression.length > 0) {
+          const prevNumber = newExpression[newExpression.length - 1];
+          if (!isOperator(prevNumber)) {
+            // Move the number to currentInput so user can edit it
+            setCurrentInput(prevNumber);
+            setExpression(newExpression.slice(0, -1));
+          } else {
+            setExpression(newExpression);
+          }
+        } else {
+          setExpression(newExpression);
+        }
       } else {
         // Put the number back into currentInput for editing
         setCurrentInput(lastToken);

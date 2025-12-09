@@ -107,6 +107,7 @@ export async function updateUserStatsAfterSession(
 
 /**
  * Get daily stats for a user
+ * calibrationToday is cumulative (all-time) for robust measurement
  */
 export async function getDailyStats(userId: string): Promise<{
   dailyRank: number | null;
@@ -118,10 +119,17 @@ export async function getDailyStats(userId: string): Promise<{
 }> {
   const todayStart = getUTCDayStart();
 
+  // Fetch today's scores for ranking
   const { data: dailyScores, error: dailyError } = await supabase
     .from('user_responses')
     .select('user_id, score, captured')
     .gte('answered_at', todayStart);
+
+  // Fetch ALL responses for this user to calculate cumulative calibration
+  const { data: allUserResponses, error: allUserError } = await supabase
+    .from('user_responses')
+    .select('captured')
+    .eq('user_id', userId);
 
   if (dailyError) {
     console.error('Failed to fetch daily scores:', dailyError);
@@ -135,13 +143,21 @@ export async function getDailyStats(userId: string): Promise<{
     };
   }
 
+  // Calculate cumulative calibration from all user responses
+  let cumulativeCalibration: number | null = null;
+  if (!allUserError && allUserResponses && allUserResponses.length > 0) {
+    const totalCaptured = allUserResponses.filter(r => r.captured).length;
+    const totalAnswered = allUserResponses.length;
+    cumulativeCalibration = (totalCaptured / totalAnswered) * 100;
+  }
+
   if (!dailyScores || dailyScores.length === 0) {
     return {
       dailyRank: null,
       topScoreToday: null,
       todaysAverage: null,
       userScoreToday: null,
-      calibrationToday: null,
+      calibrationToday: cumulativeCalibration,
       totalParticipantsToday: 0,
     };
   }
@@ -160,7 +176,6 @@ export async function getDailyStats(userId: string): Promise<{
     .map(([uid, stats]) => ({
       userId: uid,
       totalScore: stats.totalScore,
-      calibration: stats.total > 0 ? (stats.captured / stats.total) * 100 : 0,
     }))
     .sort((a, b) => b.totalScore - a.totalScore);
 
@@ -178,13 +193,14 @@ export async function getDailyStats(userId: string): Promise<{
     topScoreToday: topScore,
     todaysAverage: averageScore,
     userScoreToday: userStats?.totalScore ?? null,
-    calibrationToday: userStats?.calibration ?? null,
+    calibrationToday: cumulativeCalibration,
     totalParticipantsToday: totalParticipants,
   };
 }
 
 /**
  * Get performance history for past N days
+ * Calibration is shown as cumulative (all-time) up to each day for robust measurement
  */
 export async function getPerformanceHistory(
   userId: string,
@@ -211,19 +227,33 @@ export async function getPerformanceHistory(
 
   const startDateStr = getUTCDayStart(startDate);
 
-  const { data: responses, error } = await supabase
+  // Fetch responses from the display window for daily scores
+  const { data: recentResponses, error: recentError } = await supabase
     .from('user_responses')
     .select('user_id, score, captured, answered_at')
     .gte('answered_at', startDateStr);
 
-  if (error) {
-    console.error('Failed to fetch performance history:', error);
+  if (recentError) {
+    console.error('Failed to fetch performance history:', recentError);
     return [];
   }
 
+  // Fetch ALL responses for this user to calculate cumulative calibration
+  const { data: allUserResponses, error: allUserError } = await supabase
+    .from('user_responses')
+    .select('captured, answered_at')
+    .eq('user_id', userId)
+    .order('answered_at', { ascending: true });
+
+  if (allUserError) {
+    console.error('Failed to fetch all user responses:', allUserError);
+    return [];
+  }
+
+  // Build daily stats for all users (for avgScore calculation)
   const dateUserStats: Map<string, Map<string, { score: number; captured: number; total: number }>> = new Map();
 
-  for (const response of responses || []) {
+  for (const response of recentResponses || []) {
     const dateStr = getUTCDateString(new Date(response.answered_at));
 
     if (!dateUserStats.has(dateStr)) {
@@ -238,6 +268,32 @@ export async function getPerformanceHistory(
     dayStats.set(response.user_id, userStats);
   }
 
+  // Calculate cumulative calibration for the user up to end of each day
+  // Map: dateStr -> { cumulativeCaptured, cumulativeTotal }
+  const cumulativeByDate: Map<string, { captured: number; total: number }> = new Map();
+  let runningCaptured = 0;
+  let runningTotal = 0;
+
+  for (const response of allUserResponses || []) {
+    runningCaptured += response.captured ? 1 : 0;
+    runningTotal += 1;
+    const dateStr = getUTCDateString(new Date(response.answered_at));
+    cumulativeByDate.set(dateStr, { captured: runningCaptured, total: runningTotal });
+  }
+
+  // Track the last known cumulative values for days with no activity
+  let lastKnownCaptured = 0;
+  let lastKnownTotal = 0;
+
+  // Find cumulative stats before the display window starts
+  for (const response of allUserResponses || []) {
+    const responseDate = new Date(response.answered_at);
+    if (responseDate < startDate) {
+      lastKnownCaptured += response.captured ? 1 : 0;
+      lastKnownTotal += 1;
+    }
+  }
+
   for (let i = 0; i < days; i++) {
     const date = new Date(startDate);
     date.setUTCDate(startDate.getUTCDate() + i);
@@ -246,13 +302,24 @@ export async function getPerformanceHistory(
 
     const dayStats = dateUserStats.get(dateStr);
 
+    // Get cumulative calibration up to this date
+    const cumulative = cumulativeByDate.get(dateStr);
+    if (cumulative) {
+      lastKnownCaptured = cumulative.captured;
+      lastKnownTotal = cumulative.total;
+    }
+
+    const cumulativeCalibration = lastKnownTotal > 0
+      ? (lastKnownCaptured / lastKnownTotal) * 100
+      : 0;
+
     if (!dayStats || dayStats.size === 0) {
       result.push({
         date: dateStr,
         day: dayNames[dayOfWeek],
         userScore: 0,
         avgScore: 0,
-        calibration: 0,
+        calibration: cumulativeCalibration,
       });
       continue;
     }
@@ -262,16 +329,13 @@ export async function getPerformanceHistory(
 
     const userDayStats = dayStats.get(userId);
     const userScore = userDayStats?.score ?? 0;
-    const userCalibration = userDayStats && userDayStats.total > 0
-      ? (userDayStats.captured / userDayStats.total) * 100
-      : 0;
 
     result.push({
       date: dateStr,
       day: dayNames[dayOfWeek],
       userScore,
       avgScore,
-      calibration: userCalibration,
+      calibration: cumulativeCalibration,
     });
   }
 

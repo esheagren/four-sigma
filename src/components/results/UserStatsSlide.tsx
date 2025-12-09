@@ -214,8 +214,6 @@ export function UserStatsSlide({
 }: UserStatsSlideProps) {
   return (
     <div className="tiktok-slide user-stats-slide">
-      <div className="summary-grid-bg" />
-
       <div className="user-stats-content">
         <div className="user-stats-header">Your Stats</div>
 
