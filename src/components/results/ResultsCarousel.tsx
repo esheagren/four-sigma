@@ -158,32 +158,44 @@ export function ResultsCarousel({
 
       {/* Scroll snap container */}
       <div className="tiktok-scroll-container">
-        {/* Individual question slides */}
-        {judgements.map((judgement, index) => (
-          <QuestionSlide
-            key={judgement.questionId}
-            {...judgement}
-            index={index}
-            total={total}
-          />
-        ))}
+        {/* Total slides = questions + daily stats + user stats */}
+        {(() => {
+          const totalSlides = judgements.length + 2;
+          return (
+            <>
+              {/* Individual question slides */}
+              {judgements.map((judgement, index) => (
+                <QuestionSlide
+                  key={judgement.questionId}
+                  {...judgement}
+                  slideIndex={index}
+                  totalSlides={totalSlides}
+                />
+              ))}
 
-        {/* Daily Stats Slide (Session Complete) */}
-        <DailyStatsSlide
-          totalScore={score}
-          topScoreToday={topScoreToday}
-          hits={hits}
-          total={total}
-          questionHighScores={questionHighScores}
-          onShare={handleShare}
-          isSharing={isSharing}
-        />
+              {/* Daily Stats Slide (Session Complete) */}
+              <DailyStatsSlide
+                totalScore={score}
+                topScoreToday={topScoreToday}
+                hits={hits}
+                total={total}
+                questionHighScores={questionHighScores}
+                onShare={handleShare}
+                isSharing={isSharing}
+                slideIndex={judgements.length}
+                totalSlides={totalSlides}
+              />
 
-        {/* User Stats Slide (Long-term stats) */}
-        <UserStatsSlide
-          calibration={calibration}
-          performanceHistory={performanceHistory}
-        />
+              {/* User Stats Slide (Long-term stats) */}
+              <UserStatsSlide
+                calibration={calibration}
+                performanceHistory={performanceHistory}
+                slideIndex={judgements.length + 1}
+                totalSlides={totalSlides}
+              />
+            </>
+          );
+        })()}
       </div>
     </div>
   );

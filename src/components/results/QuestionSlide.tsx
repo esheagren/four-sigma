@@ -19,8 +19,8 @@ interface QuestionSlideProps {
   score: number;
   sourceUrl?: string;
   crowdData?: CrowdData;
-  index: number;
-  total: number;
+  slideIndex: number;
+  totalSlides: number;
 }
 
 export function QuestionSlide({
@@ -33,20 +33,24 @@ export function QuestionSlide({
   score,
   sourceUrl,
   crowdData,
-  index,
-  total,
+  slideIndex,
+  totalSlides,
 }: QuestionSlideProps) {
   return (
     <div className="tiktok-slide question-slide">
-      {/* Header - just the counter */}
-      <div className="slide-header">
-        <span className="slide-counter">
-          {index + 1} / {total}
-        </span>
-      </div>
+      <div className="slide-body">
+        {/* Dot indicators on the left */}
+        <div className="slide-dots">
+          {Array.from({ length: totalSlides }).map((_, i) => (
+            <div
+              key={i}
+              className={`slide-dot ${i === slideIndex ? 'active' : ''}`}
+            />
+          ))}
+        </div>
 
-      {/* Content */}
-      <div className="slide-content">
+        {/* Content */}
+        <div className="slide-content">
         {/* Score inside card - top center */}
         <div className={`slide-score-badge ${hit ? 'hit' : 'miss'}`}>
           {hit ? '+' : ''}{Math.round(score)} <span className="score-label">pts</span>
@@ -55,16 +59,6 @@ export function QuestionSlide({
         {/* Question */}
         <div className="slide-question-section">
           <h2 className="slide-question">{prompt}</h2>
-          <div className="slide-answer-badge">
-            {sourceUrl ? (
-              <a href={sourceUrl} target="_blank" rel="noopener noreferrer" className="slide-answer-link">
-                {formatNumber(trueValue)}
-              </a>
-            ) : (
-              <span>{formatNumber(trueValue)}</span>
-            )}
-            {unit && <span className="slide-answer-unit"> {unit}</span>}
-          </div>
         </div>
 
         {/* Visualization */}
@@ -76,6 +70,13 @@ export function QuestionSlide({
             hit={hit}
             crowdData={crowdData}
           />
+        </div>
+
+        {/* Question Context */}
+        <div className="question-context">
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+          <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
         </div>
       </div>
 

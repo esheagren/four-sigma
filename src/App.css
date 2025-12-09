@@ -7408,19 +7408,36 @@ a.judgement-answer-below:hover .judgement-answer-value {
   background: transparent;
 }
 
-.slide-header {
+/* Slide body - horizontal layout with dots on left */
+.slide-body {
+  flex: 1;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1.5rem;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.75rem;
+  min-height: 0;
 }
 
-.slide-counter {
-  font-family: 'SF Mono', 'Monaco', monospace;
-  font-size: 0.625rem;
-  color: rgba(255, 255, 255, 0.3);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
+/* Vertical dot indicators */
+.slide-dots {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 0;
+}
+
+.slide-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+.slide-dot.active {
+  background: rgba(255, 255, 255, 0.8);
+  transform: scale(1.2);
 }
 
 .slide-score {
@@ -7442,10 +7459,10 @@ a.judgement-answer-below:hover .judgement-answer-value {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 1.5rem;
-  padding-bottom: 4rem;
-  margin: 0 0.5rem;
+  justify-content: flex-start;
+  padding: 1rem;
+  padding-top: 3rem;
+  padding-bottom: 2rem;
   background: linear-gradient(135deg,
     rgba(255, 255, 255, 0.08) 0%,
     rgba(255, 255, 255, 0.04) 50%,
@@ -7457,6 +7474,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   border-radius: 16px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   position: relative;
+  overflow-y: auto;
 }
 
 /* Score badge inside card */
@@ -7490,15 +7508,15 @@ a.judgement-answer-below:hover .judgement-answer-value {
 }
 
 .slide-question-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .slide-question {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: white;
-  line-height: 1.4;
-  margin: 0 0 1rem 0;
+  line-height: 1.3;
+  margin: 0;
 }
 
 .slide-answer-badge {
@@ -7532,6 +7550,34 @@ a.judgement-answer-below:hover .judgement-answer-value {
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 1rem;
   padding: 1rem;
+}
+
+/* Question Context */
+.question-context {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(11, 14, 20, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+  flex: 1;
+  min-height: 120px;
+  max-height: 200px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Fade at bottom to indicate more content */
+  mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+}
+
+.question-context p {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 0.75rem 0;
+}
+
+.question-context p:last-child {
+  margin-bottom: 0;
 }
 
 .slide-scroll-hint {
@@ -7955,16 +8001,16 @@ a.judgement-answer-below:hover .judgement-answer-value {
 /* Daily Stats Slide */
 .daily-stats-slide {
   background: transparent;
+  padding: 1.5rem;
+  padding-top: calc(60px + 1.5rem); /* Account for navbar */
 }
 
 .daily-stats-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 2rem 1.5rem;
-  height: auto;
-  max-width: 400px;
-  margin: 60px auto 0;
   background: linear-gradient(135deg,
     rgba(255, 255, 255, 0.08) 0%,
     rgba(255, 255, 255, 0.04) 50%,
@@ -8129,16 +8175,16 @@ a.judgement-answer-below:hover .judgement-answer-value {
 /* User Stats Slide */
 .user-stats-slide {
   background: transparent;
+  padding: 1.5rem;
+  padding-top: calc(60px + 1.5rem); /* Account for navbar */
 }
 
 .user-stats-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 2rem 1.5rem;
-  height: auto;
-  max-width: 400px;
-  margin: 60px auto 0;
   background: linear-gradient(135deg,
     rgba(255, 255, 255, 0.08) 0%,
     rgba(255, 255, 255, 0.04) 50%,

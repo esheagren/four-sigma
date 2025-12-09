@@ -9,6 +9,8 @@ interface PerformanceHistoryEntry {
 interface UserStatsSlideProps {
   calibration: number;
   performanceHistory?: PerformanceHistoryEntry[];
+  slideIndex: number;
+  totalSlides: number;
 }
 
 function CircularCalibration({ percentage, size = 80 }: { percentage: number; size?: number }) {
@@ -211,11 +213,24 @@ function ScoreHistoryChart({ history }: { history: PerformanceHistoryEntry[] }) 
 export function UserStatsSlide({
   calibration,
   performanceHistory = [],
+  slideIndex,
+  totalSlides,
 }: UserStatsSlideProps) {
   return (
     <div className="tiktok-slide user-stats-slide">
-      <div className="user-stats-content">
-        <div className="user-stats-header">Your Stats</div>
+      <div className="slide-body">
+        {/* Dot indicators on the left */}
+        <div className="slide-dots">
+          {Array.from({ length: totalSlides }).map((_, i) => (
+            <div
+              key={i}
+              className={`slide-dot ${i === slideIndex ? 'active' : ''}`}
+            />
+          ))}
+        </div>
+
+        <div className="user-stats-content">
+          <div className="user-stats-header">Your Stats</div>
 
         {/* Calibration Section */}
         <div className="user-stats-section">
@@ -235,6 +250,7 @@ export function UserStatsSlide({
         <div className="user-stats-section">
           <div className="user-stats-section-title">Score Over Time</div>
           <ScoreHistoryChart history={performanceHistory} />
+        </div>
         </div>
       </div>
     </div>

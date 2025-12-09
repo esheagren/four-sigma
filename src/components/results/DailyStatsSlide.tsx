@@ -13,6 +13,8 @@ interface DailyStatsSlideProps {
   questionHighScores?: QuestionHighScore[];
   onShare: () => void;
   isSharing: boolean;
+  slideIndex: number;
+  totalSlides: number;
 }
 
 export function DailyStatsSlide({
@@ -23,10 +25,23 @@ export function DailyStatsSlide({
   questionHighScores,
   onShare,
   isSharing,
+  slideIndex,
+  totalSlides,
 }: DailyStatsSlideProps) {
   return (
     <div className="tiktok-slide daily-stats-slide">
-      <div className="daily-stats-content">
+      <div className="slide-body">
+        {/* Dot indicators on the left */}
+        <div className="slide-dots">
+          {Array.from({ length: totalSlides }).map((_, i) => (
+            <div
+              key={i}
+              className={`slide-dot ${i === slideIndex ? 'active' : ''}`}
+            />
+          ))}
+        </div>
+
+        <div className="daily-stats-content">
         <div className="daily-stats-header">Session Complete</div>
 
         {/* Score Section with Share Button */}
@@ -81,6 +96,7 @@ export function DailyStatsSlide({
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M6 9l6 6 6-6" />
           </svg>
+        </div>
         </div>
       </div>
     </div>
