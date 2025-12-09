@@ -38,18 +38,20 @@ export function QuestionSlide({
 }: QuestionSlideProps) {
   return (
     <div className="tiktok-slide question-slide">
-      {/* Header */}
+      {/* Header - just the counter */}
       <div className="slide-header">
         <span className="slide-counter">
           {index + 1} / {total}
         </span>
-        <div className={`slide-score ${hit ? 'hit' : 'miss'}`}>
-          {hit ? '+' : ''}{Math.round(score)}
-        </div>
       </div>
 
       {/* Content */}
       <div className="slide-content">
+        {/* Score inside card - top right */}
+        <div className={`slide-score-badge ${hit ? 'hit' : 'miss'}`}>
+          {hit ? '+' : ''}{Math.round(score)}
+        </div>
+
         {/* Question */}
         <div className="slide-question-section">
           <h2 className="slide-question">{prompt}</h2>
