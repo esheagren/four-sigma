@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useAnalytics } from '../context/PostHogContext';
+import { useAuth } from '../../context/AuthContext';
+import { useAnalytics } from '../../context/PostHogContext';
 
 interface FeedbackModalProps {
   isOpen: boolean;

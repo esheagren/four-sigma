@@ -7456,6 +7456,37 @@ a.judgement-answer-below:hover .judgement-answer-value {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  position: relative;
+}
+
+/* Score badge inside card */
+.slide-score-badge {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'SF Mono', 'Monaco', monospace;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+}
+
+.slide-score-badge .score-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+}
+
+.slide-score-badge.hit {
+  color: #10b981;
+}
+
+.slide-score-badge.miss {
+  color: #f43f5e;
 }
 
 .slide-question-section {

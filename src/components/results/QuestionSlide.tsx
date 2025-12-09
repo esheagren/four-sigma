@@ -47,9 +47,9 @@ export function QuestionSlide({
 
       {/* Content */}
       <div className="slide-content">
-        {/* Score inside card - top right */}
+        {/* Score inside card - top center */}
         <div className={`slide-score-badge ${hit ? 'hit' : 'miss'}`}>
-          {hit ? '+' : ''}{Math.round(score)}
+          {hit ? '+' : ''}{Math.round(score)} <span className="score-label">pts</span>
         </div>
 
         {/* Question */}

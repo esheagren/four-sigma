@@ -5,7 +5,7 @@ import { AuthModal } from './AuthModal';
 import { StatisticsModal } from './StatisticsModal';
 import { SettingsModal } from './SettingsModal';
 import { FeedbackModal } from './FeedbackModal';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 // Icon components
 function HelpCircleIcon() {

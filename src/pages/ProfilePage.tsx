@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useAnalytics } from '../context/PostHogContext';
-import { AuthModal } from '../components/AuthModal';
-import { PerformanceChart } from '../components/PerformanceChart';
+import { AuthModal } from '../components/nav/AuthModal';
+import { PerformanceChart } from '../components/results/PerformanceChart';
 
 export function ProfilePage() {
   const { user, isAnonymous, logout, isLoading } = useAuth();

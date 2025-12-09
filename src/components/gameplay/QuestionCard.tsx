@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { EstimateNumPad, BoundsData, formatDisplay } from './EstimateNumPad';
 import { ProgressDots } from './ProgressDots';
-import { isTouchDevice } from '../lib/device';
+import { isTouchDevice } from '../../lib/device';
 
 interface Question {
   id: string;

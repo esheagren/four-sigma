@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { QuestionSlide } from './QuestionSlide';
 import { DailyStatsSlide } from './DailyStatsSlide';
 import { UserStatsSlide } from './UserStatsSlide';
-import { ShareScoreCard, type ShareScoreCardRef } from '../ShareScoreCard';
+import { ShareScoreCard, type ShareScoreCardRef } from './ShareScoreCard';
 import { BackgroundAnimation } from '../BackgroundAnimation';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../context/PostHogContext';
@@ -43,7 +43,7 @@ interface PerformanceHistoryEntry {
   calibration: number;
 }
 
-interface TikTokResultsProps {
+interface ResultsCarouselProps {
   judgements: Judgement[];
   score: number;
   calibration?: number;
@@ -53,7 +53,7 @@ interface TikTokResultsProps {
   performanceHistory?: PerformanceHistoryEntry[];
 }
 
-export function TikTokResults({
+export function ResultsCarousel({
   judgements,
   score,
   calibration = 0,
@@ -61,7 +61,7 @@ export function TikTokResults({
   totalParticipants,
   topScoreToday,
   performanceHistory,
-}: TikTokResultsProps) {
+}: ResultsCarouselProps) {
   const { user } = useAuth();
   const { capture } = useAnalytics();
   const shareCardRef = useRef<ShareScoreCardRef>(null);

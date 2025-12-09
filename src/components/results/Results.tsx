@@ -1,4 +1,4 @@
-import { TikTokResults } from './results/TikTokResults';
+import { ResultsCarousel } from './ResultsCarousel';
 
 interface CrowdGuess {
   min: number;
@@ -63,7 +63,7 @@ export function Results({
   topScoreGlobal,
 }: ResultsProps) {
   return (
-    <TikTokResults
+    <ResultsCarousel
       judgements={judgements}
       score={score}
       calibration={calibration}

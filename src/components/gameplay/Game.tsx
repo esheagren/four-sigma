@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { QuestionCard } from './QuestionCard';
-import { Results } from './Results';
+import { Results } from '../results/Results';
 import { LoadingOrb } from './LoadingOrb';
-import { getDeviceId } from '../lib/device';
-import { useAuth } from '../context/AuthContext';
-import { useAnimation } from '../context/AnimationContext';
-import { useAnalytics } from '../context/PostHogContext';
+import { getDeviceId } from '../../lib/device';
+import { useAuth } from '../../context/AuthContext';
+import { useAnimation } from '../../context/AnimationContext';
+import { useAnalytics } from '../../context/PostHogContext';
 
 interface Question {
   id: string;
