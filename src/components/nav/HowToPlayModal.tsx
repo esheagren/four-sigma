@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 
 interface HowToPlayModalProps {
   isOpen: boolean;
@@ -42,6 +42,44 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
   const [demoUncertainty, setDemoUncertainty] = useState(10);
   const sliderRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
+
+  // Scroll detection state
+  const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
+  const modalBodyRef = useRef<HTMLDivElement>(null);
+
+  // Check if user has scrolled to bottom
+  const checkScrollPosition = useCallback(() => {
+    const element = modalBodyRef.current;
+    if (!element) return;
+
+    const threshold = 20; // pixels from bottom to consider "at bottom"
+    const isAtBottom = element.scrollHeight - element.scrollTop - element.clientHeight < threshold;
+    setHasScrolledToBottom(isAtBottom);
+  }, []);
+
+  // Set up scroll listener and initial check
+  useEffect(() => {
+    if (!isOpen) {
+      setHasScrolledToBottom(false);
+      return;
+    }
+
+    const element = modalBodyRef.current;
+    if (!element) return;
+
+    // Check initial position (in case content doesn't need scrolling)
+    // Use setTimeout to ensure DOM is fully rendered
+    const timeoutId = setTimeout(() => {
+      checkScrollPosition();
+    }, 100);
+
+    element.addEventListener('scroll', checkScrollPosition);
+
+    return () => {
+      clearTimeout(timeoutId);
+      element.removeEventListener('scroll', checkScrollPosition);
+    };
+  }, [isOpen, checkScrollPosition]);
 
   const handleSliderInteraction = useCallback((clientX: number) => {
     if (!sliderRef.current) return;
@@ -123,7 +161,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
           </button>
         </div>
 
-        <div className="modal-body">
+        <div className="modal-body" ref={modalBodyRef}>
           <>
               <p style={{ fontSize: '1.0625rem', lineHeight: '1.7', color: 'var(--text-secondary)', marginBottom: '2.5rem' }}>
                 The purpose of 4-σ is to estimate the numerical quantity of various things.
@@ -443,7 +481,24 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
         </div>
 
         <div className="modal-footer">
-          <button className="modal-button" onClick={onClose}>Got it!</button>
+          {hasScrolledToBottom ? (
+            <button className="modal-button" onClick={onClose}>Got it!</button>
+          ) : (
+            <div className="scroll-indicator">
+              <span>Scroll to continue</span>
+              <svg
+                className="scroll-indicator-arrow"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          )}
         </div>
       </div>
     </div>
