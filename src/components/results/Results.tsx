@@ -28,6 +28,7 @@ interface Judgement {
   communityStats?: {
     averageScore: number;
     highestScore: number;
+    highestScoreUsername?: string;
   };
   crowdData?: CrowdData;
 }
@@ -38,6 +39,13 @@ interface PerformanceHistoryEntry {
   userScore: number;
   avgScore: number;
   calibration: number;
+}
+
+interface TodayLeaderboardEntry {
+  rank: number;
+  username: string;
+  score: number;
+  isCurrentUser?: boolean;
 }
 
 interface ResultsProps {
@@ -51,6 +59,7 @@ interface ResultsProps {
   calibration?: number;
   performanceHistory?: PerformanceHistoryEntry[];
   totalParticipants?: number;
+  todayLeaderboard?: TodayLeaderboardEntry[];
 }
 
 export function Results({
@@ -61,6 +70,7 @@ export function Results({
   performanceHistory,
   totalParticipants,
   topScoreGlobal,
+  todayLeaderboard,
 }: ResultsProps) {
   return (
     <ResultsCarousel
@@ -71,6 +81,7 @@ export function Results({
       totalParticipants={totalParticipants}
       topScoreToday={topScoreGlobal}
       performanceHistory={performanceHistory}
+      todayLeaderboard={todayLeaderboard}
     />
   );
 }

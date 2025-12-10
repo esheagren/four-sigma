@@ -17,6 +17,7 @@ import {
   updateUserStatsAfterSession,
   getDailyStats,
   getPerformanceHistory,
+  getQuestionTopScorers,
 } from '../database/sessions.js';
 import {
   Answer,
@@ -201,6 +202,25 @@ router.post('/finalize', async (req: Request, res: Response) => {
     // Add to leaderboard (in-memory)
     addToLeaderboard(sessionId, score);
 
+    // Get question top scorers from database (for today's questions)
+    const questionIds = judgements.map(j => j.questionId);
+    const questionTopScorers = await getQuestionTopScorers(questionIds);
+
+    // Attach top scorer usernames to each judgement's communityStats
+    for (const judgement of judgements) {
+      const topScorer = questionTopScorers.get(judgement.questionId);
+      if (topScorer && judgement.communityStats) {
+        judgement.communityStats.highestScore = topScorer.highestScore;
+        judgement.communityStats.highestScoreUsername = topScorer.highestScoreUsername;
+      } else if (topScorer) {
+        judgement.communityStats = {
+          averageScore: 0,
+          highestScore: topScorer.highestScore,
+          highestScoreUsername: topScorer.highestScoreUsername,
+        };
+      }
+    }
+
     // Update user stats and get daily stats if user is authenticated
     let dailyStats = undefined;
     let performanceHistory = undefined;
@@ -217,7 +237,7 @@ router.post('/finalize', async (req: Request, res: Response) => {
         // Fetch daily stats and performance history
         const [daily, history] = await Promise.all([
           getDailyStats(userId),
-          getPerformanceHistory(userId, 7),
+          getPerformanceHistory(userId, 10),
         ]);
 
         dailyStats = daily;

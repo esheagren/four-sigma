@@ -30,6 +30,13 @@ interface Judgement {
   };
 }
 
+interface TodayLeaderboardEntry {
+  rank: number;
+  username: string;
+  score: number;
+  isCurrentUser?: boolean;
+}
+
 interface DailyStats {
   dailyRank: number | null;
   topScoreToday: number | null;
@@ -37,6 +44,7 @@ interface DailyStats {
   userScoreToday: number | null;
   calibrationToday: number | null;
   totalParticipantsToday: number;
+  todayLeaderboard?: TodayLeaderboardEntry[];
 }
 
 interface PerformanceHistoryEntry {
@@ -324,6 +332,7 @@ export function Game() {
             calibration={calibration}
             performanceHistory={performanceHistory}
             totalParticipants={dailyStats?.totalParticipantsToday ?? undefined}
+            todayLeaderboard={dailyStats?.todayLeaderboard}
           />
         </div>
       )}

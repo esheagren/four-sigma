@@ -73,6 +73,7 @@ export interface Judgement {
   communityStats?: {
     averageScore: number;
     highestScore: number;
+    highestScoreUsername?: string;
   };
 }
 
@@ -93,6 +94,13 @@ export interface FinalizeSessionRequest {
   sessionId: string;
 }
 
+export interface TodayLeaderboardEntry {
+  rank: number;
+  username: string;
+  score: number;
+  isCurrentUser?: boolean;
+}
+
 export interface DailyStats {
   dailyRank: number | null;
   topScoreToday: number | null;
@@ -100,6 +108,7 @@ export interface DailyStats {
   userScoreToday: number | null;
   calibrationToday: number | null;
   totalParticipantsToday: number;
+  todayLeaderboard?: TodayLeaderboardEntry[];
 }
 
 export interface PerformanceHistoryEntry {

@@ -63,6 +63,10 @@ export function RangeVisualization({
   const userWidthPct = userEndPct - userStartPct;
   const correctPct = toPercent(trueValue);
 
+  // Determine if labels would overlap (threshold: 25% of track width)
+  const MIN_LABEL_GAP_PCT = 25;
+  const labelsOverlap = (userEndPct - userStartPct) < MIN_LABEL_GAP_PCT;
+
   // Crowd data percentages
   const crowdStartPct = crowdData ? toPercent(crowdData.avgMin) : 0;
   const crowdEndPct = crowdData ? toPercent(crowdData.avgMax) : 0;
@@ -106,15 +110,37 @@ export function RangeVisualization({
         </div>
       </div>
 
-      {/* Bound labels - below track */}
-      <div className="range-bounds">
-        <div className={`range-bound-label ${hit ? 'hit' : 'miss'}`}>
-          {formatNumber(userMin)}
+      {/* Bound labels - positioned below endpoints */}
+      {labelsOverlap ? (
+        /* Collapsed: single centered label when range is narrow */
+        <div className="range-bounds-collapsed">
+          <div className={`range-bound-label ${hit ? 'hit' : 'miss'}`}>
+            {formatNumber(userMin)} – {formatNumber(userMax)}
+          </div>
         </div>
-        <div className={`range-bound-label ${hit ? 'hit' : 'miss'}`}>
-          {formatNumber(userMax)}
+      ) : (
+        /* Separate: positioned at endpoints with connectors */
+        <div className="range-bounds-positioned">
+          <div
+            className={`range-bound-positioned ${hit ? 'hit' : 'miss'}`}
+            style={{ left: `${userStartPct}%` }}
+          >
+            <div className="range-bound-connector" />
+            <div className={`range-bound-label ${hit ? 'hit' : 'miss'}`}>
+              {formatNumber(userMin)}
+            </div>
+          </div>
+          <div
+            className={`range-bound-positioned ${hit ? 'hit' : 'miss'}`}
+            style={{ left: `${userEndPct}%` }}
+          >
+            <div className="range-bound-connector" />
+            <div className={`range-bound-label ${hit ? 'hit' : 'miss'}`}>
+              {formatNumber(userMax)}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

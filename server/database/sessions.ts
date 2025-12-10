@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import type { TodayLeaderboardEntry } from '../types/index.js';
 
 /**
  * Get UTC date string for "today" (YYYY-MM-DD)
@@ -108,7 +109,57 @@ export async function updateUserStatsAfterSession(
 }
 
 /**
- * Get daily stats for a user - rank, top score, average, calibration
+ * Get top scorers for specific questions answered today
+ * Returns the highest score and username for each question
+ */
+export async function getQuestionTopScorers(
+  questionIds: string[]
+): Promise<Map<string, { highestScore: number; highestScoreUsername: string }>> {
+  const todayStart = getUTCDayStart();
+  const result = new Map<string, { highestScore: number; highestScoreUsername: string }>();
+
+  if (questionIds.length === 0) {
+    return result;
+  }
+
+  // Query user_responses joined with users to get top scorer per question for today
+  const { data, error } = await supabase
+    .from('user_responses')
+    .select(`
+      question_id,
+      score,
+      users!fk_user_responses_user(display_name)
+    `)
+    .in('question_id', questionIds)
+    .gte('answered_at', todayStart)
+    .order('score', { ascending: false });
+
+  if (error) {
+    console.error('Failed to fetch question top scorers:', error);
+    return result;
+  }
+
+  if (!data || data.length === 0) {
+    return result;
+  }
+
+  // Group by question_id and take the highest score for each
+  for (const row of data) {
+    const questionId = row.question_id;
+    if (!result.has(questionId)) {
+      const displayName = (row.users as any)?.display_name || 'Anonymous';
+      result.set(questionId, {
+        highestScore: Number(row.score),
+        highestScoreUsername: displayName,
+      });
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Get daily stats for a user - rank, top score, average, calibration, leaderboard
  * calibrationToday is cumulative (all-time) for robust measurement
  */
 export async function getDailyStats(userId: string): Promise<{
@@ -118,6 +169,7 @@ export async function getDailyStats(userId: string): Promise<{
   userScoreToday: number | null;
   calibrationToday: number | null;
   totalParticipantsToday: number;
+  todayLeaderboard?: TodayLeaderboardEntry[];
 }> {
   const todayStart = getUTCDayStart();
 
@@ -193,6 +245,27 @@ export async function getDailyStats(userId: string): Promise<{
   const userRankIndex = sortedUsers.findIndex(u => u.userId === userId);
   const userStats = sortedUsers.find(u => u.userId === userId);
 
+  // Build today's leaderboard (top 5) with usernames
+  let todayLeaderboard: TodayLeaderboardEntry[] | undefined;
+  const top5UserIds = sortedUsers.slice(0, 5).map(u => u.userId);
+
+  if (top5UserIds.length > 0) {
+    const { data: userNames, error: userNamesError } = await supabase
+      .from('users')
+      .select('id, display_name')
+      .in('id', top5UserIds);
+
+    if (!userNamesError && userNames) {
+      const userNameMap = new Map(userNames.map(u => [u.id, u.display_name]));
+      todayLeaderboard = sortedUsers.slice(0, 5).map((user, index) => ({
+        rank: index + 1,
+        username: userNameMap.get(user.userId) || 'Anonymous',
+        score: Math.round(user.totalScore),
+        isCurrentUser: user.userId === userId,
+      }));
+    }
+  }
+
   return {
     dailyRank: userRankIndex >= 0 ? userRankIndex + 1 : null,
     topScoreToday: topScore,
@@ -200,16 +273,17 @@ export async function getDailyStats(userId: string): Promise<{
     userScoreToday: userStats?.totalScore ?? null,
     calibrationToday: cumulativeCalibration,
     totalParticipantsToday: totalParticipants,
+    todayLeaderboard,
   };
 }
 
 /**
- * Get performance history for past N days
+ * Get performance history for the user's last N plays (days they actually played)
  * Calibration is shown as cumulative (all-time) up to each day for robust measurement
  */
 export async function getPerformanceHistory(
   userId: string,
-  days: number = 7
+  plays: number = 10
 ): Promise<Array<{
   date: string;
   day: string;
@@ -218,6 +292,77 @@ export async function getPerformanceHistory(
   calibration: number;
 }>> {
   const dayNames = ['Su', 'M', 'T', 'W', 'Th', 'F', 'S'];
+
+  // Fetch ALL responses for this user to find days they played and calculate calibration
+  const { data: allUserResponses, error: allUserError } = await supabase
+    .from('user_responses')
+    .select('score, captured, answered_at')
+    .eq('user_id', userId)
+    .order('answered_at', { ascending: true });
+
+  if (allUserError) {
+    console.error('Failed to fetch user responses:', allUserError);
+    return [];
+  }
+
+  if (!allUserResponses || allUserResponses.length === 0) {
+    return [];
+  }
+
+  // Group user's responses by date and calculate cumulative calibration
+  const userDayStats: Map<string, { score: number; captured: number; total: number; cumulativeCaptured: number; cumulativeTotal: number }> = new Map();
+  let runningCaptured = 0;
+  let runningTotal = 0;
+
+  for (const response of allUserResponses) {
+    const dateStr = getUTCDateString(new Date(response.answered_at));
+    runningCaptured += response.captured ? 1 : 0;
+    runningTotal += 1;
+
+    const existing = userDayStats.get(dateStr) || { score: 0, captured: 0, total: 0, cumulativeCaptured: 0, cumulativeTotal: 0 };
+    existing.score += Number(response.score);
+    existing.captured += response.captured ? 1 : 0;
+    existing.total += 1;
+    existing.cumulativeCaptured = runningCaptured;
+    existing.cumulativeTotal = runningTotal;
+    userDayStats.set(dateStr, existing);
+  }
+
+  // Get the last N days the user actually played
+  const playedDates = Array.from(userDayStats.keys()).slice(-plays);
+
+  if (playedDates.length === 0) {
+    return [];
+  }
+
+  // Fetch all responses for those dates to calculate average scores
+  const { data: allResponses, error: allError } = await supabase
+    .from('user_responses')
+    .select('user_id, score, answered_at')
+    .gte('answered_at', `${playedDates[0]}T00:00:00.000Z`)
+    .lte('answered_at', `${playedDates[playedDates.length - 1]}T23:59:59.999Z`);
+
+  if (allError) {
+    console.error('Failed to fetch all responses for avg calculation:', allError);
+    return [];
+  }
+
+  // Build daily stats for all users (for avgScore calculation)
+  const dateAllUserStats: Map<string, Map<string, number>> = new Map();
+
+  for (const response of allResponses || []) {
+    const dateStr = getUTCDateString(new Date(response.answered_at));
+
+    if (!dateAllUserStats.has(dateStr)) {
+      dateAllUserStats.set(dateStr, new Map());
+    }
+
+    const dayStats = dateAllUserStats.get(dateStr)!;
+    const currentScore = dayStats.get(response.user_id) || 0;
+    dayStats.set(response.user_id, currentScore + Number(response.score));
+  }
+
+  // Build result for each day the user played
   const result: Array<{
     date: string;
     day: string;
@@ -226,124 +371,27 @@ export async function getPerformanceHistory(
     calibration: number;
   }> = [];
 
-  // Calculate date range
-  const endDate = new Date();
-  const startDate = new Date();
-  startDate.setUTCDate(startDate.getUTCDate() - (days - 1));
-
-  const startDateStr = getUTCDayStart(startDate);
-
-  // Fetch responses from the display window for daily scores
-  const { data: recentResponses, error: recentError } = await supabase
-    .from('user_responses')
-    .select('user_id, score, captured, answered_at')
-    .gte('answered_at', startDateStr);
-
-  if (recentError) {
-    console.error('Failed to fetch performance history:', recentError);
-    return [];
-  }
-
-  // Fetch ALL responses for this user to calculate cumulative calibration
-  const { data: allUserResponses, error: allUserError } = await supabase
-    .from('user_responses')
-    .select('captured, answered_at')
-    .eq('user_id', userId)
-    .order('answered_at', { ascending: true });
-
-  if (allUserError) {
-    console.error('Failed to fetch all user responses:', allUserError);
-    return [];
-  }
-
-  // Build daily stats for all users (for avgScore calculation)
-  const dateUserStats: Map<string, Map<string, { score: number; captured: number; total: number }>> = new Map();
-
-  for (const response of recentResponses || []) {
-    const dateStr = getUTCDateString(new Date(response.answered_at));
-
-    if (!dateUserStats.has(dateStr)) {
-      dateUserStats.set(dateStr, new Map());
-    }
-
-    const dayStats = dateUserStats.get(dateStr)!;
-    const userStats = dayStats.get(response.user_id) || { score: 0, captured: 0, total: 0 };
-    userStats.score += Number(response.score);
-    userStats.captured += response.captured ? 1 : 0;
-    userStats.total += 1;
-    dayStats.set(response.user_id, userStats);
-  }
-
-  // Calculate cumulative calibration for the user up to end of each day
-  // Map: dateStr -> { cumulativeCaptured, cumulativeTotal }
-  const cumulativeByDate: Map<string, { captured: number; total: number }> = new Map();
-  let runningCaptured = 0;
-  let runningTotal = 0;
-
-  for (const response of allUserResponses || []) {
-    runningCaptured += response.captured ? 1 : 0;
-    runningTotal += 1;
-    const dateStr = getUTCDateString(new Date(response.answered_at));
-    cumulativeByDate.set(dateStr, { captured: runningCaptured, total: runningTotal });
-  }
-
-  // Track the last known cumulative values for days with no activity
-  let lastKnownCaptured = 0;
-  let lastKnownTotal = 0;
-
-  // Find cumulative stats before the display window starts
-  for (const response of allUserResponses || []) {
-    const responseDate = new Date(response.answered_at);
-    if (responseDate < startDate) {
-      lastKnownCaptured += response.captured ? 1 : 0;
-      lastKnownTotal += 1;
-    }
-  }
-
-  // Build result for each day
-  for (let i = 0; i < days; i++) {
-    const date = new Date(startDate);
-    date.setUTCDate(startDate.getUTCDate() + i);
-    const dateStr = getUTCDateString(date);
+  for (const dateStr of playedDates) {
+    const date = new Date(dateStr + 'T00:00:00.000Z');
     const dayOfWeek = date.getUTCDay();
 
-    const dayStats = dateUserStats.get(dateStr);
-
-    // Get cumulative calibration up to this date
-    const cumulative = cumulativeByDate.get(dateStr);
-    if (cumulative) {
-      lastKnownCaptured = cumulative.captured;
-      lastKnownTotal = cumulative.total;
-    }
-
-    const cumulativeCalibration = lastKnownTotal > 0
-      ? (lastKnownCaptured / lastKnownTotal) * 100
+    const userStats = userDayStats.get(dateStr)!;
+    const cumulativeCalibration = userStats.cumulativeTotal > 0
+      ? (userStats.cumulativeCaptured / userStats.cumulativeTotal) * 100
       : 0;
 
-    if (!dayStats || dayStats.size === 0) {
-      // No data for this day
-      result.push({
-        date: dateStr,
-        day: dayNames[dayOfWeek],
-        userScore: 0,
-        avgScore: 0,
-        calibration: cumulativeCalibration,
-      });
-      continue;
+    // Calculate average score across all users for this day
+    const dayAllUsers = dateAllUserStats.get(dateStr);
+    let avgScore = 0;
+    if (dayAllUsers && dayAllUsers.size > 0) {
+      const allScores = Array.from(dayAllUsers.values());
+      avgScore = allScores.reduce((a, b) => a + b, 0) / allScores.length;
     }
-
-    // Calculate averages across all users
-    const allUserScores = Array.from(dayStats.values()).map(s => s.score);
-    const avgScore = allUserScores.reduce((a, b) => a + b, 0) / allUserScores.length;
-
-    // Get current user's stats for this day
-    const userDayStats = dayStats.get(userId);
-    const userScore = userDayStats?.score ?? 0;
 
     result.push({
       date: dateStr,
       day: dayNames[dayOfWeek],
-      userScore,
+      userScore: userStats.score,
       avgScore,
       calibration: cumulativeCalibration,
     });

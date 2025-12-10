@@ -43,6 +43,13 @@ interface PerformanceHistoryEntry {
   calibration: number;
 }
 
+interface TodayLeaderboardEntry {
+  rank: number;
+  username: string;
+  score: number;
+  isCurrentUser?: boolean;
+}
+
 interface ResultsCarouselProps {
   judgements: Judgement[];
   score: number;
@@ -51,6 +58,7 @@ interface ResultsCarouselProps {
   totalParticipants?: number;
   topScoreToday?: number;
   performanceHistory?: PerformanceHistoryEntry[];
+  todayLeaderboard?: TodayLeaderboardEntry[];
 }
 
 export function ResultsCarousel({
@@ -61,6 +69,7 @@ export function ResultsCarousel({
   totalParticipants,
   topScoreToday,
   performanceHistory,
+  todayLeaderboard,
 }: ResultsCarouselProps) {
   const { user } = useAuth();
   const { capture } = useAnalytics();
@@ -214,10 +223,10 @@ export function ResultsCarousel({
           <DailyStatsSlide
             ref={setSlideRef(judgements.length)}
             totalScore={score}
-            topScoreToday={topScoreToday}
             hits={hits}
             total={total}
             questionHighScores={questionHighScores}
+            todayLeaderboard={todayLeaderboard}
             onShare={handleShare}
             isSharing={isSharing}
           />

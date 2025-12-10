@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useState } from 'react';
 
 interface PerformanceHistoryEntry {
   date: string;
@@ -128,8 +128,57 @@ function CalibrationHistoryChart({ history }: { history: PerformanceHistoryEntry
   );
 }
 
+function CalibrationSection({ calibration, performanceHistory }: { calibration: number; performanceHistory: PerformanceHistoryEntry[] }) {
+  const [showInfo, setShowInfo] = useState(false);
+
+  return (
+    <div className="user-stats-section">
+      <div className="user-stats-section-title">
+        Calibration
+        <button
+          className="calibration-info-button"
+          onClick={() => setShowInfo(true)}
+          aria-label="What is calibration?"
+        >
+          i
+        </button>
+      </div>
+      <div className="calibration-section">
+        <div className="calibration-left">
+          <CircularCalibration percentage={calibration} size={80} />
+          <span className="calibration-section-label">Current</span>
+        </div>
+        <div className="calibration-right">
+          <CalibrationHistoryChart history={performanceHistory} />
+        </div>
+      </div>
+
+      {showInfo && (
+        <div className="calibration-info-overlay" onClick={() => setShowInfo(false)}>
+          <div className="calibration-info-popup" onClick={(e) => e.stopPropagation()}>
+            <button className="calibration-info-close" onClick={() => setShowInfo(false)}>
+              &times;
+            </button>
+            <h3>What is Calibration?</h3>
+            <p>
+              Calibration measures how often the true answer falls within your confidence interval.
+            </p>
+            <p>
+              A calibration score of 95% means you're capturing the true answer in 95 out of 100 questions.
+            </p>
+            <p>
+              <strong>Goal:</strong> Aim for 95% calibration. Being well-calibrated means you have
+              accurate uncertainty about what you know and don't know.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ScoreHistoryChart({ history }: { history: PerformanceHistoryEntry[] }) {
-  const data = history.slice(-7);
+  const data = history.slice(-10);
 
   if (data.length <= 1) {
     return (
@@ -230,6 +279,14 @@ export const UserStatsSlide = forwardRef<HTMLDivElement, UserStatsSlideProps>(({
         <div className="user-stats-content">
           <div className="user-stats-header">Your Stats</div>
 
+        {/* Score History Section */}
+        <div className="user-stats-section">
+          <ScoreHistoryChart history={performanceHistory} />
+        </div>
+
+        {/* Calibration Section */}
+        <CalibrationSection calibration={calibration} performanceHistory={performanceHistory} />
+
         {/* Statistics Grid */}
         {userStats && (
           <div className="user-stats-section">
@@ -253,26 +310,6 @@ export const UserStatsSlide = forwardRef<HTMLDivElement, UserStatsSlideProps>(({
             </div>
           </div>
         )}
-
-        {/* Calibration Section */}
-        <div className="user-stats-section">
-          <div className="user-stats-section-title">Calibration</div>
-          <div className="calibration-section">
-            <div className="calibration-left">
-              <CircularCalibration percentage={calibration} size={80} />
-              <span className="calibration-section-label">Current</span>
-            </div>
-            <div className="calibration-right">
-              <CalibrationHistoryChart history={performanceHistory} />
-            </div>
-          </div>
-        </div>
-
-        {/* Score History Section */}
-        <div className="user-stats-section">
-          <div className="user-stats-section-title">Score Over Time</div>
-          <ScoreHistoryChart history={performanceHistory} />
-        </div>
         </div>
       </div>
     </div>

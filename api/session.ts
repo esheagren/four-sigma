@@ -203,7 +203,7 @@ async function handleFinalize(req: VercelRequest, res: VercelResponse) {
 
       const [daily, history] = await Promise.all([
         getDailyStats(userId),
-        getPerformanceHistory(userId, 7),
+        getPerformanceHistory(userId, 10),
       ]);
 
       dailyStats = daily;
