@@ -1,3 +1,5 @@
+import { forwardRef } from 'react';
+
 interface PerformanceHistoryEntry {
   date: string;
   day: string;
@@ -9,8 +11,6 @@ interface PerformanceHistoryEntry {
 interface UserStatsSlideProps {
   calibration: number;
   performanceHistory?: PerformanceHistoryEntry[];
-  slideIndex: number;
-  totalSlides: number;
 }
 
 function CircularCalibration({ percentage, size = 80 }: { percentage: number; size?: number }) {
@@ -210,25 +210,13 @@ function ScoreHistoryChart({ history }: { history: PerformanceHistoryEntry[] }) 
   );
 }
 
-export function UserStatsSlide({
+export const UserStatsSlide = forwardRef<HTMLDivElement, UserStatsSlideProps>(({
   calibration,
   performanceHistory = [],
-  slideIndex,
-  totalSlides,
-}: UserStatsSlideProps) {
+}, ref) => {
   return (
-    <div className="tiktok-slide user-stats-slide">
+    <div className="tiktok-slide user-stats-slide" ref={ref}>
       <div className="slide-body">
-        {/* Dot indicators on the left */}
-        <div className="slide-dots">
-          {Array.from({ length: totalSlides }).map((_, i) => (
-            <div
-              key={i}
-              className={`slide-dot ${i === slideIndex ? 'active' : ''}`}
-            />
-          ))}
-        </div>
-
         <div className="user-stats-content">
           <div className="user-stats-header">Your Stats</div>
 
@@ -255,4 +243,6 @@ export function UserStatsSlide({
       </div>
     </div>
   );
-}
+});
+
+UserStatsSlide.displayName = 'UserStatsSlide';

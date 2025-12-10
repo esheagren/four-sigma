@@ -7375,6 +7375,16 @@ a.judgement-answer-below:hover .judgement-answer-value {
   z-index: 100;
 }
 
+/* Layout wrapper for results */
+.results-layout {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
 .tiktok-scroll-container {
   height: 100%;
   overflow-y: scroll;
@@ -7418,18 +7428,29 @@ a.judgement-answer-below:hover .judgement-answer-value {
   min-height: 0;
 }
 
-/* Vertical dot indicators */
+/* Vertical dot indicators - positioned in the gap between screen edge and card */
 .slide-dots {
+  position: fixed;
+  left: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 1rem 0;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.3rem;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
 }
 
 .slide-dot {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.2);
   transition: all 0.2s ease;

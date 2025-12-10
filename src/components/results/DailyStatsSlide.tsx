@@ -1,3 +1,5 @@
+import { forwardRef } from 'react';
+
 interface QuestionHighScore {
   questionId: string;
   prompt: string;
@@ -13,11 +15,9 @@ interface DailyStatsSlideProps {
   questionHighScores?: QuestionHighScore[];
   onShare: () => void;
   isSharing: boolean;
-  slideIndex: number;
-  totalSlides: number;
 }
 
-export function DailyStatsSlide({
+export const DailyStatsSlide = forwardRef<HTMLDivElement, DailyStatsSlideProps>(({
   totalScore,
   topScoreToday,
   hits,
@@ -25,22 +25,10 @@ export function DailyStatsSlide({
   questionHighScores,
   onShare,
   isSharing,
-  slideIndex,
-  totalSlides,
-}: DailyStatsSlideProps) {
+}, ref) => {
   return (
-    <div className="tiktok-slide daily-stats-slide">
+    <div className="tiktok-slide daily-stats-slide" ref={ref}>
       <div className="slide-body">
-        {/* Dot indicators on the left */}
-        <div className="slide-dots">
-          {Array.from({ length: totalSlides }).map((_, i) => (
-            <div
-              key={i}
-              className={`slide-dot ${i === slideIndex ? 'active' : ''}`}
-            />
-          ))}
-        </div>
-
         <div className="daily-stats-content">
 
         {/* Score Section with Share Button */}
@@ -100,4 +88,6 @@ export function DailyStatsSlide({
       </div>
     </div>
   );
-}
+});
+
+DailyStatsSlide.displayName = 'DailyStatsSlide';

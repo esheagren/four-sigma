@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { QuestionSlide } from './QuestionSlide';
 import { DailyStatsSlide } from './DailyStatsSlide';
 import { UserStatsSlide } from './UserStatsSlide';
@@ -65,10 +65,41 @@ export function ResultsCarousel({
   const { user } = useAuth();
   const { capture } = useAnalytics();
   const shareCardRef = useRef<ShareScoreCardRef>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [isSharing, setIsSharing] = useState(false);
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
   const hits = judgements.filter(j => j.hit).length;
   const total = judgements.length;
+  const totalSlides = judgements.length + 2;
+
+  // Track which slide is currently visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+            const index = slideRefs.current.indexOf(entry.target as HTMLDivElement);
+            if (index !== -1) {
+              setActiveSlideIndex(index);
+            }
+          }
+        });
+      },
+      { threshold: 0.5, root: scrollContainerRef.current }
+    );
+
+    slideRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, [judgements.length]);
+
+  const setSlideRef = useCallback((index: number) => (el: HTMLDivElement | null) => {
+    slideRefs.current[index] = el;
+  }, []);
 
   // Calculate percentile
   const percentile = (dailyRank && totalParticipants && totalParticipants > 0)
@@ -156,46 +187,48 @@ export function ResultsCarousel({
         percentile={percentile}
       />
 
-      {/* Scroll snap container */}
-      <div className="tiktok-scroll-container">
-        {/* Total slides = questions + daily stats + user stats */}
-        {(() => {
-          const totalSlides = judgements.length + 2;
-          return (
-            <>
-              {/* Individual question slides */}
-              {judgements.map((judgement, index) => (
-                <QuestionSlide
-                  key={judgement.questionId}
-                  {...judgement}
-                  slideIndex={index}
-                  totalSlides={totalSlides}
-                />
-              ))}
+      {/* Flex layout: dots on left, content on right */}
+      <div className="results-layout">
+        {/* Dot indicators - own column, no overlap */}
+        <div className="slide-dots">
+          {Array.from({ length: totalSlides }).map((_, i) => (
+            <div
+              key={i}
+              className={`slide-dot ${i === activeSlideIndex ? 'active' : ''}`}
+            />
+          ))}
+        </div>
 
-              {/* Daily Stats Slide (Session Complete) */}
-              <DailyStatsSlide
-                totalScore={score}
-                topScoreToday={topScoreToday}
-                hits={hits}
-                total={total}
-                questionHighScores={questionHighScores}
-                onShare={handleShare}
-                isSharing={isSharing}
-                slideIndex={judgements.length}
-                totalSlides={totalSlides}
-              />
+        {/* Scroll snap container */}
+        <div className="tiktok-scroll-container" ref={scrollContainerRef}>
+          {/* Individual question slides */}
+          {judgements.map((judgement, index) => (
+            <QuestionSlide
+              key={judgement.questionId}
+              ref={setSlideRef(index)}
+              {...judgement}
+            />
+          ))}
 
-              {/* User Stats Slide (Long-term stats) */}
-              <UserStatsSlide
-                calibration={calibration}
-                performanceHistory={performanceHistory}
-                slideIndex={judgements.length + 1}
-                totalSlides={totalSlides}
-              />
-            </>
-          );
-        })()}
+          {/* Daily Stats Slide (Session Complete) */}
+          <DailyStatsSlide
+            ref={setSlideRef(judgements.length)}
+            totalScore={score}
+            topScoreToday={topScoreToday}
+            hits={hits}
+            total={total}
+            questionHighScores={questionHighScores}
+            onShare={handleShare}
+            isSharing={isSharing}
+          />
+
+          {/* User Stats Slide (Long-term stats) */}
+          <UserStatsSlide
+            ref={setSlideRef(judgements.length + 1)}
+            calibration={calibration}
+            performanceHistory={performanceHistory}
+          />
+        </div>
       </div>
     </div>
   );

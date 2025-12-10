@@ -1,5 +1,5 @@
+import { forwardRef } from 'react';
 import { RangeVisualization } from './RangeVisualization';
-import { formatNumber } from './gaussianUtils';
 
 interface CrowdData {
   avgMin: number;
@@ -19,11 +19,9 @@ interface QuestionSlideProps {
   score: number;
   sourceUrl?: string;
   crowdData?: CrowdData;
-  slideIndex: number;
-  totalSlides: number;
 }
 
-export function QuestionSlide({
+export const QuestionSlide = forwardRef<HTMLDivElement, QuestionSlideProps>(({
   prompt,
   unit,
   lower,
@@ -33,22 +31,10 @@ export function QuestionSlide({
   score,
   sourceUrl,
   crowdData,
-  slideIndex,
-  totalSlides,
-}: QuestionSlideProps) {
+}, ref) => {
   return (
-    <div className="tiktok-slide question-slide">
+    <div className="tiktok-slide question-slide" ref={ref}>
       <div className="slide-body">
-        {/* Dot indicators on the left */}
-        <div className="slide-dots">
-          {Array.from({ length: totalSlides }).map((_, i) => (
-            <div
-              key={i}
-              className={`slide-dot ${i === slideIndex ? 'active' : ''}`}
-            />
-          ))}
-        </div>
-
         {/* Content */}
         <div className="slide-content">
         {/* Question */}
@@ -84,4 +70,6 @@ export function QuestionSlide({
       </div>
     </div>
   );
-}
+});
+
+QuestionSlide.displayName = 'QuestionSlide';
