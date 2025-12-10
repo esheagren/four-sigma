@@ -3310,36 +3310,30 @@ a.judgement-answer-below:hover .judgement-answer-value {
   box-shadow: var(--shadow-sm);
 }
 
-/* Scroll indicator for modals */
-.scroll-indicator {
+/* Floating scroll indicator for modals */
+.floating-scroll-indicator {
+  position: absolute;
+  bottom: -44px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
   color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  animation: scrollIndicatorPulse 2s ease-in-out infinite;
+  animation: floatingBounce 1.5s ease-in-out infinite;
 }
 
-.scroll-indicator-arrow {
-  animation: scrollIndicatorBounce 1.5s ease-in-out infinite;
-}
-
-@keyframes scrollIndicatorPulse {
+@keyframes floatingBounce {
   0%, 100% {
-    opacity: 0.7;
+    transform: translateX(-50%) translateY(0);
   }
   50% {
-    opacity: 1;
-  }
-}
-
-@keyframes scrollIndicatorBounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(4px);
+    transform: translateX(-50%) translateY(6px);
   }
 }
 
@@ -7733,11 +7727,46 @@ a.judgement-answer-below:hover .judgement-answer-value {
   background: #f43f5e;
 }
 
-.range-bounds {
+/* Collapsed bounds - single centered label when range is narrow */
+.range-bounds-collapsed {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   width: 100%;
   padding: 0 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Positioned bounds container - for separate labels with connectors */
+.range-bounds-positioned {
+  position: relative;
+  height: 44px;
+  margin: 0 1.5rem;
+  width: calc(100% - 3rem);
+}
+
+/* Individual positioned label wrapper */
+.range-bound-positioned {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Connector line from endpoint to label */
+.range-bound-connector {
+  width: 1px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.range-bound-positioned.hit .range-bound-connector {
+  background: rgba(16, 185, 129, 0.5);
+}
+
+.range-bound-positioned.miss .range-bound-connector {
+  background: rgba(244, 63, 94, 0.5);
 }
 
 .range-bound-label {
@@ -8071,16 +8100,97 @@ a.judgement-answer-below:hover .judgement-answer-value {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem;
+  padding: 0.75rem;
+  gap: 1.25rem;
 }
 
-.daily-stats-header {
-  font-size: 0.75rem;
-  font-family: 'SF Mono', 'Monaco', monospace;
-  color: rgba(255, 255, 255, 0.5);
+/* Section 1: Today's Leaderboard */
+.today-leaderboard {
+  width: 100%;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.today-leaderboard-header {
+  font-size: 0.625rem;
   text-transform: uppercase;
-  letter-spacing: 0.3em;
-  margin-bottom: 2rem;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 0.75rem;
+}
+
+.today-leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.leaderboard-entry {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.leaderboard-entry.is-current-user {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.leaderboard-rank {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.leaderboard-entry:first-child .leaderboard-rank {
+  color: #fbbf24;
+}
+
+.leaderboard-username {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.leaderboard-entry.is-current-user .leaderboard-username {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.leaderboard-score {
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-family: 'SF Mono', 'Monaco', monospace;
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+}
+
+.leaderboard-entry:first-child .leaderboard-score {
+  color: #fbbf24;
+}
+
+.leaderboard-entry.is-current-user .leaderboard-score {
+  color: #10b981;
+}
+
+/* Section 2: Your Score */
+.daily-score-section {
+  width: 100%;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .daily-score-row {
@@ -8088,7 +8198,6 @@ a.judgement-answer-below:hover .judgement-answer-value {
   align-items: center;
   justify-content: center;
   gap: 1.5rem;
-  margin-bottom: 1.5rem;
   width: 100%;
 }
 
@@ -8097,7 +8206,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
 }
 
 .daily-score-label {
-  font-size: 0.75rem;
+  font-size: 0.625rem;
   font-family: 'SF Mono', 'Monaco', monospace;
   color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
@@ -8106,7 +8215,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
 }
 
 .daily-score-value {
-  font-size: 3.5rem;
+  font-size: 3rem;
   font-weight: 700;
   font-family: 'SF Mono', 'Monaco', monospace;
   color: white;
@@ -8115,14 +8224,14 @@ a.judgement-answer-below:hover .judgement-answer-value {
 }
 
 .daily-score-hits {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.5);
   margin-top: 0.5rem;
 }
 
 .daily-share-btn {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -8148,39 +8257,16 @@ a.judgement-answer-below:hover .judgement-answer-value {
   transform: none;
 }
 
-.daily-high-score {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* Section 3: Question Leaders */
+.question-leaders {
   width: 100%;
   padding: 1rem;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.06);
-  margin-bottom: 1.5rem;
 }
 
-.daily-high-label {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.daily-high-value {
-  font-size: 1.25rem;
-  font-weight: 700;
-  font-family: 'SF Mono', 'Monaco', monospace;
-  color: #fbbf24;
-}
-
-/* Question High Scores */
-.question-high-scores {
-  width: 100%;
-  margin-bottom: 1.5rem;
-}
-
-.question-high-scores-header {
+.question-leaders-header {
   font-size: 0.625rem;
   text-transform: uppercase;
   letter-spacing: 0.15em;
@@ -8188,39 +8274,52 @@ a.judgement-answer-below:hover .judgement-answer-value {
   margin-bottom: 0.75rem;
 }
 
-.question-high-scores-list {
+.question-leaders-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
-.question-high-score-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 0.75rem;
+.question-leader-item {
+  padding: 0.75rem;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 8px;
 }
 
-.question-number {
+.question-leader-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.question-leader-number {
   font-size: 0.75rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.4);
-  width: 24px;
 }
 
-.question-high-score-value {
+.question-leader-score {
   font-size: 0.875rem;
   font-weight: 700;
   font-family: 'SF Mono', 'Monaco', monospace;
   color: #10b981;
 }
 
-.question-high-score-user {
+.question-leader-username {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-left: auto;
+}
+
+.question-leader-prompt {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.5);
-  margin-left: auto;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* User Stats Slide */

@@ -480,26 +480,21 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
             </>
         </div>
 
-        <div className="modal-footer">
-          {hasScrolledToBottom ? (
-            <button className="modal-button" onClick={onClose}>Got it!</button>
-          ) : (
-            <div className="scroll-indicator">
-              <span>Scroll to continue</span>
-              <svg
-                className="scroll-indicator-arrow"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-              >
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </div>
-          )}
-        </div>
+        {/* Floating scroll indicator outside modal */}
+        {!hasScrolledToBottom && (
+          <div className="floating-scroll-indicator">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        )}
       </div>
     </div>
   );
