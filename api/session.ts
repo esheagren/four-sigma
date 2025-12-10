@@ -10,7 +10,7 @@ import {
   recordQuestionScore,
   getQuestionStats,
 } from './_lib/session-storage.js';
-import { recordUserResponse, updateUserStatsAfterSession, getDailyStats, getPerformanceHistory, getCrowdDataForQuestion } from './_lib/sessions.js';
+import { recordUserResponse, updateUserStatsAfterSession, getDailyStats, getPerformanceHistory, getCalibrationMilestones, getCrowdDataForQuestion } from './_lib/sessions.js';
 import { Score } from './_lib/scoring.js';
 import { Judgement } from './_lib/types.js';
 import { trackServerEvent, flushAnalytics } from './_lib/analytics.js';
@@ -192,6 +192,7 @@ async function handleFinalize(req: VercelRequest, res: VercelResponse) {
 
   let dailyStats = undefined;
   let performanceHistory = undefined;
+  let calibrationMilestones = undefined;
 
   if (userId) {
     try {
@@ -201,13 +202,15 @@ async function handleFinalize(req: VercelRequest, res: VercelResponse) {
         questionsAnswered: judgements.length,
       });
 
-      const [daily, history] = await Promise.all([
+      const [daily, history, milestones] = await Promise.all([
         getDailyStats(userId),
         getPerformanceHistory(userId, 10),
+        getCalibrationMilestones(userId),
       ]);
 
       dailyStats = daily;
       performanceHistory = history;
+      calibrationMilestones = milestones;
     } catch (statsError) {
       console.error('Failed to update/fetch user stats:', statsError);
     }
@@ -242,6 +245,7 @@ async function handleFinalize(req: VercelRequest, res: VercelResponse) {
     totalQuestions: judgements.length,
     dailyStats,
     performanceHistory,
+    calibrationMilestones,
   });
 }
 

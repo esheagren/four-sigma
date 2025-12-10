@@ -399,3 +399,126 @@ export async function getPerformanceHistory(
 
   return result;
 }
+
+/**
+ * Get calibration milestones showing the user's calibration journey from first play to now.
+ * Returns 6 evenly-spaced milestone points (or fewer if user has < 6 unique play dates).
+ */
+export async function getCalibrationMilestones(userId: string): Promise<Array<{
+  date: string;
+  label: string;
+  calibration: number;
+}>> {
+  // Fetch all user responses ordered chronologically
+  const { data: allUserResponses, error: allUserError } = await supabase
+    .from('user_responses')
+    .select('captured, answered_at')
+    .eq('user_id', userId)
+    .order('answered_at', { ascending: true });
+
+  if (allUserError) {
+    console.error('Failed to fetch user responses for calibration milestones:', allUserError);
+    return [];
+  }
+
+  if (!allUserResponses || allUserResponses.length === 0) {
+    return [];
+  }
+
+  // Build cumulative calibration per unique play date
+  const dateCalibration: Map<string, { cumulativeCaptured: number; cumulativeTotal: number }> = new Map();
+  let runningCaptured = 0;
+  let runningTotal = 0;
+
+  for (const response of allUserResponses) {
+    runningCaptured += response.captured ? 1 : 0;
+    runningTotal += 1;
+    const dateStr = getUTCDateString(new Date(response.answered_at));
+    dateCalibration.set(dateStr, {
+      cumulativeCaptured: runningCaptured,
+      cumulativeTotal: runningTotal,
+    });
+  }
+
+  // Get sorted list of unique play dates
+  const playDates = Array.from(dateCalibration.keys());
+
+  if (playDates.length < 2) {
+    // Not enough data for a trend
+    return [];
+  }
+
+  // Helper to format date as MM/DD
+  const formatLabel = (dateStr: string): string => {
+    const date = new Date(dateStr + 'T00:00:00.000Z');
+    const month = date.getUTCMonth() + 1;
+    const day = date.getUTCDate();
+    return `${month}/${day}`;
+  };
+
+  // Helper to get calibration percentage for a date
+  const getCalibration = (dateStr: string): number => {
+    const data = dateCalibration.get(dateStr);
+    if (!data || data.cumulativeTotal === 0) return 0;
+    return (data.cumulativeCaptured / data.cumulativeTotal) * 100;
+  };
+
+  // If 2-5 unique play dates, return all of them
+  if (playDates.length <= 5) {
+    return playDates.map(dateStr => ({
+      date: dateStr,
+      label: formatLabel(dateStr),
+      calibration: getCalibration(dateStr),
+    }));
+  }
+
+  // For 6+ dates, select 6 milestone points
+  const firstDate = playDates[0];
+  const lastDate = playDates[playDates.length - 1];
+  const firstTime = new Date(firstDate + 'T00:00:00.000Z').getTime();
+  const lastTime = new Date(lastDate + 'T00:00:00.000Z').getTime();
+  const timeSpan = lastTime - firstTime;
+
+  // Find closest play date to a target timestamp
+  const findClosestPlayDate = (targetTime: number): string => {
+    let closestDate = playDates[0];
+    let closestDiff = Infinity;
+
+    for (const dateStr of playDates) {
+      const dateTime = new Date(dateStr + 'T00:00:00.000Z').getTime();
+      const diff = Math.abs(dateTime - targetTime);
+      if (diff < closestDiff) {
+        closestDiff = diff;
+        closestDate = dateStr;
+      }
+    }
+
+    return closestDate;
+  };
+
+  // Calculate 6 milestone dates (first, 4 intermediate, last)
+  const milestones: string[] = [firstDate];
+
+  for (let i = 1; i <= 4; i++) {
+    const targetTime = firstTime + (timeSpan * i) / 5;
+    const closestDate = findClosestPlayDate(targetTime);
+    // Avoid duplicates
+    if (!milestones.includes(closestDate)) {
+      milestones.push(closestDate);
+    }
+  }
+
+  // Add last date if not already included
+  if (!milestones.includes(lastDate)) {
+    milestones.push(lastDate);
+  }
+
+  // Sort milestones chronologically
+  milestones.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+
+  return milestones.map(dateStr => ({
+    date: dateStr,
+    label: formatLabel(dateStr),
+    calibration: getCalibration(dateStr),
+  }));
+}
