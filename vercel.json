@@ -3,6 +3,7 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
+    { "source": "/api/ingest/:path*/", "destination": "/api/ingest" },
     { "source": "/api/ingest/:path*", "destination": "/api/ingest" },
     { "source": "/api/auth/:path*", "destination": "/api/auth" },
     { "source": "/api/session/:path*", "destination": "/api/session" },
