@@ -8,9 +8,18 @@ interface PerformanceHistoryEntry {
   calibration: number;
 }
 
+interface UserStats {
+  gamesPlayed: number;
+  averageScore: number;
+  bestSingleScore: number;
+  currentStreak: number;
+  bestStreak: number;
+}
+
 interface UserStatsSlideProps {
   calibration: number;
   performanceHistory?: PerformanceHistoryEntry[];
+  userStats?: UserStats;
 }
 
 function CircularCalibration({ percentage, size = 80 }: { percentage: number; size?: number }) {
@@ -213,12 +222,37 @@ function ScoreHistoryChart({ history }: { history: PerformanceHistoryEntry[] }) 
 export const UserStatsSlide = forwardRef<HTMLDivElement, UserStatsSlideProps>(({
   calibration,
   performanceHistory = [],
+  userStats,
 }, ref) => {
   return (
     <div className="tiktok-slide user-stats-slide" ref={ref}>
       <div className="slide-body">
         <div className="user-stats-content">
           <div className="user-stats-header">Your Stats</div>
+
+        {/* Statistics Grid */}
+        {userStats && (
+          <div className="user-stats-section">
+            <div className="user-stats-grid">
+              <div className="user-stat-item">
+                <div className="user-stat-value">{userStats.gamesPlayed}</div>
+                <div className="user-stat-label">Games</div>
+              </div>
+              <div className="user-stat-item">
+                <div className="user-stat-value">{Math.round(userStats.averageScore)}</div>
+                <div className="user-stat-label">Avg Score</div>
+              </div>
+              <div className="user-stat-item">
+                <div className="user-stat-value">{userStats.bestSingleScore.toLocaleString()}</div>
+                <div className="user-stat-label">Best Score</div>
+              </div>
+              <div className="user-stat-item">
+                <div className="user-stat-value">{userStats.currentStreak}</div>
+                <div className="user-stat-label">Streak</div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Calibration Section */}
         <div className="user-stats-section">

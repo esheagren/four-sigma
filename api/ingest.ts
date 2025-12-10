@@ -4,10 +4,16 @@ const POSTHOG_HOST = 'https://us.i.posthog.com';
 const POSTHOG_ASSETS_HOST = 'https://us-assets.i.posthog.com';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Get the path after /ingest/
-  const { path } = req.query;
-  const pathSegments = Array.isArray(path) ? path : path ? [path] : [];
-  const subPath = pathSegments.join('/');
+  // Get the path after /api/ingest from the URL
+  const url = req.url || '';
+  const ingestIndex = url.indexOf('/api/ingest');
+  let subPath = '';
+
+  if (ingestIndex !== -1) {
+    const afterIngest = url.substring(ingestIndex + '/api/ingest'.length);
+    // Remove leading slash and split off query string
+    subPath = afterIngest.replace(/^\//, '').split('?')[0];
+  }
 
   // Determine target host based on path
   const isStaticAsset = subPath.startsWith('static/');
@@ -15,26 +21,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const targetPath = isStaticAsset ? subPath.replace('static/', '') : subPath;
 
   // Build target URL with query string
-  const url = new URL(targetPath, targetHost);
+  const targetUrl = new URL(targetPath, targetHost);
 
   // Forward query parameters
-  const queryString = req.url?.split('?')[1];
+  const queryString = url.split('?')[1];
   if (queryString) {
-    url.search = queryString;
+    targetUrl.search = queryString;
   }
 
   try {
     // Forward the request to PostHog
-    const headers: Record<string, string> = {
-      'Content-Type': req.headers['content-type'] || 'application/json',
-    };
+    const headers: Record<string, string> = {};
 
-    // Forward relevant headers
+    if (req.headers['content-type']) {
+      headers['Content-Type'] = req.headers['content-type'] as string;
+    }
     if (req.headers['user-agent']) {
       headers['User-Agent'] = req.headers['user-agent'] as string;
-    }
-    if (req.headers['origin']) {
-      headers['Origin'] = req.headers['origin'] as string;
     }
 
     const fetchOptions: RequestInit = {
@@ -49,7 +52,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         : JSON.stringify(req.body);
     }
 
-    const response = await fetch(url.toString(), fetchOptions);
+    const response = await fetch(targetUrl.toString(), fetchOptions);
 
     // Forward response headers
     const contentType = response.headers.get('content-type');

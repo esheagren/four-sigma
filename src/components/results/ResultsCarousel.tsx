@@ -227,6 +227,13 @@ export function ResultsCarousel({
             ref={setSlideRef(judgements.length + 1)}
             calibration={calibration}
             performanceHistory={performanceHistory}
+            userStats={user ? {
+              gamesPlayed: user.gamesPlayed,
+              averageScore: user.averageScore,
+              bestSingleScore: user.bestSingleScore,
+              currentStreak: user.currentStreak,
+              bestStreak: user.bestStreak,
+            } : undefined}
           />
         </div>
       </div>
