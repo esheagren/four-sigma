@@ -33,6 +33,16 @@ export const DailyStatsSlide = forwardRef<HTMLDivElement, DailyStatsSlideProps>(
   onShare,
   isSharing,
 }, ref) => {
+  // Determine glow color based on performance
+  const isTopScorer = todayLeaderboard?.some(entry => entry.isCurrentUser && entry.rank === 1);
+  const isZeroScore = totalScore === 0;
+
+  const scoreGlowClass = isZeroScore
+    ? 'score-glow-gray'
+    : isTopScorer
+      ? 'score-glow-gold'
+      : 'score-glow-purple';
+
   return (
     <div className="tiktok-slide daily-stats-slide" ref={ref}>
       <div className="slide-body">
@@ -58,7 +68,7 @@ export const DailyStatsSlide = forwardRef<HTMLDivElement, DailyStatsSlideProps>(
         )}
 
         {/* Section 2: Your Score (Middle) */}
-        <div className="daily-score-section">
+        <div className={`daily-score-section ${scoreGlowClass}`}>
           <div className="daily-score-row">
             <div className="daily-score-main">
               <div className="daily-score-label">Your Score</div>
