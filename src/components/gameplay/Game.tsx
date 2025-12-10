@@ -152,14 +152,37 @@ export function Game() {
     if (!sessionId || !questions[currentQuestionIndex]) return;
 
     const responseTimeMs = Date.now() - questionStartTime.current;
+    const currentQuestion = questions[currentQuestionIndex];
+    const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
+    // Track answer submission (fire-and-forget)
+    capture('answer_submitted', {
+      sessionId,
+      questionId: currentQuestion.id,
+      questionIndex: currentQuestionIndex,
+      lowerBound: lower,
+      upperBound: upper,
+      intervalWidth: upper - lower,
+      responseTimeMs,
+      isLastQuestion,
+    });
+
+    // OPTIMISTIC UI: Advance to next question immediately, don't wait for API
+    if (!isLastQuestion) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else {
+      // FINAL QUESTION - trigger dramatic reveal animation
+      setIsFinalizingSession(true);
+    }
+
+    // Submit answer to API in background
     try {
       const response = await fetch('/api/session/answer', {
         method: 'POST',
         headers: getHeaders(),
         body: JSON.stringify({
           sessionId,
-          questionId: questions[currentQuestionIndex].id,
+          questionId: currentQuestion.id,
           lower,
           upper,
         }),
@@ -168,42 +191,26 @@ export function Game() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         console.error('Submit answer error:', response.status, errorData);
-        throw new Error(errorData.error || 'Failed to submit answer');
-      }
-
-      // Track answer submission
-      capture('answer_submitted', {
-        sessionId,
-        questionId: questions[currentQuestionIndex].id,
-        questionIndex: currentQuestionIndex,
-        lowerBound: lower,
-        upperBound: upper,
-        intervalWidth: upper - lower,
-        responseTimeMs,
-        isLastQuestion: currentQuestionIndex === questions.length - 1,
-      });
-
-      // Move to next question or finalize
-      if (currentQuestionIndex < questions.length - 1) {
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
-      } else {
-        // FINAL QUESTION - trigger dramatic reveal animation
-        // Set flag immediately to prevent question from reappearing during transition
-        setIsFinalizingSession(true);
-        // Run animation and API call in parallel, wait for both
-        await Promise.all([
-          triggerRevealAnimation(),
-          finalizeSession(),
-        ]);
+        // Don't throw - we've already advanced the UI
+        // The answer will be missing at finalize time, which is handled gracefully
       }
     } catch (err) {
       console.error('Submit answer exception:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      // Don't set error state - allow user to continue playing
+      // Missing answers will be handled at finalize
       capture('game_error', {
         error: 'answer_submit_failed',
         sessionId,
         questionIndex: currentQuestionIndex,
       });
+    }
+
+    // For last question, run animation and finalize in parallel
+    if (isLastQuestion) {
+      await Promise.all([
+        triggerRevealAnimation(),
+        finalizeSession(),
+      ]);
     }
   };
 

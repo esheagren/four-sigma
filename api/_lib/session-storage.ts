@@ -58,16 +58,40 @@ export async function getSession(sessionId: string): Promise<{
 }
 
 /**
- * Add an answer to a session
+ * Add an answer to a session using Postgres array append (single DB call)
  */
 export async function addAnswer(sessionId: string, answer: Answer): Promise<boolean> {
-  // First get the current session
+  const newAnswer = {
+    questionId: answer.questionId,
+    lower: answer.lower,
+    upper: answer.upper,
+    submittedAt: answer.submittedAt.toISOString(),
+  };
+
+  // Use raw SQL to append to JSONB array in a single operation
+  const { error } = await supabase.rpc('append_session_answer', {
+    p_session_id: sessionId,
+    p_answer: newAnswer,
+  });
+
+  if (error) {
+    // Fallback to read-modify-write if RPC doesn't exist
+    console.warn('RPC not available, using fallback:', error.message);
+    return addAnswerFallback(sessionId, answer);
+  }
+
+  return true;
+}
+
+/**
+ * Fallback for adding answer (used if RPC not available)
+ */
+async function addAnswerFallback(sessionId: string, answer: Answer): Promise<boolean> {
   const session = await getSession(sessionId);
   if (!session) {
     return false;
   }
 
-  // Add the new answer
   const updatedAnswers = [...session.answers, {
     questionId: answer.questionId,
     lower: answer.lower,

@@ -12,6 +12,8 @@ interface RangeVisualizationProps {
   userMax: number;
   trueValue: number;
   hit: boolean;
+  score: number;
+  unit?: string;
   displayMin?: number;
   displayMax?: number;
   crowdData?: CrowdData;
@@ -22,6 +24,8 @@ export function RangeVisualization({
   userMax,
   trueValue,
   hit,
+  score,
+  unit,
   displayMin,
   displayMax,
   crowdData,
@@ -66,68 +70,50 @@ export function RangeVisualization({
 
   return (
     <div className="range-viz">
-      {/* User Range Section */}
-      <div className="range-section">
-        <div className="range-header">
-          <span className="range-label">YOUR RANGE</span>
-          <span className="range-values">
-            {formatNumber(userMin)} — {formatNumber(userMax)}
-          </span>
-        </div>
-        <div className="range-track-container">
-          <div className="range-track">
-            {/* Grid lines */}
-            {[0, 25, 50, 75, 100].map(pos => (
-              <div key={pos} className="range-gridline" style={{ left: `${pos}%` }} />
-            ))}
-            {/* User range bar */}
-            <div
-              className={`range-bar user ${hit ? 'hit' : 'miss'}`}
-              style={{ left: `${userStartPct}%`, width: `${userWidthPct}%` }}
-            />
+      {/* Score Badge - top */}
+      <div className={`range-score-badge ${hit ? 'hit' : 'miss'}`}>
+        {hit ? '+' : ''}{Math.round(score)} pts
+      </div>
+
+      {/* Answer Label - below score */}
+      <div className="range-answer-label">
+        {formatNumber(trueValue)}{unit && ` ${unit}`}
+      </div>
+
+      {/* Range Track */}
+      <div className="range-track-wrapper">
+        {/* Track */}
+        <div className="range-track">
+          {/* Background line */}
+          <div className="range-track-bg" />
+
+          {/* User range bar with endpoint dots */}
+          <div
+            className={`range-bar user ${hit ? 'hit' : 'miss'}`}
+            style={{ left: `${userStartPct}%`, width: `${userWidthPct}%` }}
+          >
+            <div className="range-endpoint left" />
+            <div className="range-endpoint right" />
+          </div>
+
+          {/* Correct Answer marker dot */}
+          <div
+            className="range-answer-marker"
+            style={{ left: `${correctPct}%` }}
+          >
+            <div className="range-answer-dot" />
           </div>
         </div>
       </div>
 
-      {/* Crowd Heatmap Section (if data available) */}
-      {crowdData && (
-        <div className="range-section crowd">
-          <div className="range-header">
-            <span className="range-label">OTHERS</span>
-            <span className="range-hint">{Math.round(crowdData.hitRate * 100)}% hit rate</span>
-          </div>
-          <div className="range-track-container crowd">
-            <div className="range-track">
-              {[0, 25, 50, 75, 100].map(pos => (
-                <div key={pos} className="range-gridline faint" style={{ left: `${pos}%` }} />
-              ))}
-              {/* Crowd gradient bar */}
-              <div
-                className="range-bar crowd"
-                style={{
-                  left: `${crowdStartPct}%`,
-                  width: `${crowdWidthPct}%`,
-                }}
-              />
-            </div>
-          </div>
+      {/* Bound labels - below track */}
+      <div className="range-bounds">
+        <div className={`range-bound-label ${hit ? 'hit' : 'miss'}`}>
+          {formatNumber(userMin)}
         </div>
-      )}
-
-      {/* Correct Answer Line */}
-      <div
-        className={`range-answer-line ${hit ? 'hit' : ''}`}
-        style={{ left: `${correctPct}%` }}
-      >
-        <div className={`range-answer-badge ${hit ? 'hit' : ''}`}>
-          {formatNumber(trueValue)}
+        <div className={`range-bound-label ${hit ? 'hit' : 'miss'}`}>
+          {formatNumber(userMax)}
         </div>
-      </div>
-
-      {/* Axis Labels */}
-      <div className="range-axis">
-        <span>{formatNumber(range.min)}</span>
-        <span>{formatNumber(range.max)}</span>
       </div>
     </div>
   );

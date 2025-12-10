@@ -97,14 +97,8 @@ async function handleAnswer(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Lower bound cannot be greater than upper bound' });
   }
 
-  const session = await getSession(sessionId);
-  if (!session) {
-    return res.status(404).json({ error: 'Session not found' });
-  }
-  if (!session.questionIds.includes(questionId)) {
-    return res.status(400).json({ error: 'Question not part of this session' });
-  }
-
+  // Skip session validation for speed - addAnswer will fail if session doesn't exist
+  // The questionId validation happens at finalize time anyway
   const success = await addAnswer(sessionId, {
     questionId,
     lower,

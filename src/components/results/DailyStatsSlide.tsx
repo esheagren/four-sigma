@@ -42,7 +42,6 @@ export function DailyStatsSlide({
         </div>
 
         <div className="daily-stats-content">
-        <div className="daily-stats-header">Session Complete</div>
 
         {/* Score Section with Share Button */}
         <div className="daily-score-row">
