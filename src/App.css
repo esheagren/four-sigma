@@ -7566,8 +7566,8 @@ a.judgement-answer-below:hover .judgement-answer-value {
 }
 
 .slide-question {
-  font-size: 1.125rem;
-  font-weight: 700;
+  font-size: 0.9rem;
+  font-weight: 600;
   color: white;
   line-height: 1.3;
   margin: 0;
@@ -8580,7 +8580,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   }
 
   .slide-question {
-    font-size: 1.25rem;
+    font-size: 0.85rem;
   }
 
   .slide-score {

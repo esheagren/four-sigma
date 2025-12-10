@@ -17,6 +17,7 @@ import {
   updateUserStatsAfterSession,
   getDailyStats,
   getPerformanceHistory,
+  getCalibrationMilestones,
   getQuestionTopScorers,
 } from '../database/sessions.js';
 import {
@@ -224,6 +225,7 @@ router.post('/finalize', async (req: Request, res: Response) => {
     // Update user stats and get daily stats if user is authenticated
     let dailyStats = undefined;
     let performanceHistory = undefined;
+    let calibrationMilestones = undefined;
 
     if (userId) {
       try {
@@ -234,14 +236,16 @@ router.post('/finalize', async (req: Request, res: Response) => {
           questionsAnswered: judgements.length,
         });
 
-        // Fetch daily stats and performance history
-        const [daily, history] = await Promise.all([
+        // Fetch daily stats, performance history, and calibration milestones
+        const [daily, history, milestones] = await Promise.all([
           getDailyStats(userId),
           getPerformanceHistory(userId, 10),
+          getCalibrationMilestones(userId),
         ]);
 
         dailyStats = daily;
         performanceHistory = history;
+        calibrationMilestones = milestones;
       } catch (statsError) {
         console.error('Failed to update/fetch user stats:', statsError);
         // Continue even if stats fail
@@ -254,6 +258,7 @@ router.post('/finalize', async (req: Request, res: Response) => {
       totalQuestions: judgements.length,
       dailyStats,
       performanceHistory,
+      calibrationMilestones,
     };
 
     res.json(response);

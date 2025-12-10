@@ -119,12 +119,19 @@ export interface PerformanceHistoryEntry {
   calibration: number;
 }
 
+export interface CalibrationMilestone {
+  date: string;
+  label: string;
+  calibration: number;
+}
+
 export interface FinalizeSessionResponse {
   judgements: Judgement[];
   score: number;
   totalQuestions: number;
   dailyStats?: DailyStats;
   performanceHistory?: PerformanceHistoryEntry[];
+  calibrationMilestones?: CalibrationMilestone[];
 }
 
 // Feedback types

@@ -8,6 +8,12 @@ interface PerformanceHistoryEntry {
   calibration: number;
 }
 
+interface CalibrationMilestone {
+  date: string;
+  label: string;
+  calibration: number;
+}
+
 interface UserStats {
   gamesPlayed: number;
   averageScore: number;
@@ -19,6 +25,7 @@ interface UserStats {
 interface UserStatsSlideProps {
   calibration: number;
   performanceHistory?: PerformanceHistoryEntry[];
+  calibrationMilestones?: CalibrationMilestone[];
   userStats?: UserStats;
 }
 
@@ -60,11 +67,10 @@ function CircularCalibration({ percentage, size = 80 }: { percentage: number; si
   );
 }
 
-function CalibrationHistoryChart({ history }: { history: PerformanceHistoryEntry[] }) {
-  const data = history.slice(-7).map(h => h.calibration);
+function CalibrationHistoryChart({ milestones }: { milestones: CalibrationMilestone[] }) {
   const targetLine = 95;
 
-  if (data.length <= 1) {
+  if (milestones.length < 2) {
     return (
       <div className="calibration-history-chart">
         <div className="calibration-target-label">95% target</div>
@@ -75,37 +81,42 @@ function CalibrationHistoryChart({ history }: { history: PerformanceHistoryEntry
     );
   }
 
+  const data = milestones.map(m => m.calibration);
   const maxVal = Math.max(...data, targetLine);
   const minVal = Math.min(...data, 0);
   const range = maxVal - minVal || 1;
 
-  const chartHeight = 60;
-  const chartWidth = 140;
-  const padding = 4;
+  const chartHeight = 70;
+  const chartWidth = 180;
+  const paddingX = 8;
+  const paddingTop = 4;
+  const paddingBottom = 16; // Extra space for labels
 
   const points = data.map((val, i) => {
-    const x = padding + (i / (data.length - 1)) * (chartWidth - padding * 2);
-    const y = chartHeight - padding - ((val - minVal) / range) * (chartHeight - padding * 2);
-    return { x, y, val };
+    const x = paddingX + (i / (data.length - 1)) * (chartWidth - paddingX * 2);
+    const y = paddingTop + (1 - (val - minVal) / range) * (chartHeight - paddingTop - paddingBottom);
+    return { x, y, val, label: milestones[i].label };
   });
 
   const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
-  const targetY = chartHeight - padding - ((targetLine - minVal) / range) * (chartHeight - padding * 2);
+  const targetY = paddingTop + (1 - (targetLine - minVal) / range) * (chartHeight - paddingTop - paddingBottom);
 
   return (
     <div className="calibration-history-chart">
       <div className="calibration-target-label">95% target</div>
       <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="calibration-chart-svg">
+        {/* Target line */}
         <line
-          x1={padding}
+          x1={paddingX}
           y1={targetY}
-          x2={chartWidth - padding}
+          x2={chartWidth - paddingX}
           y2={targetY}
           stroke="#10b981"
           strokeWidth="1"
           strokeDasharray="4 2"
           opacity="0.6"
         />
+        {/* Data line */}
         <path
           d={pathD}
           fill="none"
@@ -114,14 +125,27 @@ function CalibrationHistoryChart({ history }: { history: PerformanceHistoryEntry
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <circle
-          cx={points[points.length - 1].x}
-          cy={points[points.length - 1].y}
-          r="4"
-          fill="#10b981"
-        />
-        {points.slice(0, -1).map((p, i) => (
-          <circle key={i} cx={p.x} cy={p.y} r="2" fill="rgba(255,255,255,0.4)" />
+        {/* Data points */}
+        {points.map((p, i) => (
+          <circle
+            key={i}
+            cx={p.x}
+            cy={p.y}
+            r={i === points.length - 1 ? 4 : 2}
+            fill={i === points.length - 1 ? '#10b981' : 'rgba(255,255,255,0.4)'}
+          />
+        ))}
+        {/* Date labels */}
+        {points.map((p, i) => (
+          <text
+            key={`label-${i}`}
+            x={p.x}
+            y={chartHeight - 2}
+            textAnchor="middle"
+            className="calibration-chart-date-label"
+          >
+            {p.label}
+          </text>
         ))}
       </svg>
     </div>
