@@ -6692,8 +6692,8 @@ a.judgement-answer-below:hover .judgement-answer-value {
   /* Subtle background to prevent slider line from cutting through text */
   background: radial-gradient(
     ellipse 100% 100% at center,
-    rgba(30, 30, 50, 0.7) 0%,
-    rgba(30, 30, 50, 0.4) 60%,
+    rgba(30, 30, 50, 0.4) 0%,
+    rgba(30, 30, 50, 0.2) 60%,
     transparent 100%
   );
   padding: 4px 12px;
