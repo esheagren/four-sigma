@@ -55,12 +55,19 @@ interface PerformanceHistoryEntry {
   calibration: number;
 }
 
+interface CalibrationMilestone {
+  date: string;
+  label: string;
+  calibration: number;
+}
+
 interface FinalizeResponse {
   judgements: Judgement[];
   score: number;
   totalQuestions: number;
   dailyStats?: DailyStats;
   performanceHistory?: PerformanceHistoryEntry[];
+  calibrationMilestones?: CalibrationMilestone[];
 }
 
 export function Game() {
@@ -289,6 +296,7 @@ export function Game() {
   // Extract daily stats from response (when available)
   const dailyStats = results?.dailyStats;
   const performanceHistory = results?.performanceHistory;
+  const calibrationMilestones = results?.calibrationMilestones;
 
   // Calculate calibration from this session's judgements
   const sessionCalibration = results && results.judgements.length > 0
@@ -331,6 +339,7 @@ export function Game() {
             dailyAverageScore={dailyStats?.todaysAverage ?? undefined}
             calibration={calibration}
             performanceHistory={performanceHistory}
+            calibrationMilestones={calibrationMilestones}
             totalParticipants={dailyStats?.totalParticipantsToday ?? undefined}
             todayLeaderboard={dailyStats?.todayLeaderboard}
           />

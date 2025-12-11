@@ -7914,7 +7914,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 .calibration-right {
   flex: 1;
-  max-width: 160px;
+  max-width: 200px;
 }
 
 /* Calibration Dial (smaller version) */
@@ -7963,11 +7963,17 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 .calibration-chart-svg {
   width: 100%;
-  height: 60px;
+  height: 70px;
+}
+
+.calibration-chart-date-label {
+  font-size: 7px;
+  fill: rgba(255, 255, 255, 0.5);
+  font-family: 'SF Mono', 'Monaco', monospace;
 }
 
 .calibration-chart-empty {
-  height: 60px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;

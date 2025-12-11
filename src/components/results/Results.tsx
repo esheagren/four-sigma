@@ -41,6 +41,12 @@ interface PerformanceHistoryEntry {
   calibration: number;
 }
 
+interface CalibrationMilestone {
+  date: string;
+  label: string;
+  calibration: number;
+}
+
 interface TodayLeaderboardEntry {
   rank: number;
   username: string;
@@ -58,6 +64,7 @@ interface ResultsProps {
   dailyAverageScore?: number;
   calibration?: number;
   performanceHistory?: PerformanceHistoryEntry[];
+  calibrationMilestones?: CalibrationMilestone[];
   totalParticipants?: number;
   todayLeaderboard?: TodayLeaderboardEntry[];
 }
@@ -68,6 +75,7 @@ export function Results({
   dailyRank,
   calibration,
   performanceHistory,
+  calibrationMilestones,
   totalParticipants,
   topScoreGlobal,
   todayLeaderboard,
@@ -81,6 +89,7 @@ export function Results({
       totalParticipants={totalParticipants}
       topScoreToday={topScoreGlobal}
       performanceHistory={performanceHistory}
+      calibrationMilestones={calibrationMilestones}
       todayLeaderboard={todayLeaderboard}
     />
   );
