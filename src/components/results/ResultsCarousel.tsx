@@ -4,6 +4,7 @@ import { DailyStatsSlide } from './DailyStatsSlide';
 import { UserStatsSlide } from './UserStatsSlide';
 import { ScoreOrbSlide } from './ScoreOrbSlide';
 import { ShareScoreCard, type ShareScoreCardRef } from './ShareScoreCard';
+import { LoadingOrb } from '../gameplay/LoadingOrb';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../context/PostHogContext';
 
@@ -86,6 +87,24 @@ export function ResultsCarousel({
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [isSharing, setIsSharing] = useState(false);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  // Track scroll position for orb shrinking effect
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const scrollTop = container.scrollTop;
+      const slideHeight = window.innerHeight;
+      // Progress: 0 at top, 1 when scrolled one full slide
+      const progress = Math.min(scrollTop / (slideHeight * 0.7), 1);
+      setScrollProgress(progress);
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Defensive check: ensure judgements is always an array
   const safeJudgements = judgements ?? [];
@@ -191,6 +210,10 @@ export function ResultsCarousel({
     }
   };
 
+  // Show mini orb when scrolled past first slide (scrollProgress >= 1)
+  const showMiniOrb = scrollProgress >= 1;
+  const miniOrbScale = 0.35;
+
   return (
     <div className="tiktok-results">
       {/* Hidden share card for image generation */}
@@ -203,6 +226,20 @@ export function ResultsCarousel({
         calibration={calibration}
         percentile={percentile}
       />
+
+      {/* Fixed mini orb - shows when scrolled past first slide */}
+      {showMiniOrb && (
+        <div className="mini-orb-fixed">
+          <div style={{ transform: `scale(${miniOrbScale})` }}>
+            <LoadingOrb
+              score={score}
+              showScore={true}
+              onScoreClick={handleShare}
+              isClickable={!isSharing}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Flex layout: dots on left, content on right */}
       <div className="results-layout">
@@ -224,6 +261,7 @@ export function ResultsCarousel({
             totalScore={score}
             onShare={handleShare}
             isSharing={isSharing}
+            scrollProgress={scrollProgress}
           />
 
           {/* Individual question slides */}

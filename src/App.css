@@ -6689,6 +6689,17 @@ a.judgement-answer-below:hover .judgement-answer-value {
   text-align: center;
   line-height: 1.2;
   transition: font-size 0.1s ease-out;
+  /* Subtle background to prevent slider line from cutting through text */
+  background: radial-gradient(
+    ellipse 100% 100% at center,
+    rgba(30, 30, 50, 0.7) 0%,
+    rgba(30, 30, 50, 0.4) 60%,
+    transparent 100%
+  );
+  padding: 4px 12px;
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .estimate-scratchpad-unified {
@@ -8157,19 +8168,44 @@ a.judgement-answer-below:hover .judgement-answer-value {
 /* Score Orb Slide */
 .score-orb-slide {
   background: transparent;
-  padding: 1.5rem;
-  padding-top: calc(60px + 1.5rem); /* Account for navbar */
+  padding: 0;
+  overflow: visible;
 }
 
-.score-orb-slide .slide-body {
-  flex-direction: column;
-  gap: 1.5rem;
+.score-orb-centered-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding-top: 60px; /* Account for navbar */
 }
 
 .score-orb-content {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 1.5rem;
+  transition: transform 0.1s ease-out;
+  transform-origin: center center;
+}
+
+/* Fixed mini orb that appears when scrolled past first slide */
+.mini-orb-fixed {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  pointer-events: auto;
+}
+
+.mini-orb-fixed .loading-orb-container {
+  position: relative;
+  pointer-events: auto;
+}
+
+.score-orb-slide .slide-body {
+  flex-direction: column;
   gap: 1.5rem;
 }
 
