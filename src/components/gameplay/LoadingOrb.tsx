@@ -27,7 +27,7 @@ export function LoadingOrb({ score, showScore = false, animateScore = false, onS
     return MIN_SCALE + (MAX_SCALE - MIN_SCALE) * ratio;
   };
 
-  // Tick-up animation for score
+  // Tick-up animation for score using requestAnimationFrame for smooth 60fps
   useEffect(() => {
     if (!animateScore || score === undefined) {
       if (showScore && score !== undefined) {
@@ -37,25 +37,32 @@ export function LoadingOrb({ score, showScore = false, animateScore = false, onS
       return;
     }
 
-    const duration = 2500; // ms - slower tick
-    const steps = 80; // more steps for smoother animation
-    const increment = score / steps;
-    let current = 0;
+    const duration = 2500;
+    let startTime: number | null = null;
+    let animationId: number;
 
-    const interval = setInterval(() => {
-      current += increment;
-      if (current >= score) {
-        setDisplayScore(score);
-        setScale(getScaleForScore(score, score));
-        clearInterval(interval);
-      } else {
-        const rounded = Math.round(current);
-        setDisplayScore(rounded);
-        setScale(getScaleForScore(rounded, score));
+    // Easing function for smooth acceleration/deceleration
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    const animate = (currentTime: number) => {
+      if (startTime === null) startTime = currentTime;
+
+      const elapsed = currentTime - startTime;
+      const linearProgress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOutCubic(linearProgress);
+
+      const currentScore = easedProgress * score;
+      setDisplayScore(Math.round(currentScore));
+      setScale(getScaleForScore(currentScore, score)); // Use non-rounded for smooth scale
+
+      if (linearProgress < 1) {
+        animationId = requestAnimationFrame(animate);
       }
-    }, duration / steps);
+    };
 
-    return () => clearInterval(interval);
+    animationId = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(animationId);
   }, [animateScore, score, showScore]);
 
   // Generate dots in a spherical pattern - memoized to prevent regeneration
@@ -115,7 +122,7 @@ export function LoadingOrb({ score, showScore = false, animateScore = false, onS
     <div className="loading-orb-container">
       <div
         className="loading-orb-scale-wrapper"
-        style={{ transform: `scale(${scale})`, transition: 'transform 0.1s ease-out' }}
+        style={{ transform: `scale(${scale})` }}
       >
         <div className="loading-orb">
           {dots}
