@@ -302,8 +302,6 @@ export const UserStatsSlide = forwardRef<HTMLDivElement, UserStatsSlideProps>(({
     <div className="tiktok-slide user-stats-slide" ref={ref}>
       <div className="slide-body">
         <div className="user-stats-content">
-          <div className="user-stats-header">Your Stats</div>
-
         {/* Score History Section */}
         <div className="user-stats-section">
           <ScoreHistoryChart history={performanceHistory} />
