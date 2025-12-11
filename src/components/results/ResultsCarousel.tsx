@@ -3,6 +3,7 @@ import { QuestionSlide } from './QuestionSlide';
 import { DailyStatsSlide } from './DailyStatsSlide';
 import { UserStatsSlide } from './UserStatsSlide';
 import { ScoreOrbSlide } from './ScoreOrbSlide';
+import { QuestionLeadersSlide } from './QuestionLeadersSlide';
 import { ShareScoreCard, type ShareScoreCardRef } from './ShareScoreCard';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../context/PostHogContext';
@@ -18,6 +19,8 @@ interface CommunityStats {
   averageScore: number;
   highestScore: number;
   highestScoreUsername?: string;
+  highestScoreLowerBound?: number;
+  highestScoreUpperBound?: number;
 }
 
 interface Judgement {
@@ -113,8 +116,8 @@ export function ResultsCarousel({
   const safeJudgements = judgements ?? [];
   const hits = safeJudgements.filter(j => j.hit).length;
   const total = safeJudgements.length;
-  // +3 for ScoreOrbSlide, DailyStatsSlide, UserStatsSlide
-  const totalSlides = safeJudgements.length + 3;
+  // +4 for ScoreOrbSlide, DailyStatsSlide, UserStatsSlide, QuestionLeadersSlide
+  const totalSlides = safeJudgements.length + 4;
 
   // Track which slide is currently visible
   useEffect(() => {
@@ -148,12 +151,14 @@ export function ResultsCarousel({
     ? Math.round(((totalParticipants - dailyRank) / totalParticipants) * 100)
     : undefined;
 
-  // Extract question high scores
+  // Extract question high scores with bounds
   const questionHighScores = safeJudgements.map(j => ({
     questionId: j.questionId,
     prompt: j.prompt,
     highestScore: j.communityStats?.highestScore ?? 0,
     username: j.communityStats?.highestScoreUsername,
+    lowerBound: j.communityStats?.highestScoreLowerBound,
+    upperBound: j.communityStats?.highestScoreUpperBound,
   }));
 
   const handleShare = async () => {
@@ -255,16 +260,10 @@ export function ResultsCarousel({
             />
           ))}
 
-          {/* Daily Stats Slide (Session Complete) */}
+          {/* Daily Stats Slide (Today's Leaderboard) */}
           <DailyStatsSlide
             ref={setSlideRef(safeJudgements.length + 1)}
-            totalScore={score}
-            hits={hits}
-            total={total}
-            questionHighScores={questionHighScores}
             todayLeaderboard={todayLeaderboard}
-            onShare={handleShare}
-            isSharing={isSharing}
           />
 
           {/* User Stats Slide (Long-term stats) */}
@@ -280,6 +279,12 @@ export function ResultsCarousel({
               currentStreak: user.currentStreak,
               bestStreak: user.bestStreak,
             } : undefined}
+          />
+
+          {/* Question Leaders Slide (Bottom - top scorer for each question) */}
+          <QuestionLeadersSlide
+            ref={setSlideRef(safeJudgements.length + 3)}
+            questionHighScores={questionHighScores}
           />
         </div>
       </div>

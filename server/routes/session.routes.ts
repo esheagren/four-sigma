@@ -207,17 +207,21 @@ router.post('/finalize', async (req: Request, res: Response) => {
     const questionIds = judgements.map(j => j.questionId);
     const questionTopScorers = await getQuestionTopScorers(questionIds);
 
-    // Attach top scorer usernames to each judgement's communityStats
+    // Attach top scorer usernames and bounds to each judgement's communityStats
     for (const judgement of judgements) {
       const topScorer = questionTopScorers.get(judgement.questionId);
       if (topScorer && judgement.communityStats) {
         judgement.communityStats.highestScore = topScorer.highestScore;
         judgement.communityStats.highestScoreUsername = topScorer.highestScoreUsername;
+        judgement.communityStats.highestScoreLowerBound = topScorer.lowerBound;
+        judgement.communityStats.highestScoreUpperBound = topScorer.upperBound;
       } else if (topScorer) {
         judgement.communityStats = {
           averageScore: 0,
           highestScore: topScorer.highestScore,
           highestScoreUsername: topScorer.highestScoreUsername,
+          highestScoreLowerBound: topScorer.lowerBound,
+          highestScoreUpperBound: topScorer.upperBound,
         };
       }
     }

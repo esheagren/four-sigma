@@ -8473,6 +8473,45 @@ a.judgement-answer-below:hover .judgement-answer-value {
   overflow: hidden;
 }
 
+.question-leader-bounds {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 0.375rem;
+  font-family: 'SF Mono', 'Monaco', monospace;
+}
+
+/* Question Leaders Slide (new dedicated slide) */
+.question-leaders-slide {
+  background: transparent;
+  padding: 1.5rem;
+  padding-top: calc(60px + 1.5rem); /* Account for navbar */
+}
+
+.question-leaders-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.question-leaders-content .question-leaders-header {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.question-leaders-empty {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.875rem;
+  padding: 2rem;
+}
+
 /* User Stats Slide */
 .user-stats-slide {
   background: transparent;

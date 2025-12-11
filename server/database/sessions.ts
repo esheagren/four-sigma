@@ -134,13 +134,13 @@ export async function updateUserStatsAfterSession(
 
 /**
  * Get top scorers for specific questions answered today
- * Returns the highest score and username for each question
+ * Returns the highest score, username, and their guess bounds for each question
  */
 export async function getQuestionTopScorers(
   questionIds: string[]
-): Promise<Map<string, { highestScore: number; highestScoreUsername: string }>> {
+): Promise<Map<string, { highestScore: number; highestScoreUsername: string; lowerBound: number; upperBound: number }>> {
   const todayStart = getUTCDayStart();
-  const result = new Map<string, { highestScore: number; highestScoreUsername: string }>();
+  const result = new Map<string, { highestScore: number; highestScoreUsername: string; lowerBound: number; upperBound: number }>();
 
   if (questionIds.length === 0) {
     return result;
@@ -152,6 +152,8 @@ export async function getQuestionTopScorers(
     .select(`
       question_id,
       score,
+      lower_bound,
+      upper_bound,
       users!fk_user_responses_user(display_name)
     `)
     .in('question_id', questionIds)
@@ -175,6 +177,8 @@ export async function getQuestionTopScorers(
       result.set(questionId, {
         highestScore: Number(row.score),
         highestScoreUsername: displayName,
+        lowerBound: Number(row.lower_bound),
+        upperBound: Number(row.upper_bound),
       });
     }
   }

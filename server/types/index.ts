@@ -74,6 +74,8 @@ export interface Judgement {
     averageScore: number;
     highestScore: number;
     highestScoreUsername?: string;
+    highestScoreLowerBound?: number;
+    highestScoreUpperBound?: number;
   };
 }
 
