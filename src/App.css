@@ -64,7 +64,7 @@ body {
 .navbar-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 1rem;
   padding-left: max(1rem, env(safe-area-inset-left));
   padding-right: max(1rem, env(safe-area-inset-right));
   display: flex;
