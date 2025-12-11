@@ -21,9 +21,9 @@ export const DailyStatsSlide = forwardRef<HTMLDivElement, DailyStatsSlideProps>(
         <div className="daily-stats-content">
 
         {/* Overall Leaderboard (Top 10 by total points) */}
-        {overallLeaderboard && overallLeaderboard.length > 0 && (
-          <div className="today-leaderboard">
-            <div className="today-leaderboard-header">Overall Leaderboard</div>
+        <div className="today-leaderboard">
+          <div className="today-leaderboard-header">Overall Leaderboard</div>
+          {overallLeaderboard && overallLeaderboard.length > 0 ? (
             <div className="today-leaderboard-list">
               {overallLeaderboard.map((entry) => (
                 <div
@@ -36,8 +36,12 @@ export const DailyStatsSlide = forwardRef<HTMLDivElement, DailyStatsSlideProps>(
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="leaderboard-empty">
+              Play more games to see the leaderboard!
+            </div>
+          )}
+        </div>
 
         {/* Scroll hint */}
         <div className="slide-scroll-hint">

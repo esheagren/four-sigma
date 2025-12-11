@@ -8328,6 +8328,13 @@ a.judgement-answer-below:hover .judgement-answer-value {
   gap: 0.375rem;
 }
 
+.leaderboard-empty {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 2rem;
+  font-size: 0.875rem;
+}
+
 .leaderboard-entry {
   display: flex;
   align-items: center;

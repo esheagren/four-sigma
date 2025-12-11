@@ -564,6 +564,8 @@ export async function getOverallLeaderboard(
     .order('total_score', { ascending: false })
     .limit(10);
 
+  console.log('Overall leaderboard query - data count:', data?.length, 'error:', error);
+
   if (error) {
     console.error('Failed to fetch overall leaderboard:', error);
     return [];
