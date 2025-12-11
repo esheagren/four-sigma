@@ -552,30 +552,83 @@ export async function getCalibrationMilestones(userId: string): Promise<Array<{
 }
 
 /**
- * Get overall leaderboard (top 10 users by total score)
+ * Get overall leaderboard (top 10 users by best single-day score)
+ * Calculates each user's highest daily score across all time
  */
 export async function getOverallLeaderboard(
   currentUserId?: string
 ): Promise<OverallLeaderboardEntry[]> {
-  const { data, error } = await supabase
-    .from('users')
-    .select('id, display_name, total_score, games_played')
-    .gt('games_played', 0)
-    .order('total_score', { ascending: false })
-    .limit(10);
+  // Get all user responses to calculate best daily scores
+  const { data: responses, error } = await supabase
+    .from('user_responses')
+    .select('user_id, score, answered_at');
 
-  console.log('Overall leaderboard query - data count:', data?.length, 'error:', error);
+  console.log('Overall leaderboard query - responses count:', responses?.length, 'error:', error);
 
   if (error) {
     console.error('Failed to fetch overall leaderboard:', error);
     return [];
   }
 
-  return (data || []).map((user, index) => ({
-    rank: index + 1,
-    displayName: user.display_name,
-    totalScore: Math.round(Number(user.total_score)),
-    gamesPlayed: user.games_played,
-    isCurrentUser: currentUserId ? user.id === currentUserId : false,
-  }));
+  if (!responses || responses.length === 0) {
+    return [];
+  }
+
+  // Group responses by user and date, sum scores for each day
+  const userDailyScores: Map<string, Map<string, number>> = new Map();
+
+  for (const response of responses) {
+    const userId = response.user_id;
+    const date = response.answered_at.split('T')[0]; // Get YYYY-MM-DD
+    const score = Number(response.score);
+
+    if (!userDailyScores.has(userId)) {
+      userDailyScores.set(userId, new Map());
+    }
+    const userDays = userDailyScores.get(userId)!;
+    userDays.set(date, (userDays.get(date) || 0) + score);
+  }
+
+  // Find best single-day score for each user
+  const userBestDayScores: Array<{ userId: string; bestDayScore: number }> = [];
+
+  for (const [userId, dailyScores] of userDailyScores) {
+    const bestDayScore = Math.max(...dailyScores.values());
+    userBestDayScores.push({ userId, bestDayScore });
+  }
+
+  // Sort by best day score descending
+  userBestDayScores.sort((a, b) => b.bestDayScore - a.bestDayScore);
+
+  // Get top 10
+  const top10 = userBestDayScores.slice(0, 10);
+
+  if (top10.length === 0) {
+    return [];
+  }
+
+  // Fetch display names for top 10 users
+  const top10UserIds = top10.map(u => u.userId);
+  const { data: users, error: usersError } = await supabase
+    .from('users')
+    .select('id, display_name, games_played')
+    .in('id', top10UserIds);
+
+  if (usersError) {
+    console.error('Failed to fetch user names for leaderboard:', usersError);
+    return [];
+  }
+
+  const userMap = new Map(users?.map(u => [u.id, u]) || []);
+
+  return top10.map((entry, index) => {
+    const user = userMap.get(entry.userId);
+    return {
+      rank: index + 1,
+      displayName: user?.display_name || 'Anonymous',
+      totalScore: Math.round(entry.bestDayScore),
+      gamesPlayed: user?.games_played || 0,
+      isCurrentUser: currentUserId ? entry.userId === currentUserId : false,
+    };
+  });
 }

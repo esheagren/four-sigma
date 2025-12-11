@@ -5,6 +5,7 @@ import { UserStatsSlide } from './UserStatsSlide';
 import { ScoreOrbSlide } from './ScoreOrbSlide';
 import { QuestionLeadersSlide } from './QuestionLeadersSlide';
 import { ShareScoreCard, type ShareScoreCardRef } from './ShareScoreCard';
+import { generateOrbWebm } from '../../lib/orbVideo';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../context/PostHogContext';
 
@@ -177,6 +178,37 @@ export function ResultsCarousel({
     setIsSharing(true);
 
     try {
+      // Prefer an animated share asset when supported (falls back to PNG below)
+      try {
+        const videoBlob = await generateOrbWebm({ score });
+        if (videoBlob) {
+          const videoFile = new File([videoBlob], '4sigma-orb.webm', { type: videoBlob.type || 'video/webm' });
+          const shareData = { files: [videoFile] };
+
+          if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+            await navigator.share(shareData);
+            capture('score_shared', { score, shareMethod: 'native_share_video', hits, total, calibration, percentile });
+            return;
+          }
+
+          // If native share isn't available/compatible, download the video as the best animated fallback.
+          const url = URL.createObjectURL(videoBlob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = '4sigma-orb.webm';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+
+          capture('score_shared', { score, shareMethod: 'download_video', hits, total, calibration, percentile });
+          return;
+        }
+      } catch (e) {
+        // If video generation fails, proceed with the existing PNG pipeline
+        console.warn('Animated share generation failed, falling back to PNG:', e);
+      }
+
       const blob = await shareCardRef.current.generateImage();
       if (!blob) {
         throw new Error('Failed to generate image');
