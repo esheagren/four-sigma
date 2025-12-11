@@ -99,7 +99,7 @@ export function ResultsCarousel({
       const scrollTop = container.scrollTop;
       const slideHeight = window.innerHeight;
       // Progress: 0 at top, 1 when scrolled one full slide
-      const progress = Math.min(scrollTop / (slideHeight * 0.7), 1);
+      const progress = Math.min(scrollTop / slideHeight, 1);
       setScrollProgress(progress);
       // Notify parent of scroll progress for orb positioning
       onScroll?.(progress);

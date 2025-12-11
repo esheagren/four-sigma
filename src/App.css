@@ -8177,7 +8177,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   position: fixed;
   left: 50%;
   z-index: 100;
-  transition: top 0.15s ease-out, transform 0.15s ease-out;
+  /* No transition - orb follows scroll position directly for fluid motion */
   transform-origin: center center;
   pointer-events: auto;
 }
