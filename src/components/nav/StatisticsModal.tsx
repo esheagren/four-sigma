@@ -13,7 +13,7 @@ export function StatisticsModal({ isOpen, onClose }: StatisticsModalProps) {
   const stats = [
     { label: 'Games Played', value: user?.gamesPlayed ?? 0 },
     { label: 'Average Score', value: Math.round(user?.averageScore ?? 0).toLocaleString() },
-    { label: 'Best Score', value: (user?.bestSingleScore ?? 0).toLocaleString() },
+    { label: 'Best Score', value: Math.round(user?.bestSingleScore ?? 0).toLocaleString() },
     { label: 'Calibration Rate', value: `${Math.round((user?.calibrationRate ?? 0) * 100)}%` },
   ];
 
