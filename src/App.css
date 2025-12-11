@@ -8509,6 +8509,10 @@ a.judgement-answer-below:hover .judgement-answer-value {
   line-height: 1.2;
 }
 
+.user-stat-value-small {
+  font-size: 1rem;
+}
+
 .user-stat-label {
   font-size: 0.65rem;
   color: rgba(255, 255, 255, 0.5);

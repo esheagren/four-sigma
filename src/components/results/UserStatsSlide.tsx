@@ -318,15 +318,15 @@ export const UserStatsSlide = forwardRef<HTMLDivElement, UserStatsSlideProps>(({
                 <div className="user-stat-label">Games</div>
               </div>
               <div className="user-stat-item">
-                <div className="user-stat-value">{Math.round(userStats.averageScore)}</div>
+                <div className="user-stat-value user-stat-value-small">{Math.round(userStats.averageScore)}</div>
                 <div className="user-stat-label">Avg Score</div>
               </div>
               <div className="user-stat-item">
-                <div className="user-stat-value">{Math.round(userStats.bestSingleScore).toLocaleString()}</div>
+                <div className="user-stat-value user-stat-value-small">{Math.round(userStats.bestSingleScore).toLocaleString()}</div>
                 <div className="user-stat-label">Best Score</div>
               </div>
               <div className="user-stat-item">
-                <div className="user-stat-value">{userStats.currentStreak}</div>
+                <div className="user-stat-value user-stat-value-small">{userStats.currentStreak}</div>
                 <div className="user-stat-label">Streak</div>
               </div>
             </div>
