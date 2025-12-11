@@ -2254,6 +2254,15 @@ a.judgement-answer-below:hover .judgement-answer-value {
   padding: 3rem;
 }
 
+/* Scale wrapper - handles growing effect, contains both orb and score */
+.loading-orb-scale-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Spin wrapper - handles the rotation */
 .loading-orb {
   width: 120px;
   height: 120px;
@@ -2284,8 +2293,19 @@ a.judgement-answer-below:hover .judgement-answer-value {
   transition: transform 500ms ease-out, opacity 500ms ease-out;
 }
 
-.loading-orb.bursting {
-  animation: none;
+/* Score display - positioned in center of scale wrapper (outside spinning orb) */
+.loading-orb-score {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.75rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: white;
+  text-shadow: 0 0 20px var(--primary), 0 0 40px rgba(99, 91, 255, 0.6);
+  z-index: 10;
+  white-space: nowrap;
 }
 
 .error p {
@@ -8107,6 +8127,62 @@ a.judgement-answer-below:hover .judgement-answer-value {
   padding: 0;
   border-radius: 50%;
   box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+/* Score Orb Slide */
+.score-orb-slide {
+  background: transparent;
+  padding: 1.5rem;
+  padding-top: calc(60px + 1.5rem); /* Account for navbar */
+}
+
+.score-orb-slide .slide-body {
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.score-orb-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.score-orb-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.score-orb-hits {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.score-orb-share-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.score-orb-share-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.score-orb-share-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Daily Stats Slide */

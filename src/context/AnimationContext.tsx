@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
-type AnimationPhaseName = 'idle' | 'fadeOut' | 'showOrb' | 'burst' | 'reveal';
+type AnimationPhaseName = 'idle' | 'fadeOut' | 'showOrb' | 'scoreReveal' | 'reveal';
 
 interface AnimationContextType {
   animationPhase: AnimationPhaseName;
@@ -22,7 +22,7 @@ export function useAnimation() {
 const PHASE_DURATIONS = {
   fadeOut: 300,
   showOrb: 1000,
-  burst: 500,
+  scoreReveal: 2500, // matches tick-up duration in LoadingOrb
   reveal: 400,
 };
 
@@ -49,18 +49,18 @@ export function AnimationProvider({ children }: AnimationProviderProps) {
     setAnimationPhase('showOrb');
     await wait(PHASE_DURATIONS.showOrb);
 
-    // Phase 3: Burst (500ms) - Particles scatter outward
-    setAnimationPhase('burst');
-    await wait(PHASE_DURATIONS.burst);
+    // Phase 3: Score Reveal (1750ms) - Score ticks up inside orb
+    setAnimationPhase('scoreReveal');
+    await wait(PHASE_DURATIONS.scoreReveal);
 
-    // Phase 4: Reveal (400ms) - Results appear
+    // Phase 4: Reveal (400ms) - Results carousel appears below orb
     setAnimationPhase('reveal');
     await wait(PHASE_DURATIONS.reveal);
 
     // Return to idle
     setAnimationPhase('idle');
 
-    // Total time: 300 + 1000 + 500 + 400 = 2200ms
+    // Total time: 300 + 1000 + 2500 + 400 = 4200ms
   }, []);
 
   const value: AnimationContextType = {

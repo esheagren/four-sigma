@@ -2,6 +2,7 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import { QuestionSlide } from './QuestionSlide';
 import { DailyStatsSlide } from './DailyStatsSlide';
 import { UserStatsSlide } from './UserStatsSlide';
+import { ScoreOrbSlide } from './ScoreOrbSlide';
 import { ShareScoreCard, type ShareScoreCardRef } from './ShareScoreCard';
 import { BackgroundAnimation } from '../BackgroundAnimation';
 import { useAuth } from '../../context/AuthContext';
@@ -91,7 +92,8 @@ export function ResultsCarousel({
   const safeJudgements = judgements ?? [];
   const hits = safeJudgements.filter(j => j.hit).length;
   const total = safeJudgements.length;
-  const totalSlides = safeJudgements.length + 2;
+  // +3 for ScoreOrbSlide, DailyStatsSlide, UserStatsSlide
+  const totalSlides = safeJudgements.length + 3;
 
   // Track which slide is currently visible
   useEffect(() => {
@@ -220,18 +222,26 @@ export function ResultsCarousel({
 
         {/* Scroll snap container */}
         <div className="tiktok-scroll-container" ref={scrollContainerRef}>
+          {/* Score Orb Slide (Top - Total Score) */}
+          <ScoreOrbSlide
+            ref={setSlideRef(0)}
+            totalScore={score}
+            onShare={handleShare}
+            isSharing={isSharing}
+          />
+
           {/* Individual question slides */}
           {safeJudgements.map((judgement, index) => (
             <QuestionSlide
               key={judgement.questionId}
-              ref={setSlideRef(index)}
+              ref={setSlideRef(index + 1)}
               {...judgement}
             />
           ))}
 
           {/* Daily Stats Slide (Session Complete) */}
           <DailyStatsSlide
-            ref={setSlideRef(safeJudgements.length)}
+            ref={setSlideRef(safeJudgements.length + 1)}
             totalScore={score}
             hits={hits}
             total={total}
@@ -243,7 +253,7 @@ export function ResultsCarousel({
 
           {/* User Stats Slide (Long-term stats) */}
           <UserStatsSlide
-            ref={setSlideRef(safeJudgements.length + 1)}
+            ref={setSlideRef(safeJudgements.length + 2)}
             calibration={calibration}
             performanceHistory={performanceHistory}
             calibrationMilestones={calibrationMilestones}
