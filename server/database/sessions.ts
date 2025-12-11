@@ -600,8 +600,8 @@ export async function getOverallLeaderboard(
   // Sort by best day score descending
   userBestDayScores.sort((a, b) => b.bestDayScore - a.bestDayScore);
 
-  // Get top 10
-  const top10 = userBestDayScores.slice(0, 10);
+  // Get top 5
+  const top10 = userBestDayScores.slice(0, 5);
 
   if (top10.length === 0) {
     return [];
