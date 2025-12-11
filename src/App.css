@@ -49,16 +49,81 @@ body {
 
 /* Navigation Bar */
 .navbar {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   z-index: 100;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 4px 30px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
   width: 100%;
   /* iOS safe area support */
   padding-top: env(safe-area-inset-top);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Aurora flame effect from left side */
+.navbar::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -10%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(99, 91, 255, 0.08) 20%,
+    rgba(139, 92, 246, 0.06) 40%,
+    rgba(168, 85, 247, 0.04) 60%,
+    transparent 80%
+  );
+  filter: blur(20px);
+  animation: aurora-flow 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.navbar::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: -5%;
+  width: 30%;
+  height: 160%;
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    rgba(59, 130, 246, 0.06) 30%,
+    rgba(99, 91, 255, 0.05) 50%,
+    rgba(147, 51, 234, 0.03) 70%,
+    transparent 100%
+  );
+  filter: blur(15px);
+  animation: aurora-flow 12s ease-in-out infinite reverse;
+  animation-delay: -4s;
+  pointer-events: none;
+}
+
+@keyframes aurora-flow {
+  0%, 100% {
+    transform: translateX(-5%) translateY(0%) rotate(-5deg);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translateX(5%) translateY(-10%) rotate(0deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateX(10%) translateY(5%) rotate(5deg);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translateX(0%) translateY(-5%) rotate(-2deg);
+    opacity: 0.7;
+  }
 }
 
 .navbar-container {
