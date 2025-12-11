@@ -67,6 +67,7 @@ interface ResultsProps {
   calibrationMilestones?: CalibrationMilestone[];
   totalParticipants?: number;
   todayLeaderboard?: TodayLeaderboardEntry[];
+  onScroll?: (progress: number) => void;
 }
 
 export function Results({
@@ -79,6 +80,7 @@ export function Results({
   totalParticipants,
   topScoreGlobal,
   todayLeaderboard,
+  onScroll,
 }: ResultsProps) {
   return (
     <ResultsCarousel
@@ -91,6 +93,7 @@ export function Results({
       performanceHistory={performanceHistory}
       calibrationMilestones={calibrationMilestones}
       todayLeaderboard={todayLeaderboard}
+      onScroll={onScroll}
     />
   );
 }

@@ -66,6 +66,7 @@ interface ResultsCarouselProps {
   performanceHistory?: PerformanceHistoryEntry[];
   calibrationMilestones?: CalibrationMilestone[];
   todayLeaderboard?: TodayLeaderboardEntry[];
+  onScroll?: (progress: number) => void;
 }
 
 export function ResultsCarousel({
@@ -78,6 +79,7 @@ export function ResultsCarousel({
   performanceHistory,
   calibrationMilestones,
   todayLeaderboard,
+  onScroll,
 }: ResultsCarouselProps) {
   const { user } = useAuth();
   const { capture } = useAnalytics();
@@ -99,11 +101,13 @@ export function ResultsCarousel({
       // Progress: 0 at top, 1 when scrolled one full slide
       const progress = Math.min(scrollTop / (slideHeight * 0.7), 1);
       setScrollProgress(progress);
+      // Notify parent of scroll progress for orb positioning
+      onScroll?.(progress);
     };
 
     container.addEventListener('scroll', handleScroll, { passive: true });
     return () => container.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [onScroll]);
 
   // Defensive check: ensure judgements is always an array
   const safeJudgements = judgements ?? [];
@@ -236,12 +240,9 @@ export function ResultsCarousel({
 
         {/* Scroll snap container */}
         <div className="tiktok-scroll-container" ref={scrollContainerRef}>
-          {/* Score Orb Slide (Top - Total Score) */}
+          {/* Score Orb Slide - spacer for scroll snap (orb rendered by Game.tsx) */}
           <ScoreOrbSlide
             ref={setSlideRef(0)}
-            totalScore={score}
-            onShare={handleShare}
-            isSharing={isSharing}
             scrollProgress={scrollProgress}
           />
 

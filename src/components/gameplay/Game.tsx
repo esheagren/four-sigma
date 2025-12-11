@@ -81,6 +81,7 @@ export function Game() {
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<FinalizeResponse | null>(null);
   const [isFinalizingSession, setIsFinalizingSession] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   // Track response time for each question
   const questionStartTime = useRef<number>(Date.now());
@@ -90,10 +91,39 @@ export function Game() {
   const isRevealing = animationPhase === 'reveal';
   // Hide question card once we start finalizing (prevents flicker if API is slower than animation)
   const showQuestionCard = !results && !isFinalizingSession && (animationPhase === 'idle' || isFadingOut);
-  // Show orb during transition phases, but hide once results are revealed (ScoreOrbSlide takes over)
-  const showOrb = ['showOrb', 'scoreReveal'].includes(animationPhase);
-  const showScoreInOrb = animationPhase === 'scoreReveal';
+  // Single orb: show during animation phases AND after results exist (scroll controls position)
+  const showOrb = results
+    ? true  // Always show orb once we have results
+    : ['showOrb', 'scoreReveal'].includes(animationPhase);
+  const showScoreInOrb = animationPhase === 'scoreReveal' || (results && animationPhase === 'idle');
   const showResults = results && ['reveal', 'idle'].includes(animationPhase);
+
+  // Handle scroll progress from Results carousel
+  const handleResultsScroll = (progress: number) => {
+    setScrollProgress(progress);
+  };
+
+  // Compute orb position/scale based on animation phase and scroll progress
+  const getOrbStyle = () => {
+    // During animation phases (not yet idle with results), orb is centered
+    if (!results || animationPhase !== 'idle') {
+      return {
+        top: '50%',
+        transform: 'translateX(-50%) translateY(-50%)',
+      };
+    }
+    // After reveal (idle with results), scroll controls position
+    // Scale: 1.0 at progress=0, 0.35 at progress=1
+    const scale = 1 - (scrollProgress * 0.65);
+    // Top: 50% (centered) at progress=0, 10% (near top) at progress=1
+    const topPercent = 50 - (scrollProgress * 40);
+    return {
+      top: `${topPercent}%`,
+      transform: `translateX(-50%) translateY(-50%) scale(${scale})`,
+    };
+  };
+
+  const orbStyle = getOrbStyle();
 
   // Helper to get auth headers
   const getHeaders = (): HeadersInit => {
@@ -323,13 +353,15 @@ export function Game() {
         </div>
       )}
 
-      {/* Loading Orb during transition with score reveal */}
+      {/* Single orb - positioned based on animation phase and scroll progress */}
       {showOrb && (
-        <LoadingOrb
-          score={results?.score}
-          showScore={showScoreInOrb}
-          animateScore={showScoreInOrb}
-        />
+        <div className="game-orb-container" style={orbStyle}>
+          <LoadingOrb
+            score={results?.score}
+            showScore={showScoreInOrb}
+            animateScore={animationPhase === 'scoreReveal'}
+          />
+        </div>
       )}
 
       {/* Results with reveal animation */}
@@ -347,6 +379,7 @@ export function Game() {
             calibrationMilestones={calibrationMilestones}
             totalParticipants={dailyStats?.totalParticipantsToday ?? undefined}
             todayLeaderboard={dailyStats?.todayLeaderboard}
+            onScroll={handleResultsScroll}
           />
         </div>
       )}

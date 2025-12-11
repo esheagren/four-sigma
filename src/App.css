@@ -6692,8 +6692,8 @@ a.judgement-answer-below:hover .judgement-answer-value {
   /* Subtle background to prevent slider line from cutting through text */
   background: radial-gradient(
     ellipse 100% 100% at center,
-    rgba(30, 30, 50, 0.4) 0%,
-    rgba(30, 30, 50, 0.2) 60%,
+    rgba(30, 30, 50, 0.25) 0%,
+    rgba(30, 30, 50, 0.12) 60%,
     transparent 100%
   );
   padding: 4px 12px;
@@ -8165,24 +8165,24 @@ a.judgement-answer-below:hover .judgement-answer-value {
   box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
 }
 
-/* Score Orb Slide */
+/* Score Orb Slide - spacer for scroll snap (orb rendered by Game.tsx) */
 .score-orb-slide {
   background: transparent;
   padding: 0;
   overflow: visible;
 }
 
-/* Fixed orb that smoothly moves from center to top as user scrolls */
-.score-orb-fixed {
+/* Game orb container - single orb controlled by Game.tsx */
+.game-orb-container {
   position: fixed;
   left: 50%;
   z-index: 100;
-  transition: top 0.1s ease-out, transform 0.1s ease-out;
+  transition: top 0.15s ease-out, transform 0.15s ease-out;
   transform-origin: center center;
   pointer-events: auto;
 }
 
-.score-orb-fixed .loading-orb-container {
+.game-orb-container .loading-orb-container {
   position: relative;
   pointer-events: auto;
 }
