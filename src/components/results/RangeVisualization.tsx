@@ -74,14 +74,14 @@ export function RangeVisualization({
 
   return (
     <div className="range-viz">
-      {/* Score Badge - top */}
-      <div className={`range-score-badge ${hit ? 'hit' : 'miss'}`}>
-        {hit ? '+' : ''}{Math.round(score)} pts
-      </div>
-
-      {/* Answer Label - below score */}
-      <div className="range-answer-label">
-        {formatNumber(trueValue)}{unit && ` ${unit}`}
+      {/* Header row: Answer on left, Score on right */}
+      <div className="range-header-row">
+        <div className="range-answer-label">
+          {formatNumber(trueValue)}{unit && ` ${unit}`}
+        </div>
+        <div className={`range-score-badge ${hit ? 'hit' : 'miss'}`}>
+          {hit ? '+' : ''}{Math.round(score)} pts
+        </div>
       </div>
 
       {/* Range Track */}
