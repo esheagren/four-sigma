@@ -4,7 +4,6 @@ import { DailyStatsSlide } from './DailyStatsSlide';
 import { UserStatsSlide } from './UserStatsSlide';
 import { ScoreOrbSlide } from './ScoreOrbSlide';
 import { ShareScoreCard, type ShareScoreCardRef } from './ShareScoreCard';
-import { LoadingOrb } from '../gameplay/LoadingOrb';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../context/PostHogContext';
 
@@ -210,10 +209,6 @@ export function ResultsCarousel({
     }
   };
 
-  // Show mini orb when scrolled past first slide (scrollProgress >= 1)
-  const showMiniOrb = scrollProgress >= 1;
-  const miniOrbScale = 0.35;
-
   return (
     <div className="tiktok-results">
       {/* Hidden share card for image generation */}
@@ -226,20 +221,6 @@ export function ResultsCarousel({
         calibration={calibration}
         percentile={percentile}
       />
-
-      {/* Fixed mini orb - shows when scrolled past first slide */}
-      {showMiniOrb && (
-        <div className="mini-orb-fixed">
-          <div style={{ transform: `scale(${miniOrbScale})` }}>
-            <LoadingOrb
-              score={score}
-              showScore={true}
-              onScoreClick={handleShare}
-              isClickable={!isSharing}
-            />
-          </div>
-        </div>
-      )}
 
       {/* Flex layout: dots on left, content on right */}
       <div className="results-layout">

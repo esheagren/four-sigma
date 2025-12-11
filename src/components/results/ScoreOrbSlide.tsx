@@ -16,24 +16,27 @@ export const ScoreOrbSlide = forwardRef<HTMLDivElement, ScoreOrbSlideProps>(({
 }, ref) => {
   // Calculate scale: 1.0 at progress=0, 0.35 at progress=1
   const scale = 1 - (scrollProgress * 0.65);
+  // Calculate vertical position: centered (50%) → near top (10%) as scroll progresses
+  const topPosition = 50 - (scrollProgress * 40);
   // Fade out scroll hint as we scroll
   const hintOpacity = 1 - scrollProgress;
 
   return (
     <div className="tiktok-slide score-orb-slide" ref={ref}>
-      {/* Orb container - centered when at full size */}
-      <div className="score-orb-centered-container">
-        <div
-          className="score-orb-content"
-          style={{ transform: `scale(${scale})` }}
-        >
-          <LoadingOrb
-            score={totalScore}
-            showScore={true}
-            onScoreClick={onShare}
-            isClickable={!isSharing}
-          />
-        </div>
+      {/* Fixed orb that moves from center to top as user scrolls */}
+      <div
+        className="score-orb-fixed"
+        style={{
+          top: `${topPosition}%`,
+          transform: `translateX(-50%) translateY(-50%) scale(${scale})`,
+        }}
+      >
+        <LoadingOrb
+          score={totalScore}
+          showScore={true}
+          onScoreClick={onShare}
+          isClickable={!isSharing}
+        />
       </div>
       {/* Scroll hint - fades as user scrolls */}
       <div className="slide-scroll-hint" style={{ opacity: hintOpacity }}>
