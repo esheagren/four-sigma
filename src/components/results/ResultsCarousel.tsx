@@ -43,6 +43,12 @@ interface PerformanceHistoryEntry {
   calibration: number;
 }
 
+interface CalibrationMilestone {
+  date: string;
+  label: string;
+  calibration: number;
+}
+
 interface TodayLeaderboardEntry {
   rank: number;
   username: string;
@@ -58,6 +64,7 @@ interface ResultsCarouselProps {
   totalParticipants?: number;
   topScoreToday?: number;
   performanceHistory?: PerformanceHistoryEntry[];
+  calibrationMilestones?: CalibrationMilestone[];
   todayLeaderboard?: TodayLeaderboardEntry[];
 }
 
@@ -69,6 +76,7 @@ export function ResultsCarousel({
   totalParticipants,
   topScoreToday,
   performanceHistory,
+  calibrationMilestones,
   todayLeaderboard,
 }: ResultsCarouselProps) {
   const { user } = useAuth();
@@ -79,9 +87,11 @@ export function ResultsCarousel({
   const [isSharing, setIsSharing] = useState(false);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
-  const hits = judgements.filter(j => j.hit).length;
-  const total = judgements.length;
-  const totalSlides = judgements.length + 2;
+  // Defensive check: ensure judgements is always an array
+  const safeJudgements = judgements ?? [];
+  const hits = safeJudgements.filter(j => j.hit).length;
+  const total = safeJudgements.length;
+  const totalSlides = safeJudgements.length + 2;
 
   // Track which slide is currently visible
   useEffect(() => {
@@ -104,7 +114,7 @@ export function ResultsCarousel({
     });
 
     return () => observer.disconnect();
-  }, [judgements.length]);
+  }, [safeJudgements.length]);
 
   const setSlideRef = useCallback((index: number) => (el: HTMLDivElement | null) => {
     slideRefs.current[index] = el;
@@ -116,7 +126,7 @@ export function ResultsCarousel({
     : undefined;
 
   // Extract question high scores
-  const questionHighScores = judgements.map(j => ({
+  const questionHighScores = safeJudgements.map(j => ({
     questionId: j.questionId,
     prompt: j.prompt,
     highestScore: j.communityStats?.highestScore ?? 0,
@@ -211,7 +221,7 @@ export function ResultsCarousel({
         {/* Scroll snap container */}
         <div className="tiktok-scroll-container" ref={scrollContainerRef}>
           {/* Individual question slides */}
-          {judgements.map((judgement, index) => (
+          {safeJudgements.map((judgement, index) => (
             <QuestionSlide
               key={judgement.questionId}
               ref={setSlideRef(index)}
@@ -221,7 +231,7 @@ export function ResultsCarousel({
 
           {/* Daily Stats Slide (Session Complete) */}
           <DailyStatsSlide
-            ref={setSlideRef(judgements.length)}
+            ref={setSlideRef(safeJudgements.length)}
             totalScore={score}
             hits={hits}
             total={total}
@@ -233,9 +243,10 @@ export function ResultsCarousel({
 
           {/* User Stats Slide (Long-term stats) */}
           <UserStatsSlide
-            ref={setSlideRef(judgements.length + 1)}
+            ref={setSlideRef(safeJudgements.length + 1)}
             calibration={calibration}
             performanceHistory={performanceHistory}
+            calibrationMilestones={calibrationMilestones}
             userStats={user ? {
               gamesPlayed: user.gamesPlayed,
               averageScore: user.averageScore,

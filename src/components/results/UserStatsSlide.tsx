@@ -152,7 +152,7 @@ function CalibrationHistoryChart({ milestones }: { milestones: CalibrationMilest
   );
 }
 
-function CalibrationSection({ calibration, performanceHistory }: { calibration: number; performanceHistory: PerformanceHistoryEntry[] }) {
+function CalibrationSection({ calibration, calibrationMilestones }: { calibration: number; calibrationMilestones: CalibrationMilestone[] }) {
   const [showInfo, setShowInfo] = useState(false);
 
   return (
@@ -173,7 +173,7 @@ function CalibrationSection({ calibration, performanceHistory }: { calibration: 
           <span className="calibration-section-label">Current</span>
         </div>
         <div className="calibration-right">
-          <CalibrationHistoryChart history={performanceHistory} />
+          <CalibrationHistoryChart milestones={calibrationMilestones} />
         </div>
       </div>
 
@@ -295,6 +295,7 @@ function ScoreHistoryChart({ history }: { history: PerformanceHistoryEntry[] }) 
 export const UserStatsSlide = forwardRef<HTMLDivElement, UserStatsSlideProps>(({
   calibration,
   performanceHistory = [],
+  calibrationMilestones = [],
   userStats,
 }, ref) => {
   return (
@@ -309,7 +310,7 @@ export const UserStatsSlide = forwardRef<HTMLDivElement, UserStatsSlideProps>(({
         </div>
 
         {/* Calibration Section */}
-        <CalibrationSection calibration={calibration} performanceHistory={performanceHistory} />
+        <CalibrationSection calibration={calibration} calibrationMilestones={calibrationMilestones} />
 
         {/* Statistics Grid */}
         {userStats && (

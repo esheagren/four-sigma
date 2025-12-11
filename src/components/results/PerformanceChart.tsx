@@ -11,7 +11,7 @@ interface PerformanceChartProps {
 
 export function PerformanceChart({ performanceHistory }: PerformanceChartProps) {
   // Mock data for demonstration - will be replaced with real data from backend
-  const historyData = performanceHistory || [
+  const defaultData = [
     { day: 'M', userScore: 45, avgScore: 38, calibration: 67 },
     { day: 'T', userScore: 62, avgScore: 52, calibration: 71 },
     { day: 'W', userScore: 58, avgScore: 49, calibration: 75 },
@@ -20,6 +20,11 @@ export function PerformanceChart({ performanceHistory }: PerformanceChartProps) 
     { day: 'S', userScore: 68, avgScore: 51, calibration: 85 },
     { day: 'Su', userScore: 75, avgScore: 54, calibration: 88 },
   ];
+
+  // Use provided data if it has at least 2 points, otherwise use default
+  const historyData = (performanceHistory && performanceHistory.length >= 2)
+    ? performanceHistory
+    : defaultData;
 
   // Calculate chart dimensions
   const maxScore = Math.max(
