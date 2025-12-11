@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import './BackgroundAnimation.css'
 
 interface GradientBlob {
+  baseX: number
   x: number
   y: number
   baseY: number // Starting Y position (bottom of screen)
@@ -12,13 +13,21 @@ interface GradientBlob {
   lightness: number
   phase: number
   speed: number
+  driftSpeed: number
+  noiseSeedA: number
+  noiseSeedB: number
+}
+
+function clamp01(value: number) {
+  return Math.max(0, Math.min(1, value))
 }
 
 export function BackgroundAnimation() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const blobsRef = useRef<GradientBlob[]>([])
   const animationFrameRef = useRef<number>()
-  const timeRef = useRef(0)
+  const timeRef = useRef(0) // seconds
+  const lastTsRef = useRef<number | null>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -28,7 +37,7 @@ export function BackgroundAnimation() {
     if (!ctx) return
 
     // Initialize gradient blobs rising from bottom
-    const initElements = () => {
+    const initElements = (width: number, height: number) => {
       const blobs: GradientBlob[] = []
       const blobCount = 10 // More blobs for richer effect
 
@@ -51,18 +60,24 @@ export function BackgroundAnimation() {
         let hue = hueRange.min + Math.random() * (hueRange.max - hueRange.min)
         if (hue >= 360) hue -= 360
 
-        const x = Math.random() * canvas.width
+        const baseX = Math.random() * width
+        const baseY = height + 120 + Math.random() * 140
         blobs.push({
-          x,
-          baseY: canvas.height + 100 + Math.random() * 100, // Start further below screen
-          y: canvas.height + 100 + Math.random() * 100,
+          baseX,
+          x: baseX,
+          baseY, // Start further below screen
+          y: baseY,
           floatOffset: 50 + Math.random() * 150, // Stay concentrated at bottom
           radius: 180 + Math.random() * 280,
           hue,
           saturation: 70 + Math.random() * 25, // Higher saturation for electric colors
           lightness: 55 + Math.random() * 15,  // Brighter
           phase: Math.random() * Math.PI * 2,
-          speed: 0.0004 + Math.random() * 0.0004,
+          // Speed in "time units" per second for smooth deterministic motion
+          speed: 0.12 + Math.random() * 0.18,
+          driftSpeed: (Math.random() < 0.5 ? -1 : 1) * (2 + Math.random() * 6), // px/s
+          noiseSeedA: Math.random() * Math.PI * 2,
+          noiseSeedB: Math.random() * Math.PI * 2,
         })
       }
 
@@ -71,55 +86,79 @@ export function BackgroundAnimation() {
 
     // Set canvas size
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-      initElements()
+      const width = window.innerWidth
+      const height = window.innerHeight
+      const dpr = window.devicePixelRatio || 1
+
+      // Render in device pixels for smoother gradients (esp. on Retina)
+      canvas.width = Math.max(1, Math.floor(width * dpr))
+      canvas.height = Math.max(1, Math.floor(height * dpr))
+
+      // Draw using CSS pixel coordinates
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+      initElements(width, height)
     }
 
     resizeCanvas()
     window.addEventListener('resize', resizeCanvas)
 
     // Animation loop - dark top with warm pastel glow rising from bottom
-    const animate = () => {
-      timeRef.current += 1
+    const animate = (ts: number) => {
+      if (lastTsRef.current == null) lastTsRef.current = ts
+      const dt = Math.min(0.05, (ts - lastTsRef.current) / 1000) // cap dt to avoid jumps
+      lastTsRef.current = ts
+      timeRef.current += dt
+      const t = timeRef.current
+      const width = window.innerWidth
+      const height = window.innerHeight
 
       // Dark gradient - very dark purple at top, color only at very bottom
-      const baseGradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
+      const baseGradient = ctx.createLinearGradient(0, 0, 0, height)
       baseGradient.addColorStop(0, '#05000a')    // Almost black with purple tint
       baseGradient.addColorStop(0.6, '#05000a')  // Stay dark much longer
       baseGradient.addColorStop(0.8, '#0a0012')  // Very dark purple
       baseGradient.addColorStop(0.9, '#0f0a1a')  // Dark purple
       baseGradient.addColorStop(1, '#150f22')    // Slightly lighter purple at bottom
       ctx.fillStyle = baseGradient
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.fillRect(0, 0, width, height)
 
       // Apply blur for smooth, dreamy blending
       ctx.filter = 'blur(120px)'
+      ctx.globalCompositeOperation = 'screen'
 
-      // Update and draw blobs rising from bottom
+      // Update and draw blobs (smooth deterministic motion to avoid "static" flicker)
       blobsRef.current.forEach((blob, index) => {
-        const time = timeRef.current * blob.speed + blob.phase
+        const time = t * blob.speed + blob.phase
 
-        // Subtle floating motion - stay near bottom
-        const floatY = Math.sin(time * 1.2) * blob.floatOffset * 0.25 +
-                       Math.sin(time * 0.7 + index) * 15
-        const floatX = Math.sin(time * 0.8 + blob.phase) * 80 +
-                       Math.cos(time * 0.5 + index * 0.5) * 50
+        // Smooth "flame lick" lift (more motion near bottom, softer above)
+        const lick = 0.55 + 0.45 * Math.sin(time * 1.1 + blob.noiseSeedA)
+        const lick2 = 0.5 + 0.5 * Math.sin(time * 2.2 + blob.noiseSeedB + index * 0.7)
+        const liftFactor = clamp01(0.25 + 0.75 * (0.6 * lick + 0.4 * lick2))
+        const lift = blob.floatOffset * liftFactor
 
-        // Dynamic shimmer/wobble effect
-        const shimmerX = (Math.random() - 0.5) * 4
-        const shimmerY = (Math.random() - 0.5) * 4
+        // Gentle lateral waviness (no per-frame randomness)
+        const waveX =
+          Math.sin(time * 0.7 + blob.phase) * 70 +
+          Math.sin(time * 1.3 + index * 0.9) * 30
 
-        // Position blob - anchored at bottom, more active float
-        blob.y = blob.baseY - blob.floatOffset + floatY + shimmerY
-        blob.x += shimmerX * 0.5 + floatX * 0.002
+        // Slow drift + wave, wrapped across screen (prevents accumulation jitter)
+        const drift = blob.driftSpeed * t
+        let x = blob.baseX + drift + waveX
+        x = ((x % (width + blob.radius * 2)) + (width + blob.radius * 2)) % (width + blob.radius * 2)
+        x -= blob.radius
 
-        // Keep blob within horizontal bounds
-        if (blob.x < -blob.radius) blob.x = canvas.width + blob.radius
-        if (blob.x > canvas.width + blob.radius) blob.x = -blob.radius
+        // Vertical: anchored below bottom, lift up with smooth licks + subtle turbulence
+        const turbY =
+          Math.sin(time * 1.6 + index * 1.3) * 10 +
+          Math.sin(time * 3.1 + blob.phase) * 6
+        const y = blob.baseY - lift + turbY
+
+        blob.x = x
+        blob.y = y
 
         // Gentle pulsing for lifelike feel
-        const pulse = 1 + Math.sin(time * 1.5) * 0.12 + Math.sin(time * 2.3 + index) * 0.08
+        const pulse = 1 + Math.sin(time * 1.4) * 0.12 + Math.sin(time * 2.2 + index) * 0.08
         const currentRadius = blob.radius * pulse
 
         // Create radial gradient for blob
@@ -132,8 +171,8 @@ export function BackgroundAnimation() {
           currentRadius
         )
 
-        // Brighter alpha for more visible aurora effect
-        const baseAlpha = 0.55 + Math.sin(time * 0.5) * 0.15
+        // Brighter alpha, but modulated smoothly with lick strength
+        const baseAlpha = 0.45 + 0.25 * liftFactor + Math.sin(time * 0.45) * 0.08
 
         gradient.addColorStop(0, `hsla(${blob.hue}, ${blob.saturation}%, ${blob.lightness}%, ${baseAlpha})`)
         gradient.addColorStop(0.3, `hsla(${blob.hue}, ${blob.saturation}%, ${blob.lightness}%, ${baseAlpha * 0.75})`)
@@ -148,11 +187,12 @@ export function BackgroundAnimation() {
 
       // Reset filter
       ctx.filter = 'none'
+      ctx.globalCompositeOperation = 'source-over'
 
       animationFrameRef.current = requestAnimationFrame(animate)
     }
 
-    animate()
+    animationFrameRef.current = requestAnimationFrame(animate)
 
     return () => {
       window.removeEventListener('resize', resizeCanvas)
