@@ -90,8 +90,9 @@ export function Game() {
   const isRevealing = animationPhase === 'reveal';
   // Hide question card once we start finalizing (prevents flicker if API is slower than animation)
   const showQuestionCard = !results && !isFinalizingSession && (animationPhase === 'idle' || isFadingOut);
-  const showOrb = ['showOrb', 'scoreReveal'].includes(animationPhase);
-  const showScoreInOrb = animationPhase === 'scoreReveal';
+  // Keep orb visible during reveal so results fade in over it smoothly
+  const showOrb = ['showOrb', 'scoreReveal', 'reveal'].includes(animationPhase);
+  const showScoreInOrb = ['scoreReveal', 'reveal'].includes(animationPhase);
   const showResults = results && ['reveal', 'idle'].includes(animationPhase);
 
   // Helper to get auth headers
