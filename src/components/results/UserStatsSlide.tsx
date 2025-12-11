@@ -157,20 +157,19 @@ function CalibrationSection({ calibration, calibrationMilestones }: { calibratio
 
   return (
     <div className="user-stats-section">
-      <div className="user-stats-section-title">
-        Calibration
-        <button
-          className="calibration-info-button"
-          onClick={() => setShowInfo(true)}
-          aria-label="What is calibration?"
-        >
-          i
-        </button>
-      </div>
       <div className="calibration-section">
         <div className="calibration-left">
           <CircularCalibration percentage={calibration} size={80} />
-          <span className="calibration-section-label">Current</span>
+          <div className="calibration-label-row">
+            <span className="calibration-section-label">Calibration</span>
+            <button
+              className="calibration-info-button"
+              onClick={() => setShowInfo(true)}
+              aria-label="What is calibration?"
+            >
+              i
+            </button>
+          </div>
         </div>
         <div className="calibration-right">
           <CalibrationHistoryChart milestones={calibrationMilestones} />
