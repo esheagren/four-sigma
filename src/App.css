@@ -6689,17 +6689,11 @@ a.judgement-answer-below:hover .judgement-answer-value {
   text-align: center;
   line-height: 1.2;
   transition: font-size 0.1s ease-out;
-  /* Subtle background to prevent slider line from cutting through text */
-  background: radial-gradient(
-    ellipse 100% 100% at center,
-    rgba(30, 30, 50, 0.25) 0%,
-    rgba(30, 30, 50, 0.12) 60%,
-    transparent 100%
-  );
+  /* Blur effect to keep number readable against uncertainty fill line */
   padding: 4px 12px;
   border-radius: 8px;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .estimate-scratchpad-unified {
