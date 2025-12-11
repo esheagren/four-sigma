@@ -2247,11 +2247,20 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 /* Loading Orb */
 .loading-orb-container {
+  /* Position to match score-orb-slide exactly for seamless transition */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   perspective: 800px;
-  padding: 3rem;
+  padding: 1.5rem;
+  padding-top: calc(60px + 1.5rem); /* Account for navbar */
+  box-sizing: border-box;
+  z-index: 5;
 }
 
 /* Scale wrapper - handles growing effect, contains both orb and score */
