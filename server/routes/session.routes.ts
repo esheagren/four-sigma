@@ -19,6 +19,7 @@ import {
   getPerformanceHistory,
   getCalibrationMilestones,
   getQuestionTopScorers,
+  getOverallLeaderboard,
 } from '../database/sessions.js';
 import {
   Answer,
@@ -230,6 +231,7 @@ router.post('/finalize', async (req: Request, res: Response) => {
     let dailyStats = undefined;
     let performanceHistory = undefined;
     let calibrationMilestones = undefined;
+    let overallLeaderboard = undefined;
 
     if (userId) {
       try {
@@ -240,19 +242,28 @@ router.post('/finalize', async (req: Request, res: Response) => {
           questionsAnswered: judgements.length,
         });
 
-        // Fetch daily stats, performance history, and calibration milestones
-        const [daily, history, milestones] = await Promise.all([
+        // Fetch daily stats, performance history, calibration milestones, and overall leaderboard
+        const [daily, history, milestones, overall] = await Promise.all([
           getDailyStats(userId),
           getPerformanceHistory(userId, 10),
           getCalibrationMilestones(userId),
+          getOverallLeaderboard(userId),
         ]);
 
         dailyStats = daily;
         performanceHistory = history;
         calibrationMilestones = milestones;
+        overallLeaderboard = overall;
       } catch (statsError) {
         console.error('Failed to update/fetch user stats:', statsError);
         // Continue even if stats fail
+      }
+    } else {
+      // Fetch overall leaderboard even for anonymous users
+      try {
+        overallLeaderboard = await getOverallLeaderboard();
+      } catch (err) {
+        console.error('Failed to fetch overall leaderboard:', err);
       }
     }
 
@@ -263,6 +274,7 @@ router.post('/finalize', async (req: Request, res: Response) => {
       dailyStats,
       performanceHistory,
       calibrationMilestones,
+      overallLeaderboard,
     };
 
     res.json(response);

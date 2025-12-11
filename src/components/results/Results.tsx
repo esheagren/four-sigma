@@ -54,6 +54,14 @@ interface TodayLeaderboardEntry {
   isCurrentUser?: boolean;
 }
 
+interface OverallLeaderboardEntry {
+  rank: number;
+  displayName: string;
+  totalScore: number;
+  gamesPlayed: number;
+  isCurrentUser?: boolean;
+}
+
 interface ResultsProps {
   judgements: Judgement[];
   score: number;
@@ -67,6 +75,7 @@ interface ResultsProps {
   calibrationMilestones?: CalibrationMilestone[];
   totalParticipants?: number;
   todayLeaderboard?: TodayLeaderboardEntry[];
+  overallLeaderboard?: OverallLeaderboardEntry[];
   onScroll?: (progress: number) => void;
 }
 
@@ -80,6 +89,7 @@ export function Results({
   totalParticipants,
   topScoreGlobal,
   todayLeaderboard,
+  overallLeaderboard,
   onScroll,
 }: ResultsProps) {
   return (
@@ -93,6 +103,7 @@ export function Results({
       performanceHistory={performanceHistory}
       calibrationMilestones={calibrationMilestones}
       todayLeaderboard={todayLeaderboard}
+      overallLeaderboard={overallLeaderboard}
       onScroll={onScroll}
     />
   );

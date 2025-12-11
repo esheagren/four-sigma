@@ -103,6 +103,14 @@ export interface TodayLeaderboardEntry {
   isCurrentUser?: boolean;
 }
 
+export interface OverallLeaderboardEntry {
+  rank: number;
+  displayName: string;
+  totalScore: number;
+  gamesPlayed: number;
+  isCurrentUser?: boolean;
+}
+
 export interface DailyStats {
   dailyRank: number | null;
   topScoreToday: number | null;
@@ -134,6 +142,7 @@ export interface FinalizeSessionResponse {
   dailyStats?: DailyStats;
   performanceHistory?: PerformanceHistoryEntry[];
   calibrationMilestones?: CalibrationMilestone[];
+  overallLeaderboard?: OverallLeaderboardEntry[];
 }
 
 // Feedback types

@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import type { TodayLeaderboardEntry } from '../types/index.js';
+import type { TodayLeaderboardEntry, OverallLeaderboardEntry } from '../types/index.js';
 
 /**
  * Get UTC date string for "today" (YYYY-MM-DD)
@@ -548,5 +548,32 @@ export async function getCalibrationMilestones(userId: string): Promise<Array<{
     date: dateStr,
     label: formatLabel(dateStr),
     calibration: getCalibration(dateStr),
+  }));
+}
+
+/**
+ * Get overall leaderboard (top 10 users by total score)
+ */
+export async function getOverallLeaderboard(
+  currentUserId?: string
+): Promise<OverallLeaderboardEntry[]> {
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, display_name, total_score, games_played')
+    .gt('games_played', 0)
+    .order('total_score', { ascending: false })
+    .limit(10);
+
+  if (error) {
+    console.error('Failed to fetch overall leaderboard:', error);
+    return [];
+  }
+
+  return (data || []).map((user, index) => ({
+    rank: index + 1,
+    displayName: user.display_name,
+    totalScore: Math.round(Number(user.total_score)),
+    gamesPlayed: user.games_played,
+    isCurrentUser: currentUserId ? user.id === currentUserId : false,
   }));
 }

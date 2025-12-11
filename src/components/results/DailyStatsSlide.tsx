@@ -1,37 +1,38 @@
 import { forwardRef } from 'react';
 
-interface TodayLeaderboardEntry {
+interface OverallLeaderboardEntry {
   rank: number;
-  username: string;
-  score: number;
+  displayName: string;
+  totalScore: number;
+  gamesPlayed: number;
   isCurrentUser?: boolean;
 }
 
 interface DailyStatsSlideProps {
-  todayLeaderboard?: TodayLeaderboardEntry[];
+  overallLeaderboard?: OverallLeaderboardEntry[];
 }
 
 export const DailyStatsSlide = forwardRef<HTMLDivElement, DailyStatsSlideProps>(({
-  todayLeaderboard,
+  overallLeaderboard,
 }, ref) => {
   return (
     <div className="tiktok-slide daily-stats-slide" ref={ref}>
       <div className="slide-body">
         <div className="daily-stats-content">
 
-        {/* Today's Leaderboard (Top 5) */}
-        {todayLeaderboard && todayLeaderboard.length > 0 && (
+        {/* Overall Leaderboard (Top 10 by total points) */}
+        {overallLeaderboard && overallLeaderboard.length > 0 && (
           <div className="today-leaderboard">
-            <div className="today-leaderboard-header">Today's Leaderboard</div>
+            <div className="today-leaderboard-header">Overall Leaderboard</div>
             <div className="today-leaderboard-list">
-              {todayLeaderboard.map((entry) => (
+              {overallLeaderboard.map((entry) => (
                 <div
                   key={entry.rank}
                   className={`leaderboard-entry ${entry.isCurrentUser ? 'is-current-user' : ''}`}
                 >
                   <span className="leaderboard-rank">#{entry.rank}</span>
-                  <span className="leaderboard-username">{entry.username}</span>
-                  <span className="leaderboard-score">{entry.score.toLocaleString()}</span>
+                  <span className="leaderboard-username">{entry.displayName}</span>
+                  <span className="leaderboard-score">{entry.totalScore.toLocaleString()}</span>
                 </div>
               ))}
             </div>

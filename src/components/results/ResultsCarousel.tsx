@@ -59,6 +59,14 @@ interface TodayLeaderboardEntry {
   isCurrentUser?: boolean;
 }
 
+interface OverallLeaderboardEntry {
+  rank: number;
+  displayName: string;
+  totalScore: number;
+  gamesPlayed: number;
+  isCurrentUser?: boolean;
+}
+
 interface ResultsCarouselProps {
   judgements: Judgement[];
   score: number;
@@ -69,6 +77,7 @@ interface ResultsCarouselProps {
   performanceHistory?: PerformanceHistoryEntry[];
   calibrationMilestones?: CalibrationMilestone[];
   todayLeaderboard?: TodayLeaderboardEntry[];
+  overallLeaderboard?: OverallLeaderboardEntry[];
   onScroll?: (progress: number) => void;
 }
 
@@ -82,6 +91,7 @@ export function ResultsCarousel({
   performanceHistory,
   calibrationMilestones,
   todayLeaderboard,
+  overallLeaderboard,
   onScroll,
 }: ResultsCarouselProps) {
   const { user } = useAuth();
@@ -260,10 +270,10 @@ export function ResultsCarousel({
             />
           ))}
 
-          {/* Daily Stats Slide (Today's Leaderboard) */}
+          {/* Daily Stats Slide (Overall Leaderboard) */}
           <DailyStatsSlide
             ref={setSlideRef(safeJudgements.length + 1)}
-            todayLeaderboard={todayLeaderboard}
+            overallLeaderboard={overallLeaderboard}
           />
 
           {/* User Stats Slide (Long-term stats) */}

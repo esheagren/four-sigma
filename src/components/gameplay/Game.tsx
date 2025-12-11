@@ -37,6 +37,14 @@ interface TodayLeaderboardEntry {
   isCurrentUser?: boolean;
 }
 
+interface OverallLeaderboardEntry {
+  rank: number;
+  displayName: string;
+  totalScore: number;
+  gamesPlayed: number;
+  isCurrentUser?: boolean;
+}
+
 interface DailyStats {
   dailyRank: number | null;
   topScoreToday: number | null;
@@ -68,6 +76,7 @@ interface FinalizeResponse {
   dailyStats?: DailyStats;
   performanceHistory?: PerformanceHistoryEntry[];
   calibrationMilestones?: CalibrationMilestone[];
+  overallLeaderboard?: OverallLeaderboardEntry[];
 }
 
 export function Game() {
@@ -328,6 +337,7 @@ export function Game() {
   const dailyStats = results?.dailyStats;
   const performanceHistory = results?.performanceHistory;
   const calibrationMilestones = results?.calibrationMilestones;
+  const overallLeaderboard = results?.overallLeaderboard;
 
   // Calculate calibration from this session's judgements
   const sessionCalibration = results && results.judgements.length > 0
@@ -379,6 +389,7 @@ export function Game() {
             calibrationMilestones={calibrationMilestones}
             totalParticipants={dailyStats?.totalParticipantsToday ?? undefined}
             todayLeaderboard={dailyStats?.todayLeaderboard}
+            overallLeaderboard={overallLeaderboard}
             onScroll={handleResultsScroll}
           />
         </div>
