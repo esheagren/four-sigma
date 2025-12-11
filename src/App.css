@@ -8172,21 +8172,23 @@ a.judgement-answer-below:hover .judgement-answer-value {
 .score-orb-share-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none;
+  border-radius: 50%;
   color: white;
-  font-size: 0.875rem;
-  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
 }
 
 .score-orb-share-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, #34d399, #10b981);
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
 }
 
 .score-orb-share-btn:disabled {

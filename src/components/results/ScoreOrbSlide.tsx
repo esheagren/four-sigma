@@ -29,7 +29,6 @@ export const ScoreOrbSlide = forwardRef<HTMLDivElement, ScoreOrbSlideProps>(({
                 <polyline points="16 6 12 2 8 6" />
                 <line x1="12" y1="2" x2="12" y2="15" />
               </svg>
-              Share
             </button>
           </div>
         </div>
