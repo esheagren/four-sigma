@@ -4,6 +4,8 @@ interface LoadingOrbProps {
   score?: number;
   showScore?: boolean;
   animateScore?: boolean;
+  onScoreClick?: () => void;
+  isClickable?: boolean;
 }
 
 // Scale limits for orb growth
@@ -11,7 +13,7 @@ const MIN_SCALE = 1;
 const MAX_SCALE = 1.8;
 const MAX_SCORE_FOR_SCALE = 2000; // Score at which orb reaches max size
 
-export function LoadingOrb({ score, showScore = false, animateScore = false }: LoadingOrbProps) {
+export function LoadingOrb({ score, showScore = false, animateScore = false, onScoreClick, isClickable = true }: LoadingOrbProps) {
   const [displayScore, setDisplayScore] = useState(0);
   const [scale, setScale] = useState(MIN_SCALE);
 
@@ -115,7 +117,13 @@ export function LoadingOrb({ score, showScore = false, animateScore = false }: L
           {dots}
         </div>
         {showScore && (
-          <div className="loading-orb-score">
+          <div
+            className={`loading-orb-score ${onScoreClick && isClickable ? 'clickable' : ''}`}
+            onClick={onScoreClick && isClickable ? onScoreClick : undefined}
+            role={onScoreClick ? 'button' : undefined}
+            tabIndex={onScoreClick && isClickable ? 0 : undefined}
+            onKeyDown={onScoreClick && isClickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') onScoreClick(); } : undefined}
+          >
             {Math.round(displayScore).toLocaleString()}
           </div>
         )}

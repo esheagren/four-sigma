@@ -2317,6 +2317,20 @@ a.judgement-answer-below:hover .judgement-answer-value {
   white-space: nowrap;
 }
 
+.loading-orb-score.clickable {
+  cursor: pointer;
+  transition: transform 0.15s ease, text-shadow 0.15s ease;
+}
+
+.loading-orb-score.clickable:hover {
+  transform: translate(-50%, -50%) scale(1.05);
+  text-shadow: 0 0 30px var(--primary), 0 0 60px rgba(99, 91, 255, 0.8);
+}
+
+.loading-orb-score.clickable:active {
+  transform: translate(-50%, -50%) scale(0.98);
+}
+
 .error p {
   margin-bottom: 1.5rem;
   font-size: 1rem;
