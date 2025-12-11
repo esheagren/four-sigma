@@ -64,7 +64,7 @@ body {
 .navbar-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0.4rem 1rem;
+  padding: 0.25rem 1rem;
   padding-left: max(1rem, env(safe-area-inset-left));
   padding-right: max(1rem, env(safe-area-inset-right));
   display: flex;
@@ -119,20 +119,18 @@ body {
 }
 
 .nav-icon-button {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 1.75rem;
+  height: 1.75rem;
   padding: 0;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  border: none;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .nav-icon-button:hover {
-  border-color: rgba(255, 255, 255, 1);
-  background: rgba(255, 255, 255, 0.15);
   color: rgba(255, 255, 255, 1);
 }
 
@@ -142,6 +140,8 @@ body {
 
 .nav-icon-button svg {
   flex-shrink: 0;
+  width: 16px;
+  height: 16px;
 }
 
 .nav-menu-container {

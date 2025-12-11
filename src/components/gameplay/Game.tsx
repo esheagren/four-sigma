@@ -115,8 +115,8 @@ export function Game() {
     // After reveal (idle with results), scroll controls position
     // Scale: 1.0 at progress=0, 0.35 at progress=1
     const scale = 1 - (scrollProgress * 0.65);
-    // Top: 50% (centered) at progress=0, 14% (below navbar) at progress=1
-    const topPercent = 50 - (scrollProgress * 36);
+    // Top: 50% (centered) at progress=0, 12% (below navbar) at progress=1
+    const topPercent = 50 - (scrollProgress * 38);
     return {
       top: `${topPercent}%`,
       transform: `translateX(-50%) translateY(-50%) scale(${scale})`,
