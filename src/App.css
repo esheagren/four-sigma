@@ -2261,11 +2261,13 @@ a.judgement-answer-below:hover .judgement-answer-value {
   padding-top: calc(60px + 1.5rem); /* Account for navbar */
   box-sizing: border-box;
   z-index: 5;
+  pointer-events: none; /* Don't block scroll/touch on content above */
 }
 
 /* Scale wrapper - handles growing effect, contains both orb and score */
 .loading-orb-scale-wrapper {
   position: relative;
+  pointer-events: auto; /* Re-enable for the orb itself */
   display: flex;
   justify-content: center;
   align-items: center;
