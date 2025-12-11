@@ -312,22 +312,32 @@ export const UserStatsSlide = forwardRef<HTMLDivElement, UserStatsSlideProps>(({
         {/* Statistics Grid */}
         {userStats && (
           <div className="user-stats-section">
-            <div className="user-stats-grid">
-              <div className="user-stat-item">
-                <div className="user-stat-value">{userStats.gamesPlayed}</div>
-                <div className="user-stat-label">Games</div>
+            <div className="user-stats-grouped">
+              <div className="user-stats-group">
+                <div className="user-stats-group-header">Scores</div>
+                <div className="user-stats-group-items">
+                  <div className="user-stat-item">
+                    <div className="user-stat-value">{Math.round(userStats.averageScore)}</div>
+                    <div className="user-stat-label">Average</div>
+                  </div>
+                  <div className="user-stat-item">
+                    <div className="user-stat-value">{Math.round(userStats.bestSingleScore).toLocaleString()}</div>
+                    <div className="user-stat-label">Best</div>
+                  </div>
+                </div>
               </div>
-              <div className="user-stat-item">
-                <div className="user-stat-value user-stat-value-small">{Math.round(userStats.averageScore)}</div>
-                <div className="user-stat-label">Avg Score</div>
-              </div>
-              <div className="user-stat-item">
-                <div className="user-stat-value user-stat-value-small">{Math.round(userStats.bestSingleScore).toLocaleString()}</div>
-                <div className="user-stat-label">Best Score</div>
-              </div>
-              <div className="user-stat-item">
-                <div className="user-stat-value user-stat-value-small">{userStats.currentStreak}</div>
-                <div className="user-stat-label">Streak</div>
+              <div className="user-stats-group">
+                <div className="user-stats-group-header">Games</div>
+                <div className="user-stats-group-items">
+                  <div className="user-stat-item">
+                    <div className="user-stat-value">{userStats.gamesPlayed}</div>
+                    <div className="user-stat-label">Total</div>
+                  </div>
+                  <div className="user-stat-item">
+                    <div className="user-stat-value">{userStats.currentStreak}</div>
+                    <div className="user-stat-label">Streak</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
