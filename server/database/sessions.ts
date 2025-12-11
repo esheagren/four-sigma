@@ -61,7 +61,7 @@ export async function updateUserStatsAfterSession(
   // First get current user stats
   const { data: user, error: fetchError } = await supabase
     .from('users')
-    .select('total_score, games_played, questions_captured, best_single_score, current_streak, best_streak')
+    .select('total_score, games_played, questions_captured, best_single_score, current_streak, best_streak, last_played_at')
     .eq('id', userId)
     .single();
 
@@ -81,10 +81,34 @@ export async function updateUserStatsAfterSession(
   // Check for best single score
   const newBestSingleScore = Math.max(Number(user.best_single_score), sessionData.sessionScore);
 
-  // Update streak - if they got all questions right (captured >= 2 out of 3), maintain/increase streak
-  // Otherwise reset streak
-  const streakMaintained = sessionData.questionsCaptured >= 2;
-  const newCurrentStreak = streakMaintained ? user.current_streak + 1 : 0;
+  // Update streak based on consecutive days played (not performance)
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const lastPlayed = user.last_played_at ? new Date(user.last_played_at) : null;
+  const lastPlayedDate = lastPlayed
+    ? new Date(lastPlayed.getFullYear(), lastPlayed.getMonth(), lastPlayed.getDate())
+    : null;
+
+  let newCurrentStreak = user.current_streak;
+
+  if (!lastPlayedDate) {
+    // First time playing - start streak at 1
+    newCurrentStreak = 1;
+  } else {
+    const daysDiff = Math.floor((today.getTime() - lastPlayedDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (daysDiff === 0) {
+      // Already played today - don't change streak
+      newCurrentStreak = user.current_streak;
+    } else if (daysDiff === 1) {
+      // Played yesterday - increment streak
+      newCurrentStreak = user.current_streak + 1;
+    } else {
+      // Missed a day or more - reset streak to 1 (playing today counts)
+      newCurrentStreak = 1;
+    }
+  }
+
   const newBestStreak = Math.max(user.best_streak, newCurrentStreak);
 
   const { error: updateError } = await supabase
