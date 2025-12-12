@@ -59,7 +59,7 @@ export function SignUpPromptModal({
 
         <div className="modal-body">
           <p className="signup-prompt-subtitle">
-            Get more out of 4-sigma by creating a free account:
+            Get more out of 4-σ by creating a free account:
           </p>
 
           <ul className="signup-prompt-benefits">
