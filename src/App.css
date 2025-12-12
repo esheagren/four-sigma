@@ -2244,6 +2244,45 @@ a.judgement-answer-below:hover .judgement-answer-value {
   letter-spacing: 0.02em;
 }
 
+/* Share Leaderboard Card (for standing image generation) */
+.share-leaderboard-card {
+  width: 400px;
+  border-radius: 16px;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.share-card-standing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.share-card-percentile-hero {
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.share-card-standing-headline {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.share-card-standing-subtext {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.share-card-players-count {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
 /* Explore Page */
 .explore-container {
   max-width: 1200px;
@@ -3483,14 +3522,14 @@ a.judgement-answer-below:hover .judgement-answer-value {
 /* Modal footer actions (Got it button) */
 .modal-footer-actions {
   position: absolute;
-  bottom: -56px;
+  bottom: -44px;
   left: 50%;
   transform: translateX(-50%);
 }
 
 .got-it-button {
-  padding: 0.75rem 2rem;
-  font-size: 1rem;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   background: var(--primary);
   color: white;
@@ -8468,6 +8507,96 @@ a.judgement-answer-below:hover .judgement-answer-value {
   align-items: center;
   padding: 0.75rem;
   gap: 1.25rem;
+}
+
+/* Your Standing Section */
+.your-standing-section {
+  width: 100%;
+  padding: 1.25rem;
+  background: linear-gradient(135deg,
+    rgba(16, 185, 129, 0.08) 0%,
+    rgba(16, 185, 129, 0.04) 100%
+  );
+  border-radius: 12px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  text-align: center;
+}
+
+.your-standing-header {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 0.75rem;
+}
+
+.your-standing-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.standing-percentile {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.standing-percentile.emphasis-high {
+  color: #fbbf24;
+  text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+}
+
+.standing-percentile.emphasis-medium {
+  color: #10b981;
+}
+
+.standing-percentile.emphasis-low {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.standing-message {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.125rem;
+}
+
+.standing-context {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 1rem;
+}
+
+.standing-share-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 8px;
+  color: #10b981;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.standing-share-button:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.25);
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+.standing-share-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.standing-share-button svg {
+  flex-shrink: 0;
 }
 
 /* Section 1: Today's Leaderboard */

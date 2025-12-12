@@ -68,6 +68,11 @@ interface OverallLeaderboardEntry {
   isCurrentUser?: boolean;
 }
 
+interface OverallStanding {
+  percentile: number;
+  totalPlayers: number;
+}
+
 interface ResultsCarouselProps {
   judgements: Judgement[];
   score: number;
@@ -79,6 +84,7 @@ interface ResultsCarouselProps {
   calibrationMilestones?: CalibrationMilestone[];
   todayLeaderboard?: TodayLeaderboardEntry[];
   overallLeaderboard?: OverallLeaderboardEntry[];
+  overallStanding?: OverallStanding;
   onScroll?: (progress: number) => void;
 }
 
@@ -93,6 +99,7 @@ export function ResultsCarousel({
   calibrationMilestones,
   todayLeaderboard,
   overallLeaderboard,
+  overallStanding,
   onScroll,
 }: ResultsCarouselProps) {
   const { user } = useAuth();
@@ -306,6 +313,8 @@ export function ResultsCarousel({
           <DailyStatsSlide
             ref={setSlideRef(safeJudgements.length + 1)}
             overallLeaderboard={overallLeaderboard}
+            overallStanding={overallStanding}
+            displayName={user?.displayName || 'Player'}
           />
 
           {/* User Stats Slide (Long-term stats) */}

@@ -135,6 +135,11 @@ export interface CalibrationMilestone {
   calibration: number;
 }
 
+export interface OverallStanding {
+  percentile: number;
+  totalPlayers: number;
+}
+
 export interface FinalizeSessionResponse {
   judgements: Judgement[];
   score: number;
@@ -143,6 +148,7 @@ export interface FinalizeSessionResponse {
   performanceHistory?: PerformanceHistoryEntry[];
   calibrationMilestones?: CalibrationMilestone[];
   overallLeaderboard?: OverallLeaderboardEntry[];
+  overallStanding?: OverallStanding;
 }
 
 // Feedback types

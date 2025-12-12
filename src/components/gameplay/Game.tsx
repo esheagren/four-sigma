@@ -69,6 +69,11 @@ interface CalibrationMilestone {
   calibration: number;
 }
 
+interface OverallStanding {
+  percentile: number;
+  totalPlayers: number;
+}
+
 interface FinalizeResponse {
   judgements: Judgement[];
   score: number;
@@ -77,6 +82,7 @@ interface FinalizeResponse {
   performanceHistory?: PerformanceHistoryEntry[];
   calibrationMilestones?: CalibrationMilestone[];
   overallLeaderboard?: OverallLeaderboardEntry[];
+  overallStanding?: OverallStanding;
 }
 
 export function Game() {
@@ -338,6 +344,7 @@ export function Game() {
   const performanceHistory = results?.performanceHistory;
   const calibrationMilestones = results?.calibrationMilestones;
   const overallLeaderboard = results?.overallLeaderboard;
+  const overallStanding = results?.overallStanding;
 
   // Calculate calibration from this session's judgements
   const sessionCalibration = results && results.judgements.length > 0
@@ -390,6 +397,7 @@ export function Game() {
             totalParticipants={dailyStats?.totalParticipantsToday ?? undefined}
             todayLeaderboard={dailyStats?.todayLeaderboard}
             overallLeaderboard={overallLeaderboard}
+            overallStanding={overallStanding}
             onScroll={handleResultsScroll}
           />
         </div>

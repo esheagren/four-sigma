@@ -632,3 +632,61 @@ export async function getOverallLeaderboard(
     };
   });
 }
+
+/**
+ * Get user's overall standing (percentile based on best single-day score)
+ * Returns the user's percentile and total number of players
+ */
+export async function getOverallStanding(userId: string): Promise<{
+  percentile: number;
+  totalPlayers: number;
+} | null> {
+  // Get all user responses to calculate best daily scores
+  const { data: responses, error } = await supabase
+    .from('user_responses')
+    .select('user_id, score, answered_at');
+
+  if (error || !responses || responses.length === 0) {
+    return null;
+  }
+
+  // Group responses by user and date, sum scores for each day
+  const userDailyScores: Map<string, Map<string, number>> = new Map();
+
+  for (const response of responses) {
+    const uid = response.user_id;
+    const date = response.answered_at.split('T')[0];
+    const score = Number(response.score);
+
+    if (!userDailyScores.has(uid)) {
+      userDailyScores.set(uid, new Map());
+    }
+    const userDays = userDailyScores.get(uid)!;
+    userDays.set(date, (userDays.get(date) || 0) + score);
+  }
+
+  // Find best single-day score for each user
+  const userBestScores: Array<{ id: string; bestScore: number }> = [];
+
+  for (const [uid, dailyScores] of userDailyScores) {
+    const bestScore = Math.max(...dailyScores.values());
+    userBestScores.push({ id: uid, bestScore });
+  }
+
+  // Sort descending by best score
+  userBestScores.sort((a, b) => b.bestScore - a.bestScore);
+
+  const totalPlayers = userBestScores.length;
+  const userRankIndex = userBestScores.findIndex(u => u.id === userId);
+
+  if (userRankIndex === -1) {
+    return null; // User hasn't played
+  }
+
+  // Calculate percentile (higher is better)
+  // If user is rank 1 of 100, percentile = 99 (top 1%)
+  // If user is rank 100 of 100, percentile = 0 (top 100%)
+  const percentile = Math.round(((totalPlayers - userRankIndex - 1) / totalPlayers) * 100);
+
+  return { percentile, totalPlayers };
+}
