@@ -32,7 +32,8 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
             <h3>Created By</h3>
             <p>
               4-σ was created by Erik Sheagren. Questions, feedback, or ideas? Use the Feedback
-              option in the menu to get in touch.
+              option in the menu to get in touch, or check out the project on{' '}
+              <a href="https://github.com/esheagren/four-sigma" target="_blank" rel="noopener noreferrer">GitHub</a>.
             </p>
           </div>
         </div>
