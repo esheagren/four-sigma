@@ -447,6 +447,84 @@ export function EstimateNumPad({
     if (onClearOverrides) onClearOverrides();
   }, [onClearOverrides]);
 
+  // Keyboard support for desktop users
+  useEffect(() => {
+    if (isTouch) return; // Only enable keyboard on desktop
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const key = e.key;
+
+      // Digits 0-9
+      if (/^[0-9]$/.test(key)) {
+        e.preventDefault();
+        handleDigit(key);
+      }
+      // Decimal point
+      else if (key === '.') {
+        e.preventDefault();
+        handleDecimal();
+      }
+      // Operators
+      else if (key === '+') {
+        e.preventDefault();
+        handleOperator('+');
+      }
+      else if (key === '-') {
+        e.preventDefault();
+        handleOperator('−'); // Unicode minus
+      }
+      else if (key === '*') {
+        e.preventDefault();
+        handleOperator('×'); // Unicode multiplication
+      }
+      else if (key === '/') {
+        e.preventDefault();
+        handleOperator('÷'); // Unicode division
+      }
+      else if (key === '^') {
+        e.preventDefault();
+        handleOperator('^');
+      }
+      // Evaluate
+      else if (key === 'Enter' || key === '=') {
+        e.preventDefault();
+        handleEquals();
+      }
+      // Backspace
+      else if (key === 'Backspace') {
+        e.preventDefault();
+        handleBackspace();
+      }
+      // Clear (Escape or C)
+      else if (key === 'Escape' || key.toLowerCase() === 'c') {
+        e.preventDefault();
+        handleClear();
+      }
+      // Arrow keys for uncertainty adjustment
+      else if (key === 'ArrowUp' || key === 'ArrowRight') {
+        e.preventDefault();
+        handleIncrementUncertainty();
+      }
+      else if (key === 'ArrowDown' || key === 'ArrowLeft') {
+        e.preventDefault();
+        handleDecrementUncertainty();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    isTouch,
+    handleDigit,
+    handleDecimal,
+    handleOperator,
+    handleEquals,
+    handleBackspace,
+    handleClear,
+    handleIncrementUncertainty,
+    handleDecrementUncertainty
+  ]);
+
   // Show uncertainty controls only when there's a valid estimate and not calculating
   const showUncertaintyControls = hasValidEstimate && !isCalculating;
 
