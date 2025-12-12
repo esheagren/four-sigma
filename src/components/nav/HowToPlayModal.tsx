@@ -481,8 +481,8 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
             </>
         </div>
 
-        {/* Floating scroll indicator outside modal */}
-        {!hasScrolledToBottom && (
+        {/* Floating scroll indicator or Got it button */}
+        {!hasScrolledToBottom ? (
           <div className="floating-scroll-indicator">
             <svg
               width="20"
@@ -494,6 +494,12 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
             >
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
+          </div>
+        ) : (
+          <div className="modal-footer-actions">
+            <button className="got-it-button" onClick={onClose}>
+              Got it
+            </button>
           </div>
         )}
       </div>

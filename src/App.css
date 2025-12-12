@@ -3479,6 +3479,31 @@ a.judgement-answer-below:hover .judgement-answer-value {
   }
 }
 
+/* Modal footer actions (Got it button) */
+.modal-footer-actions {
+  position: absolute;
+  bottom: -56px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.got-it-button {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.got-it-button:hover {
+  background: var(--primary-hover);
+}
+
 /* Statistics Modal */
 .statistics-modal {
   max-width: 700px;
@@ -4276,6 +4301,107 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 .auth-toggle-button:hover {
   text-decoration: underline;
+}
+
+/* Sign Up Prompt Modal */
+.signup-prompt-modal {
+  max-width: 440px;
+}
+
+.signup-prompt-modal .modal-header-horizontal {
+  padding: 1.5rem 1.5rem 0;
+  border-bottom: none;
+}
+
+.signup-prompt-modal .modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.signup-prompt-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+}
+
+.signup-prompt-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem;
+}
+
+.signup-prompt-benefits li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.signup-prompt-benefits li:last-child {
+  border-bottom: none;
+}
+
+.signup-prompt-benefits .benefit-icon {
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+.signup-prompt-benefits span {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.signup-prompt-benefits strong {
+  color: var(--text-primary);
+}
+
+.signup-prompt-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+}
+
+.signup-prompt-primary-button {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.signup-prompt-primary-button:hover {
+  background: var(--primary-hover);
+}
+
+.signup-prompt-secondary-button {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.signup-prompt-secondary-button:hover {
+  background: var(--background);
+  color: var(--text-primary);
+  border-color: var(--border-focus);
 }
 
 .modal-close {
@@ -7806,7 +7932,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 /* Range Visualization */
 .range-viz {
-  position: relative;
+  /* No position: relative - header pills need to position relative to .slide-viz-container */
   display: flex;
   flex-direction: column;
   align-items: stretch;

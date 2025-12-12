@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { HowToPlayModal } from './HowToPlayModal';
 import { AuthModal } from './AuthModal';
+import { SignUpPromptModal } from './SignUpPromptModal';
 import { StatisticsModal } from './StatisticsModal';
 import { SettingsModal } from './SettingsModal';
 import { FeedbackModal } from './FeedbackModal';
@@ -87,6 +88,7 @@ export function Nav() {
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSignUpPromptOpen, setIsSignUpPromptOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -101,6 +103,16 @@ export function Nav() {
       localStorage.setItem(HAS_SEEN_HOW_TO_PLAY_KEY, 'true');
     }
   }, [isLoading]);
+
+  // Show sign-up prompt for anonymous users on return visits
+  useEffect(() => {
+    if (isLoading) return;
+
+    const hasSeenHowToPlay = localStorage.getItem(HAS_SEEN_HOW_TO_PLAY_KEY);
+    if (hasSeenHowToPlay && isAnonymous) {
+      setIsSignUpPromptOpen(true);
+    }
+  }, [isLoading, isAnonymous]);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -122,6 +134,23 @@ export function Nav() {
   const handleMenuItemClick = (openModal: () => void) => {
     setIsMenuOpen(false);
     openModal();
+  };
+
+  const handleHowToPlayClose = () => {
+    setIsHowToPlayOpen(false);
+    // Show sign-up prompt for anonymous users after HowToPlay closes
+    if (isAnonymous && !isLoading) {
+      setIsSignUpPromptOpen(true);
+    }
+  };
+
+  const handleSignUpPromptCreateAccount = () => {
+    setIsSignUpPromptOpen(false);
+    setIsAuthModalOpen(true);
+  };
+
+  const handleSignUpPromptContinueAsGuest = () => {
+    setIsSignUpPromptOpen(false);
   };
 
   const getDropdownPosition = () => {
@@ -218,12 +247,19 @@ export function Nav() {
 
       <HowToPlayModal
         isOpen={isHowToPlayOpen}
-        onClose={() => setIsHowToPlayOpen(false)}
+        onClose={handleHowToPlayClose}
       />
 
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
+      />
+
+      <SignUpPromptModal
+        isOpen={isSignUpPromptOpen}
+        onClose={handleSignUpPromptContinueAsGuest}
+        onCreateAccount={handleSignUpPromptCreateAccount}
+        onContinueAsGuest={handleSignUpPromptContinueAsGuest}
       />
 
       <StatisticsModal
