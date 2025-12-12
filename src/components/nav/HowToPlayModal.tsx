@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { ModalBackdropAnimation } from '../ModalBackdropAnimation';
 
 interface HowToPlayModalProps {
   isOpen: boolean;
@@ -149,6 +150,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
 
   return createPortal(
     <div className="modal-overlay" onClick={onClose}>
+      <ModalBackdropAnimation />
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header modal-header-horizontal">
           <h2 className="modal-title">4-σ</h2>
