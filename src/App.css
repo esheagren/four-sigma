@@ -372,13 +372,21 @@ body {
   }
 }
 
-/* Progress Fraction - centered above question header */
-.progress-fraction {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.95);
-  text-align: center;
+/* Progress Bar - thin bar above question header */
+.progress-bar-container {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
   margin-bottom: 0.75rem;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 2px;
+  transition: width 0.3s ease-out;
 }
 
 /* Question Card Fade Out Animation */
@@ -2344,7 +2352,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   height: 120px;
   position: relative;
   transform-style: preserve-3d;
-  animation: loading-orb-spin 5s linear infinite;
+  animation: loading-orb-spin 6s linear infinite;
 }
 
 @keyframes loading-orb-spin {
@@ -3386,6 +3394,30 @@ a.judgement-answer-below:hover .judgement-answer-value {
   left: 0.5rem;
   color: var(--primary);
   font-weight: 700;
+}
+
+/* About Modal Styles */
+.about-section {
+  margin-bottom: 2rem;
+}
+
+.about-section:last-child {
+  margin-bottom: 0;
+}
+
+.about-section h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+.about-section p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0;
 }
 
 .modal-footer {
