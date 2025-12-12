@@ -149,6 +149,7 @@ export function Nav() {
                     position: 'fixed',
                     top: getDropdownPosition().top,
                     right: getDropdownPosition().right,
+                    zIndex: 99999,
                   }}
                 >
                   <button
