@@ -94,23 +94,18 @@ export function Nav() {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Show How to Play modal for first-time visitors
+  // Show How to Play modal for first-time visitors, or sign-up prompt for returning anonymous users
   useEffect(() => {
     if (isLoading) return;
 
     const hasSeenHowToPlay = localStorage.getItem(HAS_SEEN_HOW_TO_PLAY_KEY);
+
     if (!hasSeenHowToPlay) {
+      // First visit: show HowToPlay, then sign-up prompt will show when they click "Got it"
       setIsHowToPlayOpen(true);
       localStorage.setItem(HAS_SEEN_HOW_TO_PLAY_KEY, 'true');
-    }
-  }, [isLoading]);
-
-  // Show sign-up prompt for anonymous users on return visits
-  useEffect(() => {
-    if (isLoading) return;
-
-    const hasSeenHowToPlay = localStorage.getItem(HAS_SEEN_HOW_TO_PLAY_KEY);
-    if (hasSeenHowToPlay && isAnonymous) {
+    } else if (isAnonymous) {
+      // Return visit + anonymous: show sign-up prompt directly
       setIsSignUpPromptOpen(true);
     }
   }, [isLoading, isAnonymous]);
