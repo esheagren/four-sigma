@@ -2905,7 +2905,10 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 .modal-content {
   position: relative;
-  background: var(--surface);
+  background: rgba(15, 10, 25, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   box-shadow: var(--shadow-lg), 0 0 30px rgba(99, 91, 255, 0.3);
   max-width: 800px;
