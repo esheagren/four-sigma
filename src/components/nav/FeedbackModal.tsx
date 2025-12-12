@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../context/PostHogContext';
 
@@ -86,7 +87,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
     onClose();
   };
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal-content feedback-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
@@ -144,6 +145,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

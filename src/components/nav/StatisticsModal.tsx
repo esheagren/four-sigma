@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../context/AuthContext';
 
 interface StatisticsModalProps {
@@ -17,7 +18,7 @@ export function StatisticsModal({ isOpen, onClose }: StatisticsModalProps) {
     { label: 'Calibration Rate', value: `${Math.round((user?.calibrationRate ?? 0) * 100)}%` },
   ];
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content statistics-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
@@ -43,6 +44,7 @@ export function StatisticsModal({ isOpen, onClose }: StatisticsModalProps) {
           <button className="modal-button" onClick={onClose}>Close</button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

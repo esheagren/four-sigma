@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 interface HowToPlayModalProps {
   isOpen: boolean;
@@ -146,7 +147,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
     score: Math.round(calculateScore(wideExample.lower, wideExample.upper, wideExample.trueValue) * 10) / 10,
   };
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header modal-header-horizontal">
@@ -496,6 +497,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

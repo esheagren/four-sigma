@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../context/PostHogContext';
 
@@ -90,7 +91,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     capture('auth_mode_toggled', { newMode });
   };
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal-content auth-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
@@ -182,6 +183,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
