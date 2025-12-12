@@ -89,6 +89,7 @@ export function Nav() {
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSignUpPromptOpen, setIsSignUpPromptOpen] = useState(false);
+  const [authModalInitialMode, setAuthModalInitialMode] = useState<'login' | 'signup'>('login');
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -146,6 +147,7 @@ export function Nav() {
 
   const handleSignUpPromptCreateAccount = () => {
     setIsSignUpPromptOpen(false);
+    setAuthModalInitialMode('signup');
     setIsAuthModalOpen(true);
   };
 
@@ -217,7 +219,10 @@ export function Nav() {
                   {!isLoading && isAnonymous && (
                     <button
                       className="nav-dropdown-item"
-                      onClick={() => handleMenuItemClick(() => setIsAuthModalOpen(true))}
+                      onClick={() => handleMenuItemClick(() => {
+                        setAuthModalInitialMode('login');
+                        setIsAuthModalOpen(true);
+                      })}
                     >
                       <UserIcon />
                       <span>Sign In</span>
@@ -253,6 +258,7 @@ export function Nav() {
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
+        initialMode={authModalInitialMode}
       />
 
       <SignUpPromptModal

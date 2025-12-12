@@ -3,23 +3,31 @@ import { createPortal } from 'react-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../context/PostHogContext';
 
+type AuthMode = 'login' | 'signup';
+
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialMode?: AuthMode;
 }
 
-type AuthMode = 'login' | 'signup';
-
-export function AuthModal({ isOpen, onClose }: AuthModalProps) {
+export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalProps) {
   const { login, signup } = useAuth();
   const { capture } = useAnalytics();
-  const [mode, setMode] = useState<AuthMode>('login');
+  const [mode, setMode] = useState<AuthMode>(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const hasTrackedOpen = useRef(false);
+
+  // Sync mode with initialMode when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setMode(initialMode);
+    }
+  }, [isOpen, initialMode]);
 
   // Track modal open (only once per open)
   useEffect(() => {
