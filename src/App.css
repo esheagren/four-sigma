@@ -2379,7 +2379,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 1.75rem;
-  font-weight: 400;
+  font-weight: 300;
   font-family: var(--font-mono);
   color: white;
   text-shadow: 0 0 20px var(--primary), 0 0 40px rgba(99, 91, 255, 0.6);
