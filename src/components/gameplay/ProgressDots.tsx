@@ -4,9 +4,14 @@ interface ProgressDotsProps {
 }
 
 export function ProgressDots({ currentIndex, total }: ProgressDotsProps) {
+  const progressPercent = ((currentIndex + 1) / total) * 100;
+
   return (
-    <div className="progress-fraction">
-      {currentIndex + 1}/{total}
+    <div className="progress-bar-container">
+      <div
+        className="progress-bar-fill"
+        style={{ width: `${progressPercent}%` }}
+      />
     </div>
   );
 }
