@@ -7,7 +7,6 @@
   z-index: -1;
   pointer-events: none;
   opacity: 1;
-  will-change: transform;
 }
 
 /* Very dark purple background matching canvas top */
