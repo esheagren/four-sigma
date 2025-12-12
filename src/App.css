@@ -7517,7 +7517,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   right: 0;
   bottom: 0;
   background: transparent;
-  z-index: 100;
+  z-index: 50;
 }
 
 /* Layout wrapper for results */
