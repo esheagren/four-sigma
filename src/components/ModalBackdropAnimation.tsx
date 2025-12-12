@@ -100,12 +100,12 @@ export function ModalBackdropAnimation() {
             baseY,
             targetX: centerX,
             targetY: centerY,
-            radius: 150 + Math.random() * 100, // Smaller radius for subtle edge glow
+            radius: 180 + Math.random() * 120, // Larger radius for stronger glow
             hue,
-            saturation: 60 + Math.random() * 20, // Slightly less saturated
-            lightness: 50 + Math.random() * 15,
+            saturation: 70 + Math.random() * 25, // More saturated
+            lightness: 55 + Math.random() * 15,
             phase: Math.random() * Math.PI * 2,
-            speed: 0.08 + Math.random() * 0.06, // Slower, more subtle movement
+            speed: 0.1 + Math.random() * 0.08,
             noiseSeedA: Math.random() * Math.PI * 2,
             noiseSeedB: Math.random() * Math.PI * 2,
           })
@@ -175,8 +175,8 @@ export function ModalBackdropAnimation() {
         const pulse = 1 + Math.sin(time * 0.8) * 0.08 + Math.sin(time * 1.5 + index) * 0.04
         const currentRadius = blob.radius * pulse
 
-        // Lower alpha for subtle edge glow
-        const baseAlpha = 0.2 + Math.sin(time * 0.3) * 0.05
+        // Stronger alpha for visible edge glow
+        const baseAlpha = 0.35 + Math.sin(time * 0.3) * 0.1
 
         // Create radial gradient
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, currentRadius)

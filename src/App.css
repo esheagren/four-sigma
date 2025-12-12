@@ -2935,6 +2935,57 @@ a.judgement-answer-below:hover .judgement-answer-value {
   }
 }
 
+/* Dark glass modal overrides - light text on dark background */
+.dark-glass-modal .modal-title {
+  color: #f8fafc;
+}
+
+.dark-glass-modal .modal-subtitle-stack span {
+  color: #94a3b8;
+}
+
+.dark-glass-modal .modal-close-button {
+  color: #94a3b8;
+}
+
+.dark-glass-modal .modal-close-button:hover {
+  color: #f8fafc;
+}
+
+.dark-glass-modal .modal-header {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-glass-modal .modal-body p {
+  color: #cbd5e1;
+}
+
+.dark-glass-modal .how-to-section h3 {
+  color: #f8fafc;
+}
+
+.dark-glass-modal .how-to-section p {
+  color: #94a3b8;
+}
+
+.dark-glass-modal .answer-step {
+  background: rgba(15, 10, 25, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dark-glass-modal .answer-step-title {
+  color: #f8fafc;
+}
+
+.dark-glass-modal .answer-step-desc {
+  color: #94a3b8;
+}
+
+.dark-glass-modal .answer-step-number {
+  background: var(--primary);
+  color: #ffffff;
+}
+
 .modal-header {
   display: flex;
   align-items: center;
