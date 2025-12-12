@@ -100,12 +100,12 @@ export function ModalBackdropAnimation() {
             baseY,
             targetX: centerX,
             targetY: centerY,
-            radius: 200 + Math.random() * 200,
+            radius: 150 + Math.random() * 100, // Smaller radius for subtle edge glow
             hue,
-            saturation: 70 + Math.random() * 25,
-            lightness: 55 + Math.random() * 15,
+            saturation: 60 + Math.random() * 20, // Slightly less saturated
+            lightness: 50 + Math.random() * 15,
             phase: Math.random() * Math.PI * 2,
-            speed: 0.12 + Math.random() * 0.1,
+            speed: 0.08 + Math.random() * 0.06, // Slower, more subtle movement
             noiseSeedA: Math.random() * Math.PI * 2,
             noiseSeedB: Math.random() * Math.PI * 2,
           })
@@ -152,18 +152,18 @@ export function ModalBackdropAnimation() {
       blobsRef.current.forEach((blob, index) => {
         const time = t * blob.speed + blob.phase
 
-        // Oscillating progress toward center (0.1 to 0.6 range)
-        const baseProgress = 0.1 + 0.25 * (Math.sin(time * 0.5 + blob.noiseSeedA) + 1)
-        const waveProgress = 0.1 * Math.sin(time * 1.1 + blob.noiseSeedB)
+        // Stay very close to edges - only 5-15% toward center
+        const baseProgress = 0.05 + 0.05 * (Math.sin(time * 0.4 + blob.noiseSeedA) + 1)
+        const waveProgress = 0.02 * Math.sin(time * 0.8 + blob.noiseSeedB)
         const progress = clamp01(baseProgress + waveProgress)
 
-        // Lerp from spawn position toward center
+        // Lerp from spawn position toward center (barely moves inward)
         let x = lerp(blob.baseX, blob.targetX, progress)
         let y = lerp(blob.baseY, blob.targetY, progress)
 
-        // Add lateral drift perpendicular to movement direction
-        const driftAmount = 50 * Math.sin(time * 0.7 + index * 0.5)
-        const driftAmount2 = 25 * Math.sin(time * 1.4 + blob.phase)
+        // Subtle lateral drift along the edge
+        const driftAmount = 30 * Math.sin(time * 0.5 + index * 0.5)
+        const driftAmount2 = 15 * Math.sin(time * 1.0 + blob.phase)
 
         if (blob.edge === 'top' || blob.edge === 'bottom') {
           x += driftAmount + driftAmount2
@@ -171,24 +171,19 @@ export function ModalBackdropAnimation() {
           y += driftAmount + driftAmount2
         }
 
-        // Gentle pulsing
-        const pulse = 1 + Math.sin(time * 1.2) * 0.15 + Math.sin(time * 2.0 + index) * 0.08
+        // Very gentle pulsing
+        const pulse = 1 + Math.sin(time * 0.8) * 0.08 + Math.sin(time * 1.5 + index) * 0.04
         const currentRadius = blob.radius * pulse
 
-        // Calculate distance from center for alpha modulation
-        const distFromCenter = Math.sqrt(
-          Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)
-        )
-        // Alpha stronger near edges, fading toward center
-        const distanceFactor = clamp01(distFromCenter / maxDistance)
-        const baseAlpha = 0.35 + 0.35 * distanceFactor + Math.sin(time * 0.4) * 0.08
+        // Lower alpha for subtle edge glow
+        const baseAlpha = 0.2 + Math.sin(time * 0.3) * 0.05
 
         // Create radial gradient
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, currentRadius)
 
         gradient.addColorStop(0, `hsla(${blob.hue}, ${blob.saturation}%, ${blob.lightness}%, ${baseAlpha})`)
-        gradient.addColorStop(0.3, `hsla(${blob.hue}, ${blob.saturation}%, ${blob.lightness}%, ${baseAlpha * 0.75})`)
-        gradient.addColorStop(0.6, `hsla(${blob.hue}, ${blob.saturation - 5}%, ${blob.lightness - 5}%, ${baseAlpha * 0.4})`)
+        gradient.addColorStop(0.4, `hsla(${blob.hue}, ${blob.saturation}%, ${blob.lightness}%, ${baseAlpha * 0.6})`)
+        gradient.addColorStop(0.7, `hsla(${blob.hue}, ${blob.saturation - 5}%, ${blob.lightness - 5}%, ${baseAlpha * 0.25})`)
         gradient.addColorStop(1, `hsla(${blob.hue}, ${blob.saturation - 10}%, ${blob.lightness - 10}%, 0)`)
 
         ctx.fillStyle = gradient
