@@ -217,9 +217,6 @@ body {
 }
 
 .nav-dropdown-menu {
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  right: 0;
   min-width: 160px;
   background: rgba(30, 30, 35, 0.95);
   backdrop-filter: blur(20px);

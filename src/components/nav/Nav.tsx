@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { HowToPlayModal } from './HowToPlayModal';
 import { AuthModal } from './AuthModal';
@@ -75,6 +76,8 @@ export function Nav() {
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Show How to Play modal for first-time visitors
   useEffect(() => {
@@ -90,7 +93,10 @@ export function Nav() {
   // Close menu when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      const clickedInMenu = menuRef.current?.contains(target);
+      const clickedInDropdown = dropdownRef.current?.contains(target);
+      if (!clickedInMenu && !clickedInDropdown) {
         setIsMenuOpen(false);
       }
     }
@@ -106,6 +112,15 @@ export function Nav() {
     openModal();
   };
 
+  const getDropdownPosition = () => {
+    if (!buttonRef.current) return { top: 0, right: 0 };
+    const rect = buttonRef.current.getBoundingClientRect();
+    return {
+      top: rect.bottom + 8,
+      right: window.innerWidth - rect.right,
+    };
+  };
+
   return (
     <>
       <nav className="navbar">
@@ -118,6 +133,7 @@ export function Nav() {
           <div className="navbar-actions">
             <div className="nav-menu-container" ref={menuRef}>
               <button
+                ref={buttonRef}
                 className="nav-button nav-icon-button"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 aria-label="Menu"
@@ -125,8 +141,16 @@ export function Nav() {
               >
                 <MenuIcon />
               </button>
-              {isMenuOpen && (
-                <div className="nav-dropdown-menu">
+              {isMenuOpen && createPortal(
+                <div
+                  ref={dropdownRef}
+                  className="nav-dropdown-menu"
+                  style={{
+                    position: 'fixed',
+                    top: getDropdownPosition().top,
+                    right: getDropdownPosition().right,
+                  }}
+                >
                   <button
                     className="nav-dropdown-item"
                     onClick={() => handleMenuItemClick(() => setIsHowToPlayOpen(true))}
@@ -164,7 +188,8 @@ export function Nav() {
                     <SettingsIcon />
                     <span>Settings</span>
                   </button>
-                </div>
+                </div>,
+                document.body
               )}
             </div>
           </div>
