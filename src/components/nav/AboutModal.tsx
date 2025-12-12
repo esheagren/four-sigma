@@ -31,8 +31,9 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
           <div className="about-section">
             <h3>Created By</h3>
             <p>
-              4-σ was created by Erik Sheagren. Questions, feedback, or ideas? Use the Feedback
-              option in the menu to get in touch, or check out the project on{' '}
+              4-σ was created by <a href="https://eriksheagren.notion.site" target="_blank" rel="noopener noreferrer">Erik Sheagren</a>.
+              Questions, feedback, or ideas? Use the Feedback option in the menu to get in touch,
+              or check out the project on{' '}
               <a href="https://github.com/esheagren/four-sigma" target="_blank" rel="noopener noreferrer">GitHub</a>.
             </p>
           </div>
