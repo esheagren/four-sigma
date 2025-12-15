@@ -43,7 +43,7 @@ export function SignUpPromptModal({
   return createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div
-        className="modal-content signup-prompt-modal"
+        className="modal-content signup-prompt-modal dark-glass-modal"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header-horizontal">

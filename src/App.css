@@ -2986,6 +2986,34 @@ a.judgement-answer-below:hover .judgement-answer-value {
   color: #ffffff;
 }
 
+.dark-glass-modal .modal-header-horizontal {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Signup prompt modal overrides */
+.dark-glass-modal .signup-prompt-subtitle {
+  color: #94a3b8;
+}
+
+.dark-glass-modal .signup-prompt-benefits li {
+  color: #94a3b8;
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-glass-modal .signup-prompt-benefits strong {
+  color: #f8fafc;
+}
+
+.dark-glass-modal .signup-prompt-secondary-button {
+  color: #94a3b8;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark-glass-modal .signup-prompt-secondary-button:hover {
+  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
 .modal-header {
   display: flex;
   align-items: center;
@@ -4412,6 +4440,10 @@ a.judgement-answer-below:hover .judgement-answer-value {
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
+}
+
+.signup-prompt-modal.dark-glass-modal .modal-title {
+  color: #f8fafc;
 }
 
 .signup-prompt-subtitle {
