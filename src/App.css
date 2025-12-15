@@ -3009,6 +3009,130 @@ a.judgement-answer-below:hover .judgement-answer-value {
   border-color: rgba(255, 255, 255, 0.4);
 }
 
+/* About modal overrides */
+.dark-glass-modal .about-section h3 {
+  color: #f8fafc;
+}
+
+.dark-glass-modal .about-section p {
+  color: #cbd5e1;
+}
+
+.dark-glass-modal .about-section a {
+  color: var(--primary);
+}
+
+/* Auth modal overrides */
+.dark-glass-modal .auth-modal-subtitle {
+  color: #94a3b8;
+}
+
+.dark-glass-modal .form-group label {
+  color: #f8fafc;
+}
+
+.dark-glass-modal .form-group input {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f8fafc;
+}
+
+.dark-glass-modal .form-group input::placeholder {
+  color: #64748b;
+}
+
+.dark-glass-modal .form-group input:focus {
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dark-glass-modal .auth-toggle p {
+  color: #94a3b8;
+}
+
+.dark-glass-modal .auth-toggle-button {
+  color: var(--primary);
+}
+
+/* Feedback modal overrides */
+.dark-glass-modal .feedback-textarea {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f8fafc;
+}
+
+.dark-glass-modal .feedback-textarea::placeholder {
+  color: #64748b;
+}
+
+.dark-glass-modal .feedback-textarea:focus {
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dark-glass-modal .feedback-char-count {
+  color: #64748b;
+}
+
+.dark-glass-modal .feedback-success-title {
+  color: #f8fafc;
+}
+
+.dark-glass-modal .feedback-success-message {
+  color: #94a3b8;
+}
+
+.dark-glass-modal .feedback-success-icon {
+  color: var(--primary);
+}
+
+/* Settings modal overrides */
+.dark-glass-modal .settings-section-title {
+  color: #f8fafc;
+}
+
+.dark-glass-modal .settings-label {
+  color: #94a3b8;
+}
+
+.dark-glass-modal .settings-value {
+  color: #f8fafc;
+}
+
+.dark-glass-modal .settings-input {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f8fafc;
+}
+
+.dark-glass-modal .settings-input:focus {
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Statistics modal overrides */
+.dark-glass-modal .stat-value {
+  color: #f8fafc;
+}
+
+.dark-glass-modal .stat-label {
+  color: #94a3b8;
+}
+
+/* Modal footer button overrides */
+.dark-glass-modal .modal-footer {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-glass-modal .modal-button {
+  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark-glass-modal .modal-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .modal-header {
   display: flex;
   align-items: center;

@@ -101,7 +101,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
 
   return createPortal(
     <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal-content auth-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content auth-modal dark-glass-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2 className="modal-title">{mode === 'login' ? 'Sign In' : 'Create Account'}</h2>
           <button className="modal-close-button" onClick={handleClose} aria-label="Close">

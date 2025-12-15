@@ -10,7 +10,7 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
 
   return createPortal(
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content about-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content about-modal dark-glass-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2 className="modal-title">About 4-σ</h2>
           <button className="modal-close-button" onClick={onClose} aria-label="Close">
