@@ -58,23 +58,10 @@ export function SignUpPromptModal({
         </div>
 
         <div className="modal-body">
-          <p className="signup-prompt-subtitle">
-            Get more out of 4-σ by creating a free account:
-          </p>
-
           <ul className="signup-prompt-benefits">
-            <li>
-              <span className="benefit-icon">📊</span>
-              <span><strong>Track your stats</strong> – See your progress over time</span>
-            </li>
-            <li>
-              <span className="benefit-icon">🏆</span>
-              <span><strong>Join the leaderboard</strong> – Compete with other players</span>
-            </li>
-            <li>
-              <span className="benefit-icon">🔄</span>
-              <span><strong>Sync across devices</strong> – Play anywhere, anytime</span>
-            </li>
+            <li>Track your stats</li>
+            <li>Join the leaderboard</li>
+            <li>Sync across devices</li>
           </ul>
 
           <div className="signup-prompt-actions">
