@@ -34,6 +34,7 @@ export function SignUpPromptModal({
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [showGuestWarning, setShowGuestWarning] = useState(false);
   const usernameCheckTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // Track modal open (once per open)
@@ -48,6 +49,7 @@ export function SignUpPromptModal({
       setUsernameAvailable(null);
       setSuggestions([]);
       setError(null);
+      setShowGuestWarning(false);
     }
   }, [isOpen, capture]);
 
@@ -115,9 +117,17 @@ export function SignUpPromptModal({
     }
   };
 
-  const handleContinueAsGuest = () => {
-    capture('signup_prompt_continue_as_guest_clicked');
+  const handleContinueAsGuestClick = () => {
+    setShowGuestWarning(true);
+  };
+
+  const handleConfirmGuest = () => {
+    capture('signup_prompt_continue_as_guest_confirmed');
     onContinueAsGuest();
+  };
+
+  const handleBackFromWarning = () => {
+    setShowGuestWarning(false);
   };
 
   const handleSignIn = () => {
@@ -137,108 +147,149 @@ export function SignUpPromptModal({
         className="modal-content signup-prompt-modal dark-glass-modal"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="modal-header-horizontal">
-          <h2 className="modal-title">Create Your Account</h2>
-          <button
-            className="modal-close-button"
-            onClick={handleContinueAsGuest}
-            aria-label="Close"
-          >
-            &times;
-          </button>
-        </div>
-
-        <div className="modal-body">
-          <p className="signup-prompt-message">
-            Pick a username to save your progress and join the leaderboard.
-          </p>
-
-          <form onSubmit={handleSubmit} className="signup-prompt-form">
-            <div className="form-group">
-              <label htmlFor="signup-username">Username</label>
-              <div className="username-input-wrapper">
-                <input
-                  id="signup-username"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsernameValue(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-                  placeholder="Enter your username"
-                  maxLength={20}
-                  minLength={3}
-                  autoFocus
-                  className={
-                    usernameAvailable === true ? 'input-valid' :
-                    usernameAvailable === false ? 'input-invalid' : ''
-                  }
-                />
-                {isCheckingUsername && (
-                  <span className="username-status checking">checking...</span>
-                )}
-                {!isCheckingUsername && usernameAvailable === true && username.length >= 3 && (
-                  <span className="username-status available">✓ available</span>
-                )}
-                {!isCheckingUsername && usernameAvailable === false && (
-                  <span className="username-status taken">✗ taken</span>
-                )}
-              </div>
-              <small className="form-hint">3-20 characters, letters, numbers, and underscores only</small>
-              
-              {/* Username suggestions */}
-              {suggestions.length > 0 && (
-                <div className="username-suggestions">
-                  <span className="suggestions-label">Try:</span>
-                  {suggestions.map((suggestion) => (
-                    <button
-                      key={suggestion}
-                      type="button"
-                      className="suggestion-chip"
-                      onClick={() => handleSuggestionClick(suggestion)}
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
-              )}
+        {showGuestWarning ? (
+          <>
+            <div className="modal-header-horizontal">
+              <h2 className="modal-title">Continue as Guest?</h2>
+              <button
+                className="modal-close-button"
+                onClick={handleBackFromWarning}
+                aria-label="Back"
+              >
+                &times;
+              </button>
             </div>
 
-            {error && <div className="auth-error">{error}</div>}
+            <div className="modal-body">
+              <div className="guest-warning-content">
+                <div className="guest-warning-icon">⚠️</div>
+                <p className="guest-warning-message">
+                  Your stats won't be saved and you won't appear on leaderboards.
+                </p>
+                <p className="guest-warning-submessage">
+                  You can always create an account later from the menu.
+                </p>
+              </div>
 
-            <button
-              type="submit"
-              className="signup-prompt-primary-button"
-              disabled={isSubmitting || usernameAvailable === false || username.length < 3}
-            >
-              {isSubmitting ? 'Claiming...' : 'Claim Username'}
-            </button>
-          </form>
+              <div className="guest-warning-actions">
+                <button
+                  className="signup-prompt-primary-button"
+                  onClick={handleBackFromWarning}
+                >
+                  Go Back
+                </button>
+                <button
+                  className="signup-prompt-guest-button"
+                  onClick={handleConfirmGuest}
+                >
+                  Continue as Guest
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="modal-header-horizontal">
+              <h2 className="modal-title">Create Your Account</h2>
+              <button
+                className="modal-close-button"
+                onClick={handleContinueAsGuestClick}
+                aria-label="Close"
+              >
+                &times;
+              </button>
+            </div>
 
-          <div className="signup-prompt-divider">
-            <span>or</span>
-          </div>
+            <div className="modal-body">
+              <p className="signup-prompt-message">
+                Pick a username to save your progress and join the leaderboard.
+              </p>
 
-          <div className="signup-prompt-guest-section">
-            <button
-              className="signup-prompt-guest-button"
-              onClick={handleContinueAsGuest}
-            >
-              Continue as Guest
-            </button>
-            <p className="signup-prompt-guest-warning">
-              Your stats won't be saved and you won't appear on leaderboards
-            </p>
-          </div>
+              <form onSubmit={handleSubmit} className="signup-prompt-form">
+                <div className="form-group">
+                  <label htmlFor="signup-username">Username</label>
+                  <div className="username-input-wrapper">
+                    <input
+                      id="signup-username"
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsernameValue(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                      placeholder="Enter your username"
+                      maxLength={20}
+                      minLength={3}
+                      autoFocus
+                      className={
+                        usernameAvailable === true ? 'input-valid' :
+                        usernameAvailable === false ? 'input-invalid' : ''
+                      }
+                    />
+                    {isCheckingUsername && (
+                      <span className="username-status checking">checking...</span>
+                    )}
+                    {!isCheckingUsername && usernameAvailable === true && username.length >= 3 && (
+                      <span className="username-status available">✓ available</span>
+                    )}
+                    {!isCheckingUsername && usernameAvailable === false && (
+                      <span className="username-status taken">✗ taken</span>
+                    )}
+                  </div>
+                  <small className="form-hint">3-20 characters, letters, numbers, and underscores only</small>
+                  
+                  {/* Username suggestions */}
+                  {suggestions.length > 0 && (
+                    <div className="username-suggestions">
+                      <span className="suggestions-label">Try:</span>
+                      {suggestions.map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          type="button"
+                          className="suggestion-chip"
+                          onClick={() => handleSuggestionClick(suggestion)}
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
-          <div className="signup-prompt-signin">
-            Already have an account?{' '}
-            <button
-              type="button"
-              className="signup-prompt-signin-link"
-              onClick={handleSignIn}
-            >
-              Sign in
-            </button>
-          </div>
-        </div>
+                {error && <div className="auth-error">{error}</div>}
+
+                <button
+                  type="submit"
+                  className="signup-prompt-primary-button"
+                  disabled={isSubmitting || usernameAvailable === false || username.length < 3}
+                >
+                  {isSubmitting ? 'Claiming...' : 'Claim Username'}
+                </button>
+              </form>
+
+              <div className="signup-prompt-divider">
+                <span>or</span>
+              </div>
+
+              <div className="signup-prompt-guest-section">
+                <button
+                  className="signup-prompt-guest-button"
+                  onClick={handleContinueAsGuestClick}
+                >
+                  Continue as Guest
+                </button>
+              </div>
+
+              <div className="signup-prompt-signin">
+                Already have an account?{' '}
+                <button
+                  type="button"
+                  className="signup-prompt-signin-link"
+                  onClick={handleSignIn}
+                >
+                  Sign in
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>,
     document.body
