@@ -154,7 +154,7 @@ export async function getQuestionTopScorers(
       score,
       lower_bound,
       upper_bound,
-      users!fk_user_responses_user(display_name)
+      users!fk_user_responses_user(username)
     `)
     .in('question_id', questionIds)
     .gte('answered_at', todayStart)
@@ -173,10 +173,10 @@ export async function getQuestionTopScorers(
   for (const row of data) {
     const questionId = row.question_id;
     if (!result.has(questionId)) {
-      const displayName = (row.users as any)?.display_name || 'Anonymous';
+      const username = (row.users as any)?.username || 'Anonymous';
       result.set(questionId, {
         highestScore: Number(row.score),
-        highestScoreUsername: displayName,
+        highestScoreUsername: username,
         lowerBound: Number(row.lower_bound),
         upperBound: Number(row.upper_bound),
       });
@@ -280,11 +280,11 @@ export async function getDailyStats(userId: string): Promise<{
   if (top5UserIds.length > 0) {
     const { data: userNames, error: userNamesError } = await supabase
       .from('users')
-      .select('id, display_name')
+      .select('id, username')
       .in('id', top5UserIds);
 
     if (!userNamesError && userNames) {
-      const userNameMap = new Map(userNames.map(u => [u.id, u.display_name]));
+      const userNameMap = new Map(userNames.map(u => [u.id, u.username]));
       todayLeaderboard = sortedUsers.slice(0, 5).map((user, index) => ({
         rank: index + 1,
         username: userNameMap.get(user.userId) || 'Anonymous',
@@ -611,7 +611,7 @@ export async function getOverallLeaderboard(
   const top10UserIds = top10.map(u => u.userId);
   const { data: users, error: usersError } = await supabase
     .from('users')
-    .select('id, display_name, games_played')
+    .select('id, username, games_played')
     .in('id', top10UserIds);
 
   if (usersError) {
@@ -625,7 +625,7 @@ export async function getOverallLeaderboard(
     const user = userMap.get(entry.userId);
     return {
       rank: index + 1,
-      displayName: user?.display_name || 'Anonymous',
+      username: user?.username || 'Anonymous',
       totalScore: Math.round(entry.bestDayScore),
       gamesPlayed: user?.games_played || 0,
       isCurrentUser: currentUserId ? entry.userId === currentUserId : false,

@@ -9,7 +9,7 @@ export function ProfilePage() {
   const { capture } = useAnalytics();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editDisplayName, setEditDisplayName] = useState('');
+  const [editUsername, setEditUsername] = useState('');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const settingsRef = useRef<HTMLDivElement>(null);
   const hasTrackedView = useRef(false);
@@ -57,7 +57,7 @@ export function ProfilePage() {
   }
 
   const handleStartEdit = () => {
-    setEditDisplayName(user.displayName);
+    setEditUsername(user.username);
     setIsEditing(true);
   };
 
@@ -68,30 +68,30 @@ export function ProfilePage() {
 
   const handleCancelEdit = () => {
     setIsEditing(false);
-    setEditDisplayName('');
+    setEditUsername('');
   };
 
   return (
     <div className="profile-container">
       <div className="profile-header">
         <div className="profile-avatar">
-          {user.displayName.charAt(0).toUpperCase()}
+          {user.username.charAt(0).toUpperCase()}
         </div>
         <div className="profile-info">
           {isEditing ? (
             <div className="profile-edit-name">
               <input
                 type="text"
-                value={editDisplayName}
-                onChange={(e) => setEditDisplayName(e.target.value)}
-                maxLength={50}
+                value={editUsername}
+                onChange={(e) => setEditUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                maxLength={20}
               />
               <button onClick={handleSaveEdit} className="profile-save-btn">Save</button>
               <button onClick={handleCancelEdit} className="profile-cancel-btn">Cancel</button>
             </div>
           ) : (
             <h1>
-              {user.displayName}
+              {user.username}
             </h1>
           )}
           {isAnonymous && (

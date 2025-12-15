@@ -6,8 +6,9 @@ export interface User {
   deviceId: string | null;
   authId: string | null;
   email: string | null;
-  displayName: string;
+  username: string;
   isAnonymous: boolean;
+  emailVerified: boolean;
   createdAt: Date;
   lastPlayedAt: Date | null;
   timezone: string;
@@ -105,7 +106,7 @@ export interface TodayLeaderboardEntry {
 
 export interface OverallLeaderboardEntry {
   rank: number;
-  displayName: string;
+  username: string;
   totalScore: number;
   gamesPlayed: number;
   isCurrentUser?: boolean;

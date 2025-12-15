@@ -4,7 +4,7 @@ import html2canvas from 'html2canvas';
 interface ShareLeaderboardCardProps {
   percentile: number;
   totalPlayers: number;
-  displayName: string;
+  username: string;
 }
 
 export interface ShareLeaderboardCardRef {
@@ -56,7 +56,7 @@ function getStandingMessage(percentile: number): { headline: string; subtext: st
 }
 
 export const ShareLeaderboardCard = forwardRef<ShareLeaderboardCardRef, ShareLeaderboardCardProps>(
-  ({ percentile, totalPlayers, displayName }, ref) => {
+  ({ percentile, totalPlayers, username }, ref) => {
     const cardRef = useRef<HTMLDivElement>(null);
     const colors = useMemo(() => generateColorScheme(), []);
     const { headline, subtext } = getStandingMessage(percentile);
@@ -127,7 +127,7 @@ export const ShareLeaderboardCard = forwardRef<ShareLeaderboardCardRef, ShareLea
               className="share-card-player-name"
               style={{ color: colors.primary }}
             >
-              {displayName}
+              {username}
             </span>
           </div>
 

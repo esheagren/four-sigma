@@ -3,7 +3,7 @@ import html2canvas from 'html2canvas';
 
 interface ShareScoreCardProps {
   totalScore: number;
-  displayName: string;
+  username: string;
   hits: number;
   total: number;
   calibration?: number;
@@ -46,7 +46,7 @@ function generateColorScheme() {
 }
 
 export const ShareScoreCard = forwardRef<ShareScoreCardRef, ShareScoreCardProps>(
-  ({ totalScore, displayName, hits, total, calibration, percentile }, ref) => {
+  ({ totalScore, username, hits, total, calibration, percentile }, ref) => {
     const cardRef = useRef<HTMLDivElement>(null);
 
     // Generate colors once per render (will regenerate each time share is clicked)
@@ -138,7 +138,7 @@ export const ShareScoreCard = forwardRef<ShareScoreCardRef, ShareScoreCardProps>
               className="share-card-player-name"
               style={{ color: colors.primary }}
             >
-              {displayName}
+              {username}
             </span>
           </div>
 

@@ -62,7 +62,7 @@ interface TodayLeaderboardEntry {
 
 interface OverallLeaderboardEntry {
   rank: number;
-  displayName: string;
+  username: string;
   totalScore: number;
   gamesPlayed: number;
   isCurrentUser?: boolean;
@@ -273,7 +273,7 @@ export function ResultsCarousel({
       <ShareScoreCard
         ref={shareCardRef}
         totalScore={score}
-        displayName={user?.displayName || 'Player'}
+        username={user?.username || 'Player'}
         hits={hits}
         total={total}
         calibration={calibration}
@@ -314,7 +314,7 @@ export function ResultsCarousel({
             ref={setSlideRef(safeJudgements.length + 1)}
             overallLeaderboard={overallLeaderboard}
             overallStanding={overallStanding}
-            displayName={user?.displayName || 'Player'}
+            username={user?.username || 'Player'}
           />
 
           {/* User Stats Slide (Long-term stats) */}

@@ -39,7 +39,7 @@ interface TodayLeaderboardEntry {
 
 interface OverallLeaderboardEntry {
   rank: number;
-  displayName: string;
+  username: string;
   totalScore: number;
   gamesPlayed: number;
   isCurrentUser?: boolean;

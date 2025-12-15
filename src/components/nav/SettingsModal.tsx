@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../../context/AuthContext';
+import { getDeviceId } from '../../lib/device';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -8,28 +9,88 @@ interface SettingsModalProps {
 }
 
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
-  const { user, isAnonymous, logout, authToken } = useAuth();
-  const [displayName, setDisplayName] = useState(user?.displayName ?? '');
+  const { user, isAnonymous, hasEmail, logout, authToken, checkUsername, refreshUser } = useAuth();
+  const [username, setUsername] = useState(user?.username ?? '');
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const usernameCheckTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  // Reset state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setUsername(user?.username ?? '');
+      setIsEditing(false);
+      setError(null);
+      setSuccessMessage(null);
+      setUsernameAvailable(null);
+      setSuggestions([]);
+    }
+  }, [isOpen, user?.username]);
+
+  // Debounced username availability check
+  useEffect(() => {
+    if (!isEditing) return;
+
+    // Clear previous timeout
+    if (usernameCheckTimeout.current) {
+      clearTimeout(usernameCheckTimeout.current);
+    }
+
+    // Reset state if username is empty or too short
+    if (!username || username.length < 3) {
+      setUsernameAvailable(null);
+      setSuggestions([]);
+      return;
+    }
+
+    // Don't check if it's the same as current username
+    if (user?.username && username.toLowerCase() === user.username.toLowerCase()) {
+      setUsernameAvailable(true);
+      setSuggestions([]);
+      return;
+    }
+
+    // Debounce the check
+    setIsCheckingUsername(true);
+    usernameCheckTimeout.current = setTimeout(async () => {
+      const result = await checkUsername(username);
+      setUsernameAvailable(result.available);
+      setSuggestions(result.suggestions || []);
+      setIsCheckingUsername(false);
+    }, 400);
+
+    return () => {
+      if (usernameCheckTimeout.current) {
+        clearTimeout(usernameCheckTimeout.current);
+      }
+    };
+  }, [username, isEditing, user?.username, checkUsername]);
 
   if (!isOpen) return null;
 
-  const handleSaveDisplayName = async () => {
-    if (!displayName.trim()) {
-      setError('Display name cannot be empty');
+  const handleSaveUsername = async () => {
+    if (!username.trim()) {
+      setError('Username cannot be empty');
       return;
     }
 
-    if (displayName.trim().length < 2) {
-      setError('Display name must be at least 2 characters');
+    if (username.trim().length < 3) {
+      setError('Username must be at least 3 characters');
       return;
     }
 
-    if (displayName.trim().length > 20) {
-      setError('Display name must be 20 characters or less');
+    if (username.trim().length > 20) {
+      setError('Username must be 20 characters or less');
+      return;
+    }
+
+    if (usernameAvailable === false) {
+      setError('Username is not available');
       return;
     }
 
@@ -37,34 +98,49 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     setError(null);
 
     try {
-      const response = await fetch('/api/auth/update-profile', {
-        method: 'POST',
+      const deviceId = getDeviceId();
+      const response = await fetch('/api/user/profile', {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          'X-Device-Id': deviceId,
           ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
         },
-        body: JSON.stringify({ displayName: displayName.trim() }),
+        body: JSON.stringify({ username: username.trim() }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to update display name');
+        if (data.suggestions) {
+          setSuggestions(data.suggestions);
+        }
+        throw new Error(data.error || 'Failed to update username');
       }
 
-      setSuccessMessage('Display name updated!');
+      setSuccessMessage('Username updated!');
       setIsEditing(false);
+      await refreshUser();
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update display name');
+      setError(err instanceof Error ? err.message : 'Failed to update username');
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setUsername(suggestion);
+    setSuggestions([]);
+    setError(null);
   };
 
   const handleLogout = async () => {
     await logout();
     onClose();
   };
+
+  const isGuestUser = user?.username === 'Guest Player' || isAnonymous;
 
   return createPortal(
     <div className="modal-overlay" onClick={onClose}>
@@ -81,21 +157,35 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             <h3 className="settings-section-title">Profile</h3>
 
             <div className="settings-item">
-              <label className="settings-label">Display Name</label>
+              <label className="settings-label">Username</label>
               {isEditing ? (
                 <div className="settings-edit-row">
-                  <input
-                    type="text"
-                    className="settings-input"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    maxLength={20}
-                    autoFocus
-                  />
+                  <div className="username-input-wrapper">
+                    <input
+                      type="text"
+                      className={`settings-input ${
+                        usernameAvailable === true ? 'input-valid' :
+                        usernameAvailable === false ? 'input-invalid' : ''
+                      }`}
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                      maxLength={20}
+                      autoFocus
+                    />
+                    {isCheckingUsername && (
+                      <span className="username-status checking">checking...</span>
+                    )}
+                    {!isCheckingUsername && usernameAvailable === true && username.length >= 3 && (
+                      <span className="username-status available">✓</span>
+                    )}
+                    {!isCheckingUsername && usernameAvailable === false && (
+                      <span className="username-status taken">✗</span>
+                    )}
+                  </div>
                   <button
                     className="settings-save-button"
-                    onClick={handleSaveDisplayName}
-                    disabled={isSaving}
+                    onClick={handleSaveUsername}
+                    disabled={isSaving || usernameAvailable === false}
                   >
                     {isSaving ? 'Saving...' : 'Save'}
                   </button>
@@ -103,8 +193,10 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     className="settings-cancel-button"
                     onClick={() => {
                       setIsEditing(false);
-                      setDisplayName(user?.displayName ?? '');
+                      setUsername(user?.username ?? '');
                       setError(null);
+                      setUsernameAvailable(null);
+                      setSuggestions([]);
                     }}
                     disabled={isSaving}
                   >
@@ -113,15 +205,35 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 </div>
               ) : (
                 <div className="settings-value-row">
-                  <span className="settings-value">{user?.displayName}</span>
+                  <span className="settings-value">
+                    {isGuestUser ? <em>Not set</em> : user?.username}
+                  </span>
                   <button
                     className="settings-edit-button"
                     onClick={() => setIsEditing(true)}
                   >
-                    Edit
+                    {isGuestUser ? 'Set' : 'Edit'}
                   </button>
                 </div>
               )}
+              
+              {/* Username suggestions */}
+              {suggestions.length > 0 && (
+                <div className="username-suggestions">
+                  <span className="suggestions-label">Try:</span>
+                  {suggestions.map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      className="suggestion-chip"
+                      onClick={() => handleSuggestionClick(suggestion)}
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              )}
+              
               {error && <div className="settings-error">{error}</div>}
               {successMessage && <div className="settings-success">{successMessage}</div>}
             </div>

@@ -2,6 +2,16 @@ import { supabase } from './supabase.js';
 import { User } from './types.js';
 import { rowToUser, getUserById } from './auth.js';
 
+// Username validation regex: 3-20 chars, alphanumeric + underscore
+const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,20}$/;
+
+/**
+ * Validate username format
+ */
+export function isValidUsername(username: string): boolean {
+  return USERNAME_REGEX.test(username);
+}
+
 /**
  * Get or create an anonymous user by device ID
  */
@@ -22,7 +32,7 @@ export async function getOrCreateDeviceUser(deviceId: string): Promise<User> {
     .from('users')
     .insert({
       device_id: deviceId,
-      display_name: 'Guest Player',
+      username: 'Guest Player',
       is_anonymous: true,
     })
     .select()
@@ -53,21 +63,22 @@ export async function getUserByEmail(email: string): Promise<User | null> {
 }
 
 /**
- * Convert anonymous user to authenticated user
+ * Convert anonymous user to authenticated user (with email)
  */
 export async function convertToAuthenticatedUser(
   userId: string,
   authId: string,
   email: string,
-  displayName: string
+  username: string
 ): Promise<User> {
   const { data, error } = await supabase
     .from('users')
     .update({
       auth_id: authId,
       email: email,
-      display_name: displayName,
+      username: username,
       is_anonymous: false,
+      email_verified: true,
     })
     .eq('id', userId)
     .select()
@@ -81,12 +92,12 @@ export async function convertToAuthenticatedUser(
 }
 
 /**
- * Create a new authenticated user
+ * Create a new authenticated user (with email)
  */
 export async function createAuthenticatedUser(
   authId: string,
   email: string,
-  displayName: string,
+  username: string,
   deviceId?: string
 ): Promise<User> {
   const { data, error } = await supabase
@@ -94,9 +105,10 @@ export async function createAuthenticatedUser(
     .insert({
       auth_id: authId,
       email: email,
-      display_name: displayName,
+      username: username,
       device_id: deviceId || null,
       is_anonymous: false,
+      email_verified: true,
     })
     .select()
     .single();
@@ -141,11 +153,11 @@ export async function mergeUsers(anonymousUserId: string, authenticatedUserId: s
  */
 export async function updateUserProfile(
   userId: string,
-  updates: { displayName?: string; timezone?: string; themePreference?: string }
+  updates: { username?: string; timezone?: string; themePreference?: string }
 ): Promise<User> {
   const updateData: any = {};
-  if (updates.displayName !== undefined) {
-    updateData.display_name = updates.displayName;
+  if (updates.username !== undefined) {
+    updateData.username = updates.username;
   }
   if (updates.timezone !== undefined) {
     updateData.timezone = updates.timezone;
@@ -216,4 +228,100 @@ export async function getUserStats(userId: string): Promise<{
     recentGames: recentGames || [],
     categoryStats: categoryStats || [],
   };
+}
+
+/**
+ * Get user by username (case-insensitive)
+ */
+export async function getUserByUsername(username: string): Promise<User | null> {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .ilike('username', username)
+    .neq('username', 'Guest Player')
+    .single();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return rowToUser(data);
+}
+
+/**
+ * Check if a username is available (case-insensitive)
+ */
+export async function isUsernameAvailable(username: string): Promise<boolean> {
+  const existing = await getUserByUsername(username);
+  return existing === null;
+}
+
+/**
+ * Generate username suggestions based on a taken username
+ */
+export function generateUsernameSuggestions(baseUsername: string): string[] {
+  const suggestions: string[] = [];
+  const random = Math.floor(Math.random() * 1000);
+
+  suggestions.push(`${baseUsername}${random}`);
+  suggestions.push(`${baseUsername}_${random}`);
+  suggestions.push(`${baseUsername}${Math.floor(Math.random() * 100)}`);
+
+  return suggestions;
+}
+
+/**
+ * Set username for a device user (converts from anonymous to username-only)
+ * This is for username-only signup (no email/password)
+ */
+export async function setUsernameForDevice(
+  deviceId: string,
+  username: string
+): Promise<User> {
+  // First, get or create the device user
+  const existingUser = await getOrCreateDeviceUser(deviceId);
+
+  // Update the user with the username and mark as non-anonymous
+  const { data, error } = await supabase
+    .from('users')
+    .update({
+      username: username,
+      is_anonymous: false,
+    })
+    .eq('id', existingUser.id)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to set username: ${error.message}`);
+  }
+
+  return rowToUser(data);
+}
+
+/**
+ * Link email to a username-only user (creates Supabase auth)
+ * This upgrades a username-only account to a full account with email
+ */
+export async function linkEmailToUser(
+  userId: string,
+  authId: string,
+  email: string
+): Promise<User> {
+  const { data, error } = await supabase
+    .from('users')
+    .update({
+      auth_id: authId,
+      email: email,
+      email_verified: true,
+    })
+    .eq('id', userId)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to link email: ${error.message}`);
+  }
+
+  return rowToUser(data);
 }

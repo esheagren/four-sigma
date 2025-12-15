@@ -8,8 +8,9 @@ function rowToUser(row: any): User {
     deviceId: row.device_id,
     authId: row.auth_id,
     email: row.email,
-    displayName: row.display_name,
+    username: row.username,
     isAnonymous: row.is_anonymous,
+    emailVerified: row.email_verified ?? false,
     createdAt: new Date(row.created_at),
     lastPlayedAt: row.last_played_at ? new Date(row.last_played_at) : null,
     timezone: row.timezone,
@@ -45,7 +46,7 @@ export async function getOrCreateDeviceUser(deviceId: string): Promise<User> {
     .from('users')
     .insert({
       device_id: deviceId,
-      display_name: 'Guest Player',
+      username: 'Guest Player',
       is_anonymous: true,
     })
     .select()
@@ -134,15 +135,16 @@ export async function convertToAuthenticatedUser(
   userId: string,
   authId: string,
   email: string,
-  displayName: string
+  username: string
 ): Promise<User> {
   const { data, error } = await supabase
     .from('users')
     .update({
       auth_id: authId,
       email: email,
-      display_name: displayName,
+      username: username,
       is_anonymous: false,
+      email_verified: true,
     })
     .eq('id', userId)
     .select()
@@ -161,7 +163,7 @@ export async function convertToAuthenticatedUser(
 export async function createAuthenticatedUser(
   authId: string,
   email: string,
-  displayName: string,
+  username: string,
   deviceId?: string
 ): Promise<User> {
   const { data, error } = await supabase
@@ -169,9 +171,10 @@ export async function createAuthenticatedUser(
     .insert({
       auth_id: authId,
       email: email,
-      display_name: displayName,
+      username: username,
       device_id: deviceId || null,
       is_anonymous: false,
+      email_verified: true,
     })
     .select()
     .single();
@@ -217,11 +220,11 @@ export async function mergeUsers(anonymousUserId: string, authenticatedUserId: s
  */
 export async function updateUserProfile(
   userId: string,
-  updates: { displayName?: string; timezone?: string }
+  updates: { username?: string; timezone?: string }
 ): Promise<User> {
   const updateData: any = {};
-  if (updates.displayName !== undefined) {
-    updateData.display_name = updates.displayName;
+  if (updates.username !== undefined) {
+    updateData.username = updates.username;
   }
   if (updates.timezone !== undefined) {
     updateData.timezone = updates.timezone;

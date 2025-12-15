@@ -308,7 +308,7 @@ router.get('/leaderboard/overall', async (req: Request, res: Response) => {
   try {
     const { data, error } = await supabase
       .from('users')
-      .select('id, display_name, total_score, games_played, average_score')
+      .select('id, username, total_score, games_played, average_score')
       .gt('games_played', 0)
       .order('total_score', { ascending: false })
       .limit(10);
@@ -320,7 +320,7 @@ router.get('/leaderboard/overall', async (req: Request, res: Response) => {
 
     const leaderboard = (data || []).map((user, index) => ({
       rank: index + 1,
-      displayName: user.display_name,
+      username: user.username,
       totalScore: Math.round(Number(user.total_score)),
       gamesPlayed: user.games_played,
       averageScore: Number(user.average_score).toFixed(1),
@@ -347,7 +347,7 @@ router.get('/leaderboard/best-guesses', async (req: Request, res: Response) => {
         upper_bound,
         answer_value_at_response,
         answered_at,
-        users!fk_user_responses_user(display_name),
+        users!fk_user_responses_user(username),
         questions!inner(question_text)
       `)
       .order('score', { ascending: false })
@@ -360,7 +360,7 @@ router.get('/leaderboard/best-guesses', async (req: Request, res: Response) => {
 
     const leaderboard = (data || []).map((entry: any, index: number) => ({
       rank: index + 1,
-      displayName: entry.users?.display_name || 'Anonymous',
+      username: entry.users?.username || 'Anonymous',
       score: Math.round(Number(entry.score)),
       questionText: entry.questions?.question_text || 'Unknown question',
       lowerBound: Number(entry.lower_bound),

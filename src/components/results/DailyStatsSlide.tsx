@@ -3,7 +3,7 @@ import { ShareLeaderboardCard, type ShareLeaderboardCardRef } from './ShareLeade
 
 interface OverallLeaderboardEntry {
   rank: number;
-  displayName: string;
+  username: string;
   totalScore: number;
   gamesPlayed: number;
   isCurrentUser?: boolean;
@@ -17,7 +17,7 @@ interface OverallStanding {
 interface DailyStatsSlideProps {
   overallLeaderboard?: OverallLeaderboardEntry[];
   overallStanding?: OverallStanding;
-  displayName: string;
+  username: string;
 }
 
 function getStandingDisplay(percentile: number): {
@@ -44,7 +44,7 @@ function getStandingDisplay(percentile: number): {
 export const DailyStatsSlide = forwardRef<HTMLDivElement, DailyStatsSlideProps>(({
   overallLeaderboard,
   overallStanding,
-  displayName,
+  username,
 }, ref) => {
   const shareCardRef = useRef<ShareLeaderboardCardRef>(null);
   const [isSharing, setIsSharing] = useState(false);
@@ -143,7 +143,7 @@ export const DailyStatsSlide = forwardRef<HTMLDivElement, DailyStatsSlideProps>(
                   className={`leaderboard-entry ${entry.isCurrentUser ? 'is-current-user' : ''}`}
                 >
                   <span className="leaderboard-rank">#{entry.rank}</span>
-                  <span className="leaderboard-username">{entry.displayName}</span>
+                  <span className="leaderboard-username">{entry.username}</span>
                   <span className="leaderboard-score">{entry.totalScore.toLocaleString()}</span>
                 </div>
               ))}
@@ -170,7 +170,7 @@ export const DailyStatsSlide = forwardRef<HTMLDivElement, DailyStatsSlideProps>(
           ref={shareCardRef}
           percentile={overallStanding.percentile}
           totalPlayers={overallStanding.totalPlayers}
-          displayName={displayName}
+          username={username}
         />
       )}
     </div>
