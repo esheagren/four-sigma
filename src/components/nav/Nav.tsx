@@ -84,7 +84,7 @@ const HAS_DISMISSED_EMAIL_UPGRADE_KEY = 'four_sigma_dismissed_email_upgrade';
 const EMAIL_UPGRADE_VISIT_THRESHOLD = 4;
 
 export function Nav() {
-  const { isAnonymous, isLoading, hasUsername, hasEmail } = useAuth();
+  const { isAnonymous, isLoading, hasUsername, hasEmail, checkUsername, setUsername } = useAuth();
   const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isStatisticsOpen, setIsStatisticsOpen] = useState(false);
@@ -157,14 +157,14 @@ export function Nav() {
     }
   };
 
-  const handleSignUpPromptCreateAccount = () => {
-    setIsSignUpPromptOpen(false);
-    setAuthModalInitialMode('signup');
-    setIsAuthModalOpen(true);
-  };
-
   const handleSignUpPromptContinueAsGuest = () => {
     setIsSignUpPromptOpen(false);
+  };
+
+  const handleSignUpPromptSignIn = () => {
+    setIsSignUpPromptOpen(false);
+    setAuthModalInitialMode('login');
+    setIsAuthModalOpen(true);
   };
 
   const handleEmailUpgradeAddEmail = () => {
@@ -287,8 +287,10 @@ export function Nav() {
       <SignUpPromptModal
         isOpen={isSignUpPromptOpen}
         onClose={handleSignUpPromptContinueAsGuest}
-        onCreateAccount={handleSignUpPromptCreateAccount}
         onContinueAsGuest={handleSignUpPromptContinueAsGuest}
+        onSignIn={handleSignUpPromptSignIn}
+        checkUsername={checkUsername}
+        setUsername={setUsername}
       />
 
       <EmailUpgradePromptModal
