@@ -58,18 +58,16 @@ export function SignUpPromptModal({
         </div>
 
         <div className="modal-body">
-          <ul className="signup-prompt-benefits">
-            <li>Track your stats</li>
-            <li>Join the leaderboard</li>
-            <li>Sync across devices</li>
-          </ul>
+          <p className="signup-prompt-message">
+            We're not gonna spam you. We'll track your stats and let you join the leaderboard to compare with other players.
+          </p>
 
           <div className="signup-prompt-actions">
             <button
               className="signup-prompt-primary-button"
               onClick={handleCreateAccount}
             >
-              Create Account
+              Let's do it
             </button>
             <button
               className="signup-prompt-secondary-button"

@@ -4462,6 +4462,18 @@ a.judgement-answer-below:hover .judgement-answer-value {
   line-height: 1.4;
 }
 
+.signup-prompt-message {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0 0 2rem;
+  text-align: center;
+}
+
+.dark-glass-modal .signup-prompt-message {
+  color: #cbd5e1;
+}
+
 .signup-prompt-actions {
   display: flex;
   flex-direction: column;
