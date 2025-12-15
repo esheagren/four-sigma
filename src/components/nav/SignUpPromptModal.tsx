@@ -59,7 +59,7 @@ export function SignUpPromptModal({
 
         <div className="modal-body">
           <p className="signup-prompt-message">
-            We're not gonna spam you. We'll track your stats and let you join the leaderboard to compare with other players.
+            We're not gonna spam you. We'll track your stats and let you join the leaderboard to compare with other players. More features coming soon.
           </p>
 
           <div className="signup-prompt-actions">
