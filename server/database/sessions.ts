@@ -173,10 +173,10 @@ export async function getQuestionTopScorers(
   for (const row of data) {
     const questionId = row.question_id;
     if (!result.has(questionId)) {
-      const username = (row.users as any)?.username || 'Anonymous';
+      const displayName = (row.users as any)?.username || 'Anonymous';
       result.set(questionId, {
         highestScore: Number(row.score),
-        highestScoreUsername: username,
+        highestScoreUsername: displayName,
         lowerBound: Number(row.lower_bound),
         upperBound: Number(row.upper_bound),
       });
@@ -625,7 +625,7 @@ export async function getOverallLeaderboard(
     const user = userMap.get(entry.userId);
     return {
       rank: index + 1,
-      username: user?.username || 'Anonymous',
+      displayName: user?.username || 'Anonymous',
       totalScore: Math.round(entry.bestDayScore),
       gamesPlayed: user?.games_played || 0,
       isCurrentUser: currentUserId ? entry.userId === currentUserId : false,

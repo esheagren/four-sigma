@@ -8,9 +8,8 @@ function rowToUser(row: any): User {
     deviceId: row.device_id,
     authId: row.auth_id,
     email: row.email,
-    username: row.username,
+    displayName: row.username,
     isAnonymous: row.is_anonymous,
-    emailVerified: row.email_verified ?? false,
     createdAt: new Date(row.created_at),
     lastPlayedAt: row.last_played_at ? new Date(row.last_played_at) : null,
     timezone: row.timezone,
@@ -135,16 +134,15 @@ export async function convertToAuthenticatedUser(
   userId: string,
   authId: string,
   email: string,
-  username: string
+  displayName: string
 ): Promise<User> {
   const { data, error } = await supabase
     .from('users')
     .update({
       auth_id: authId,
       email: email,
-      username: username,
+      username: displayName,
       is_anonymous: false,
-      email_verified: true,
     })
     .eq('id', userId)
     .select()
@@ -163,7 +161,7 @@ export async function convertToAuthenticatedUser(
 export async function createAuthenticatedUser(
   authId: string,
   email: string,
-  username: string,
+  displayName: string,
   deviceId?: string
 ): Promise<User> {
   const { data, error } = await supabase
@@ -171,10 +169,9 @@ export async function createAuthenticatedUser(
     .insert({
       auth_id: authId,
       email: email,
-      username: username,
+      username: displayName,
       device_id: deviceId || null,
       is_anonymous: false,
-      email_verified: true,
     })
     .select()
     .single();
@@ -220,11 +217,11 @@ export async function mergeUsers(anonymousUserId: string, authenticatedUserId: s
  */
 export async function updateUserProfile(
   userId: string,
-  updates: { username?: string; timezone?: string }
+  updates: { displayName?: string; timezone?: string }
 ): Promise<User> {
   const updateData: any = {};
-  if (updates.username !== undefined) {
-    updateData.username = updates.username;
+  if (updates.displayName !== undefined) {
+    updateData.username = updates.displayName;
   }
   if (updates.timezone !== undefined) {
     updateData.timezone = updates.timezone;

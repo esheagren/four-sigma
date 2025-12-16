@@ -83,6 +83,13 @@ export interface Judgement {
   crowdData?: CrowdData;
 }
 
+export interface TodayLeaderboardEntry {
+  rank: number;
+  username: string;
+  score: number;
+  isCurrentUser?: boolean;
+}
+
 export interface DailyStats {
   dailyRank: number | null;
   topScoreToday: number | null;
@@ -90,6 +97,7 @@ export interface DailyStats {
   userScoreToday: number | null;
   calibrationToday: number | null;
   totalParticipantsToday: number;
+  todayLeaderboard?: TodayLeaderboardEntry[];
 }
 
 export interface PerformanceHistoryEntry {

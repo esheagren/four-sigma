@@ -142,6 +142,12 @@ export async function getDailyStats(userId: string): Promise<{
   userScoreToday: number | null;
   calibrationToday: number | null;
   totalParticipantsToday: number;
+  todayLeaderboard?: Array<{
+    rank: number;
+    username: string;
+    score: number;
+    isCurrentUser?: boolean;
+  }>;
 }> {
   const todayStart = getUTCDayStart();
 
@@ -166,6 +172,7 @@ export async function getDailyStats(userId: string): Promise<{
       userScoreToday: null,
       calibrationToday: null,
       totalParticipantsToday: 0,
+      todayLeaderboard: undefined,
     };
   }
 
@@ -185,6 +192,7 @@ export async function getDailyStats(userId: string): Promise<{
       userScoreToday: null,
       calibrationToday: cumulativeCalibration,
       totalParticipantsToday: 0,
+      todayLeaderboard: undefined,
     };
   }
 
@@ -214,6 +222,35 @@ export async function getDailyStats(userId: string): Promise<{
   const userRankIndex = sortedUsers.findIndex(u => u.userId === userId);
   const userStats = sortedUsers.find(u => u.userId === userId);
 
+  // Generate today's leaderboard (top 10)
+  let todayLeaderboard: Array<{
+    rank: number;
+    username: string;
+    score: number;
+    isCurrentUser?: boolean;
+  }> | undefined;
+
+  if (sortedUsers.length > 0) {
+    // Fetch usernames for top 10 users
+    const topUserIds = sortedUsers.slice(0, 10).map(u => u.userId);
+    const { data: topUsers, error: usersError } = await supabase
+      .from('users')
+      .select('id, username')
+      .in('id', topUserIds);
+
+    if (!usersError && topUsers) {
+      todayLeaderboard = sortedUsers.slice(0, 10).map((user, index) => {
+        const userData = topUsers.find(u => u.id === user.userId);
+        return {
+          rank: index + 1,
+          username: userData?.username || 'Anonymous',
+          score: Math.round(user.totalScore),
+          isCurrentUser: user.userId === userId,
+        };
+      });
+    }
+  }
+
   return {
     dailyRank: userRankIndex >= 0 ? userRankIndex + 1 : null,
     topScoreToday: topScore,
@@ -221,6 +258,7 @@ export async function getDailyStats(userId: string): Promise<{
     userScoreToday: userStats?.totalScore ?? null,
     calibrationToday: cumulativeCalibration,
     totalParticipantsToday: totalParticipants,
+    todayLeaderboard,
   };
 }
 
@@ -489,6 +527,99 @@ export async function getCalibrationMilestones(userId: string): Promise<Array<{
     label: formatLabel(dateStr),
     calibration: getCalibration(dateStr),
   }));
+}
+
+/**
+ * Get overall leaderboard showing top performers by total score
+ */
+export async function getOverallLeaderboard(
+  userId: string,
+  limit: number = 10
+): Promise<Array<{
+  rank: number;
+  displayName: string;
+  totalScore: number;
+  gamesPlayed: number;
+  isCurrentUser?: boolean;
+}>> {
+  const { data: topUsers, error } = await supabase
+    .from('users')
+    .select('id, username, total_score, games_played')
+    .gt('games_played', 0)
+    .order('total_score', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Failed to fetch overall leaderboard:', error);
+    return [];
+  }
+
+  if (!topUsers || topUsers.length === 0) {
+    return [];
+  }
+
+  return topUsers.map((user, index) => ({
+    rank: index + 1,
+    displayName: user.username,
+    totalScore: Math.round(Number(user.total_score)),
+    gamesPlayed: user.games_played,
+    isCurrentUser: user.id === userId,
+  }));
+}
+
+/**
+ * Get user's overall standing (percentile and total players)
+ */
+export async function getOverallStanding(
+  userId: string
+): Promise<{
+  percentile: number;
+  totalPlayers: number;
+} | null> {
+  // Get total number of users who have played at least one game
+  const { count: totalPlayers, error: countError } = await supabase
+    .from('users')
+    .select('*', { count: 'exact', head: true })
+    .gt('games_played', 0);
+
+  if (countError || totalPlayers === null || totalPlayers === 0) {
+    console.error('Failed to count total players:', countError);
+    return null;
+  }
+
+  // Get current user's score
+  const { data: currentUser, error: userError } = await supabase
+    .from('users')
+    .select('total_score')
+    .eq('id', userId)
+    .single();
+
+  if (userError || !currentUser) {
+    console.error('Failed to fetch current user:', userError);
+    return null;
+  }
+
+  // Count how many users have a higher score
+  const { count: usersAbove, error: rankError } = await supabase
+    .from('users')
+    .select('*', { count: 'exact', head: true })
+    .gt('total_score', currentUser.total_score)
+    .gt('games_played', 0);
+
+  if (rankError || usersAbove === null) {
+    console.error('Failed to calculate ranking:', rankError);
+    return null;
+  }
+
+  // Calculate percentile (what % of users this user is better than)
+  const percentile = totalPlayers > 1
+    ? ((totalPlayers - usersAbove - 1) / totalPlayers) * 100
+    : 100;
+
+  return {
+    percentile: Math.max(0, Math.min(100, percentile)), // Clamp between 0-100
+    totalPlayers,
+  };
 }
 
 /**

@@ -10,7 +10,7 @@ import {
   recordQuestionScore,
   getQuestionStats,
 } from './_lib/session-storage.js';
-import { recordUserResponse, updateUserStatsAfterSession, getDailyStats, getPerformanceHistory, getCalibrationMilestones, getCrowdDataForQuestion } from './_lib/sessions.js';
+import { recordUserResponse, updateUserStatsAfterSession, getDailyStats, getPerformanceHistory, getCalibrationMilestones, getCrowdDataForQuestion, getOverallLeaderboard, getOverallStanding } from './_lib/sessions.js';
 import { Score } from './_lib/scoring.js';
 import { Judgement } from './_lib/types.js';
 import { trackServerEvent, flushAnalytics } from './_lib/analytics.js';
@@ -193,6 +193,8 @@ async function handleFinalize(req: VercelRequest, res: VercelResponse) {
   let dailyStats = undefined;
   let performanceHistory = undefined;
   let calibrationMilestones = undefined;
+  let overallLeaderboard = undefined;
+  let overallStanding = undefined;
 
   if (userId) {
     try {
@@ -202,15 +204,19 @@ async function handleFinalize(req: VercelRequest, res: VercelResponse) {
         questionsAnswered: judgements.length,
       });
 
-      const [daily, history, milestones] = await Promise.all([
+      const [daily, history, milestones, leaderboard, standing] = await Promise.all([
         getDailyStats(userId),
         getPerformanceHistory(userId, 10),
         getCalibrationMilestones(userId),
+        getOverallLeaderboard(userId, 10),
+        getOverallStanding(userId),
       ]);
 
       dailyStats = daily;
       performanceHistory = history;
       calibrationMilestones = milestones;
+      overallLeaderboard = leaderboard;
+      overallStanding = standing;
     } catch (statsError) {
       console.error('Failed to update/fetch user stats:', statsError);
     }
@@ -246,6 +252,8 @@ async function handleFinalize(req: VercelRequest, res: VercelResponse) {
     dailyStats,
     performanceHistory,
     calibrationMilestones,
+    overallLeaderboard,
+    overallStanding,
   });
 }
 
@@ -270,7 +278,7 @@ async function handleLeaderboard(req: VercelRequest, res: VercelResponse) {
 
     const leaderboard = (data || []).map((user, index) => ({
       rank: index + 1,
-      username: user.username,
+      displayName: user.username,
       totalScore: Math.round(Number(user.total_score)),
       gamesPlayed: user.games_played,
       averageScore: Number(user.average_score).toFixed(1),
@@ -300,7 +308,7 @@ async function handleLeaderboard(req: VercelRequest, res: VercelResponse) {
 
     const leaderboard = (data || []).map((entry: any, index: number) => ({
       rank: index + 1,
-      username: entry.users?.username || 'Anonymous',
+      displayName: entry.users?.username || 'Anonymous',
       score: Math.round(Number(entry.score)),
       questionText: entry.questions?.question_text || 'Unknown question',
       lowerBound: Number(entry.lower_bound),
