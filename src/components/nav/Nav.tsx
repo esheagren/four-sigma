@@ -179,20 +179,13 @@ export function Nav() {
         ref={sidebarRef}
         className={`sidebar ${isExpanded ? 'expanded' : 'collapsed'}`}
       >
-        {/* Header with logo and close button */}
+        {/* Header with logo */}
         <div className="sidebar-header">
           <div className="sidebar-logo">
             <Link to="/" className="brand-link" onClick={() => setIsExpanded(false)}>
               4-σ
             </Link>
           </div>
-          <button
-            className="sidebar-toggle"
-            onClick={() => setIsExpanded(!isExpanded)}
-            aria-label={isExpanded ? 'Collapse menu' : 'Expand menu'}
-          >
-            <HamburgerIcon isExpanded={isExpanded} />
-          </button>
         </div>
 
         {/* Menu items */}
