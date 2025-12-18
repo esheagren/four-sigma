@@ -452,6 +452,12 @@ export function EstimateNumPad({
     if (isTouch) return; // Only enable keyboard on desktop
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept keyboard events when user is typing in an input
+      const activeEl = document.activeElement;
+      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
+        return;
+      }
+
       const key = e.key;
 
       // Digits 0-9
