@@ -1,4 +1,6 @@
 .username-claim-modal {
+  position: relative;
+  z-index: 1;
   background: linear-gradient(135deg, rgba(30, 35, 50, 0.95) 0%, rgba(40, 45, 60, 0.92) 100%);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
@@ -7,6 +9,14 @@
   max-width: 90vw;
   text-align: center;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  margin-bottom: auto;
+  margin-top: 15vh;
+}
+
+@media (max-height: 500px) {
+  .username-claim-modal {
+    margin-top: 2rem;
+  }
 }
 
 .username-claim-modal h2 {

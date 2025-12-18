@@ -12,6 +12,7 @@
     "preview": "vite preview",
     "import-questions": "tsx scripts/seed/import-questions.ts",
     "populate-daily-questions": "tsx scripts/seed/populate-daily-questions.ts",
+    "reset-and-reimport": "tsx scripts/reset-and-reimport.ts",
     "db:migrate": "echo 'Run the SQL file in Supabase dashboard: scripts/migrations/001_initial_schema.sql'"
   },
   "dependencies": {

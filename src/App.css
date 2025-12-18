@@ -2849,6 +2849,10 @@ a.judgement-answer-below:hover .judgement-answer-value {
   left: 0;
   right: 0;
   bottom: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
   background: rgba(10, 37, 64, 0.85);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -2858,6 +2862,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   z-index: 9999;
   animation: fadeIn 0.2s ease-out;
   overflow: hidden;
+  overscroll-behavior: contain;
 }
 
 .modal-content {
