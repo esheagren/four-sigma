@@ -528,7 +528,6 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
           }}
         />
       </div>
-      </div>
     </div>,
     document.body
   );
