@@ -46,6 +46,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return handleMe(req, res);
       case 'claim-username':
         return handleClaimUsername(req, res);
+      case 'check-username':
+        return handleCheckUsername(req, res);
       case 'claim-account':
         return handleClaimAccount(req, res);
       default:
@@ -304,6 +306,26 @@ async function handleClaimUsername(req: VercelRequest, res: VercelResponse) {
       createdAt: user.createdAt,
     },
   });
+}
+
+async function handleCheckUsername(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { username } = req.body;
+
+  if (!username || !username.trim()) {
+    return res.json({ valid: false, available: false, error: 'Username required' });
+  }
+
+  const valid = isValidUsername(username);
+  if (!valid) {
+    return res.json({ valid: false, available: false, error: 'Invalid format' });
+  }
+
+  const available = await isUsernameAvailable(username);
+  return res.json({ valid: true, available });
 }
 
 async function handleClaimAccount(req: VercelRequest, res: VercelResponse) {

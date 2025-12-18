@@ -22,8 +22,15 @@
   gap: 1rem;
 }
 
+.username-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .username-claim-modal input {
-  padding: 0.875rem 1rem;
+  width: 100%;
+  padding: 0.875rem 2.5rem 0.875rem 1rem;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
@@ -31,6 +38,32 @@
   font-size: 1rem;
   text-align: center;
   transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.status-icon {
+  position: absolute;
+  right: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.status-icon.checking {
+  color: rgba(255, 255, 255, 0.5);
+  animation: pulse 1s infinite;
+}
+
+.status-icon.valid {
+  color: #4ade80;
+}
+
+.status-icon.taken,
+.status-icon.invalid {
+  color: #f87171;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 
 .username-claim-modal input:focus {
