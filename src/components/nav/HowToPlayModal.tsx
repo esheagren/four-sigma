@@ -170,7 +170,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
 
         <div className="modal-body" ref={modalBodyRef}>
           <>
-              <p style={{ fontSize: '1.0625rem', lineHeight: '1.7', color: '#ffffff', marginBottom: '2.5rem' }}>
+              <p style={{ fontSize: '1.0625rem', lineHeight: '1.7', color: '#1e293b', marginBottom: '2.5rem' }}>
                 The purpose of 4-σ is to estimate the numerical quantity of various things.
               </p>
 
