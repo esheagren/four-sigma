@@ -156,9 +156,9 @@ export function HowToPlayModal({ isOpen, onClose, onGotIt }: HowToPlayModalProps
   };
 
   return createPortal(
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay">
       <ModalBackdropAnimation />
-      <div className="modal-content dark-glass-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content dark-glass-modal">
         <div className="modal-header modal-header-horizontal">
           <h2 className="modal-title">4-σ</h2>
           <div className="modal-subtitle-stack">

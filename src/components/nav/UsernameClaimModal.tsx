@@ -135,7 +135,7 @@ export function UsernameClaimModal({ isOpen, onUsernameClaimed }: UsernameClaimM
   };
 
   return createPortal(
-    <div className="modal-overlay" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay">
       <ModalBackdropAnimation />
       <div className="username-claim-modal">
         <h2>Choose Username</h2>
