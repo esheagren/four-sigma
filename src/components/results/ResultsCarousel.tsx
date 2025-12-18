@@ -3,7 +3,6 @@ import { QuestionSlide } from './QuestionSlide';
 import { DailyStatsSlide } from './DailyStatsSlide';
 import { UserStatsSlide } from './UserStatsSlide';
 import { ScoreOrbSlide } from './ScoreOrbSlide';
-import { QuestionLeadersSlide } from './QuestionLeadersSlide';
 import { ShareScoreCard, type ShareScoreCardRef } from './ShareScoreCard';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../context/PostHogContext';
@@ -162,16 +161,6 @@ export function ResultsCarousel({
     ? Math.round(((totalParticipants - dailyRank) / totalParticipants) * 100)
     : undefined;
 
-  // Extract question high scores with bounds
-  const questionHighScores = safeJudgements.map(j => ({
-    questionId: j.questionId,
-    prompt: j.prompt,
-    highestScore: j.communityStats?.highestScore ?? 0,
-    username: j.communityStats?.highestScoreUsername,
-    lowerBound: j.communityStats?.highestScoreLowerBound,
-    upperBound: j.communityStats?.highestScoreUpperBound,
-  }));
-
   const handleShare = async () => {
     if (!shareCardRef.current) return;
 
@@ -290,12 +279,6 @@ export function ResultsCarousel({
               currentStreak: user.currentStreak,
               bestStreak: user.bestStreak,
             } : undefined}
-          />
-
-          {/* Question Leaders Slide (Bottom - top scorer for each question) */}
-          <QuestionLeadersSlide
-            ref={setSlideRef(safeJudgements.length + 3)}
-            questionHighScores={questionHighScores}
           />
         </div>
       </div>
