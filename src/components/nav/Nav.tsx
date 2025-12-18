@@ -122,9 +122,10 @@ export function Nav() {
       return;
     }
 
-    // Legacy behavior: show sign-up prompt for anonymous users
-    if (isAnonymous) {
-      setIsSignUpPromptOpen(true);
+    // For anonymous returning users who somehow haven't claimed username,
+    // show HowToPlayModal again (which includes username claim)
+    if (isAnonymous && !hasClaimedUsername) {
+      setIsHowToPlayOpen(true);
     }
   }, [isLoading, isAnonymous, user, hasClaimedUsername]);
 
@@ -152,10 +153,7 @@ export function Nav() {
 
   const handleHowToPlayClose = () => {
     setIsHowToPlayOpen(false);
-    // Show sign-up prompt for anonymous users after HowToPlay closes
-    if (isAnonymous && !isLoading) {
-      setIsSignUpPromptOpen(true);
-    }
+    // Username claim now happens inside HowToPlayModal, no need for SignUpPromptModal here
   };
 
   const handleSignUpPromptCreateAccount = () => {
