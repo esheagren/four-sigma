@@ -267,6 +267,17 @@ export function Nav() {
         </nav>
       </aside>
 
+      {/* Floating hamburger button for mobile (visible when sidebar is collapsed) */}
+      {!isExpanded && (
+        <button
+          className="sidebar-toggle-floating"
+          onClick={() => setIsExpanded(true)}
+          aria-label="Open menu"
+        >
+          <HamburgerIcon isExpanded={false} />
+        </button>
+      )}
+
       {/* Mobile backdrop */}
       <div
         className={`sidebar-backdrop ${isExpanded ? 'visible' : ''}`}
