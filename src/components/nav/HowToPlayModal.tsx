@@ -166,9 +166,6 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
             <span>3 Questions</span>
             <span>Estimate + Uncertainty</span>
           </div>
-          <button className="modal-close-button" onClick={onClose} aria-label="Close">
-            ×
-          </button>
         </div>
 
         <div className="modal-body" ref={modalBodyRef}>
