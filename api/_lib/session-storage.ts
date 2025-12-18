@@ -15,19 +15,27 @@ export function generateSessionId(): string {
  * @param userId - User ID who started the session (null if not authenticated)
  */
 export async function createSession(sessionId: string, questionIds: string[], userId: string | null = null): Promise<void> {
-  const { error } = await supabase
+  console.log(`[createSession] Creating session ${sessionId} with userId=${userId}`);
+
+  const insertData = {
+    id: sessionId,
+    question_ids: questionIds,
+    answers: [],
+    user_id: userId,
+    created_at: new Date().toISOString(),
+  };
+  console.log(`[createSession] Insert data:`, JSON.stringify(insertData));
+
+  const { data, error } = await supabase
     .from('game_sessions')
-    .insert({
-      id: sessionId,
-      question_ids: questionIds,
-      answers: [],
-      user_id: userId,
-      created_at: new Date().toISOString(),
-    });
+    .insert(insertData)
+    .select();
 
   if (error) {
-    // If table doesn't exist, we'll handle sessions in-memory via request body
-    console.error('Session creation error (table may not exist):', error);
+    // If table doesn't exist or column doesn't exist, we'll handle sessions in-memory via request body
+    console.error('[createSession] Session creation error:', error.message, error.details, error.hint);
+  } else {
+    console.log(`[createSession] Session created successfully:`, JSON.stringify(data));
   }
 }
 
@@ -40,15 +48,26 @@ export async function getSession(sessionId: string): Promise<{
   answers: Answer[];
   userId: string | null;
 } | null> {
+  console.log(`[getSession] Fetching session ${sessionId}`);
+
   const { data, error } = await supabase
     .from('game_sessions')
     .select('*')
     .eq('id', sessionId)
     .single();
 
-  if (error || !data) {
+  if (error) {
+    console.error(`[getSession] Error fetching session:`, error.message, error.details);
     return null;
   }
+
+  if (!data) {
+    console.log(`[getSession] No session found for ${sessionId}`);
+    return null;
+  }
+
+  console.log(`[getSession] Raw session data:`, JSON.stringify(data));
+  console.log(`[getSession] user_id field value:`, data.user_id, `type:`, typeof data.user_id);
 
   return {
     sessionId: data.id,

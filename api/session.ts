@@ -71,6 +71,7 @@ async function handleStart(req: VercelRequest, res: VercelResponse) {
   // Capture userId at session start time - this is the user who will own the session
   const authUser = await getAuthUser(req);
   const userId = authUser?.userId || null;
+  console.log(`[handleStart] Session ${sessionId}: userId=${userId}, authUser=${JSON.stringify(authUser)}`);
 
   const questionIds = selectedQuestions.map(q => q.id);
   await createSession(sessionId, questionIds, userId);
@@ -136,6 +137,7 @@ async function handleFinalize(req: VercelRequest, res: VercelResponse) {
   // This prevents issues where a user logs in mid-game and answers get attributed
   // to a different user than who actually played
   const userId = session.userId;
+  console.log(`[handleFinalize] Session ${sessionId}: userId from session=${userId}, session data=${JSON.stringify(session)}`);
 
   const judgements: Judgement[] = [];
   let questionsCaptured = 0;

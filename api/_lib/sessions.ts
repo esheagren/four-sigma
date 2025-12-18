@@ -58,12 +58,16 @@ export async function updateUserStatsAfterSession(
     questionsAnswered: number;
   }
 ): Promise<void> {
+  console.log(`[updateUserStatsAfterSession] Updating stats for userId=${userId}`, JSON.stringify(sessionData));
+
   // First get current user stats
   const { data: user, error: fetchError } = await supabase
     .from('users')
     .select('total_score, games_played, questions_captured, best_single_score, current_streak, best_streak, last_played_at')
     .eq('id', userId)
     .single();
+
+  console.log(`[updateUserStatsAfterSession] Fetched user:`, user ? JSON.stringify(user) : 'null', fetchError ? `error: ${fetchError.message}` : '');
 
   if (fetchError || !user) {
     throw new Error('Failed to fetch user stats');
@@ -543,6 +547,8 @@ export async function getOverallLeaderboard(
   gamesPlayed: number;
   isCurrentUser?: boolean;
 }>> {
+  console.log(`[getOverallLeaderboard] Fetching leaderboard for userId=${userId}, limit=${limit}`);
+
   const { data: topUsers, error } = await supabase
     .from('users')
     .select('id, username, total_score, games_played')
@@ -551,11 +557,14 @@ export async function getOverallLeaderboard(
     .limit(limit);
 
   if (error) {
-    console.error('Failed to fetch overall leaderboard:', error);
+    console.error('[getOverallLeaderboard] Failed to fetch overall leaderboard:', error.message, error.details);
     return [];
   }
 
+  console.log(`[getOverallLeaderboard] Query returned ${topUsers?.length || 0} users:`, JSON.stringify(topUsers));
+
   if (!topUsers || topUsers.length === 0) {
+    console.log('[getOverallLeaderboard] No users with games_played > 0 found');
     return [];
   }
 
