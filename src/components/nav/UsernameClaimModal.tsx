@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../context/PostHogContext';
+import { ModalBackdropAnimation } from '../ModalBackdropAnimation';
 import './UsernameClaimModal.css';
 
 interface UsernameClaimModalProps {
@@ -52,72 +54,81 @@ export function UsernameClaimModal({ isOpen, onUsernameClaimed }: UsernameClaimM
     setError('');
   };
 
-  return (
-    <div className="username-claim-modal-overlay">
-      <div className="username-claim-modal">
-        <h2>Claim Your Username</h2>
-        <p className="username-claim-description">
-          Choose a username to start playing. You can add email and password later to access your account from any device.
-        </p>
+  return createPortal(
+    <div className="modal-overlay">
+      <ModalBackdropAnimation />
+      <div className="modal-content dark-glass-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2 className="modal-title">Claim Your Username</h2>
+        </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
-              minLength={3}
-              maxLength={20}
-              pattern="[a-zA-Z0-9_]{3,20}"
-              title="Username must be 3-20 characters (letters, numbers, underscores only)"
-              disabled={isSubmitting}
-              autoFocus
-            />
-            <small className="input-hint">
-              3-20 characters (letters, numbers, underscores only)
-            </small>
-          </div>
+        <div className="modal-body username-claim-body">
+          <p className="username-claim-description">
+            Choose a username to start playing. You can add email and password later to access your account from any device.
+          </p>
 
-          {error && (
-            <div className="error-message">
-              {error}
+          <form onSubmit={handleSubmit}>
+            <div className="username-form-group">
+              <label htmlFor="username">Username</label>
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter your username"
+                minLength={3}
+                maxLength={20}
+                pattern="[a-zA-Z0-9_]{3,20}"
+                title="Username must be 3-20 characters (letters, numbers, underscores only)"
+                disabled={isSubmitting}
+                autoFocus
+              />
+              <small className="input-hint">
+                3-20 characters (letters, numbers, underscores only)
+              </small>
             </div>
-          )}
 
-          {suggestions.length > 0 && (
-            <div className="suggestions">
-              <p className="suggestions-label">Try these instead:</p>
-              <div className="suggestions-list">
-                {suggestions.map((suggestion) => (
-                  <button
-                    key={suggestion}
-                    type="button"
-                    className="suggestion-button"
-                    onClick={() => handleSuggestionClick(suggestion)}
-                  >
-                    {suggestion}
-                  </button>
-                ))}
+            {error && (
+              <div className="username-error-message">
+                {error}
               </div>
+            )}
+
+            {suggestions.length > 0 && (
+              <div className="suggestions">
+                <p className="suggestions-label">Try these instead:</p>
+                <div className="suggestions-list">
+                  {suggestions.map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      className="suggestion-button"
+                      onClick={() => handleSuggestionClick(suggestion)}
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="modal-footer-actions">
+              <button
+                type="submit"
+                className="got-it-button"
+                disabled={isSubmitting || !username.trim()}
+              >
+                {isSubmitting ? 'Claiming...' : 'Start Playing'}
+              </button>
             </div>
-          )}
+          </form>
 
-          <button
-            type="submit"
-            className="username-claim-submit"
-            disabled={isSubmitting || !username.trim()}
-          >
-            {isSubmitting ? 'Claiming...' : 'Claim Username'}
-          </button>
-        </form>
-
-        <p className="username-claim-note">
-          Note: You cannot dismiss this modal without claiming a username
-        </p>
+          <p className="username-claim-note">
+            You must claim a username to play
+          </p>
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

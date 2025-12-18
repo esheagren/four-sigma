@@ -5,6 +5,7 @@ import { HowToPlayModal } from './HowToPlayModal';
 import { AuthModal } from './AuthModal';
 import { SignUpPromptModal } from './SignUpPromptModal';
 import { ClaimAccountModal } from './ClaimAccountModal';
+import { UsernameClaimModal } from './UsernameClaimModal';
 import { StatisticsModal } from './StatisticsModal';
 import { SettingsModal } from './SettingsModal';
 import { FeedbackModal } from './FeedbackModal';
@@ -83,6 +84,7 @@ const HAS_SEEN_HOW_TO_PLAY_KEY = 'four_sigma_has_seen_how_to_play';
 export function Nav() {
   const { user, isAnonymous, hasClaimedUsername, isLoading } = useAuth();
   const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
+  const [isUsernameClaimModalOpen, setIsUsernameClaimModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isStatisticsOpen, setIsStatisticsOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -153,7 +155,16 @@ export function Nav() {
 
   const handleHowToPlayClose = () => {
     setIsHowToPlayOpen(false);
-    // Username claim now happens inside HowToPlayModal, no need for SignUpPromptModal here
+  };
+
+  // Called when user clicks "Got it" in HowToPlayModal and needs to claim username
+  const handleHowToPlayGotIt = () => {
+    setIsHowToPlayOpen(false);
+    setIsUsernameClaimModalOpen(true);
+  };
+
+  const handleUsernameClaimed = () => {
+    setIsUsernameClaimModalOpen(false);
   };
 
   const handleSignUpPromptCreateAccount = () => {
@@ -264,6 +275,12 @@ export function Nav() {
       <HowToPlayModal
         isOpen={isHowToPlayOpen}
         onClose={handleHowToPlayClose}
+        onGotIt={handleHowToPlayGotIt}
+      />
+
+      <UsernameClaimModal
+        isOpen={isUsernameClaimModalOpen}
+        onUsernameClaimed={handleUsernameClaimed}
       />
 
       <AuthModal

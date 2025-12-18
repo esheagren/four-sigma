@@ -1,12 +1,12 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ModalBackdropAnimation } from '../ModalBackdropAnimation';
-import { UsernameClaimModal } from './UsernameClaimModal';
 import { useAuth } from '../../context/AuthContext';
 
 interface HowToPlayModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onGotIt?: () => void; // Called when user clicks "Got it" and needs to claim username
 }
 
 // Scoring function matching server-side algorithm
@@ -41,7 +41,7 @@ function calculateScore(lower: number, upper: number, answer: number): number {
   return Math.round(score * 10) / 10;
 }
 
-export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
+export function HowToPlayModal({ isOpen, onClose, onGotIt }: HowToPlayModalProps) {
   const { user, hasClaimedUsername } = useAuth();
 
   // Interactive slider state
@@ -52,9 +52,6 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
   // Scroll detection state
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const modalBodyRef = useRef<HTMLDivElement>(null);
-
-  // Username claim state
-  const [showUsernameClaim, setShowUsernameClaim] = useState(false);
 
   // Check if user has scrolled to bottom (sticky - once true, stays true)
   const checkScrollPosition = useCallback(() => {
@@ -509,7 +506,10 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
             <button className="got-it-button" onClick={() => {
               // Check if user needs to claim username
               if (user?.isAnonymous || !hasClaimedUsername) {
-                setShowUsernameClaim(true);
+                // Signal to parent that user needs to claim username
+                if (onGotIt) {
+                  onGotIt();
+                }
               } else {
                 onClose();
               }
@@ -518,15 +518,6 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
             </button>
           </div>
         )}
-
-        {/* Username claim modal - shown after "Got it" if user hasn't claimed username */}
-        <UsernameClaimModal
-          isOpen={showUsernameClaim}
-          onUsernameClaimed={() => {
-            setShowUsernameClaim(false);
-            onClose();
-          }}
-        />
       </div>
     </div>,
     document.body
