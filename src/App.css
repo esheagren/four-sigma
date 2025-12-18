@@ -272,6 +272,49 @@ body {
 .sidebar.expanded .sidebar-item:nth-child(5) .sidebar-item-text { transition-delay: 0.15s; }
 .sidebar.expanded .sidebar-item:nth-child(6) .sidebar-item-text { transition-delay: 0.175s; }
 
+/* User info section at bottom of sidebar */
+.sidebar-user-section {
+  display: none;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: auto;
+}
+
+.sidebar.expanded .sidebar-user-section {
+  display: flex;
+}
+
+.sidebar-user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+
+.sidebar-user-info svg {
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.sidebar-user-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-user-email {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.5);
+  padding-left: 2rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Sidebar Backdrop (for mobile click-outside) */
 .sidebar-backdrop {
   display: none;

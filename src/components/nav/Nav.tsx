@@ -5,7 +5,6 @@ import { AuthModal } from './AuthModal';
 import { SignUpPromptModal } from './SignUpPromptModal';
 import { ClaimAccountModal } from './ClaimAccountModal';
 import { UsernameClaimModal } from './UsernameClaimModal';
-import { SettingsModal } from './SettingsModal';
 import { FeedbackModal } from './FeedbackModal';
 import { useAuth } from '../../context/AuthContext';
 
@@ -56,11 +55,12 @@ function UserIcon() {
   );
 }
 
-function SettingsIcon() {
+function LogOutIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
     </svg>
   );
 }
@@ -68,11 +68,10 @@ function SettingsIcon() {
 const HAS_SEEN_HOW_TO_PLAY_KEY = 'four_sigma_has_seen_how_to_play';
 
 export function Nav() {
-  const { user, isAnonymous, hasClaimedUsername, isLoading } = useAuth();
+  const { user, isAnonymous, hasClaimedUsername, isLoading, logout, authToken } = useAuth();
   const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
   const [isUsernameClaimModalOpen, setIsUsernameClaimModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSignUpPromptOpen, setIsSignUpPromptOpen] = useState(false);
@@ -169,6 +168,11 @@ export function Nav() {
     setIsSignUpPromptOpen(false);
   };
 
+  const handleLogout = async () => {
+    await logout();
+    setIsExpanded(false);
+  };
+
   return (
     <>
       <aside
@@ -219,14 +223,27 @@ export function Nav() {
               <span className="sidebar-item-text">Sign In</span>
             </button>
           )}
-          <button
-            className="sidebar-item"
-            onClick={() => handleMenuItemClick(() => setIsSettingsOpen(true))}
-          >
-            <SettingsIcon />
-            <span className="sidebar-item-text">Settings</span>
-          </button>
+          {!isLoading && !isAnonymous && (
+            <button
+              className="sidebar-item"
+              onClick={handleLogout}
+            >
+              <LogOutIcon />
+              <span className="sidebar-item-text">Log Out</span>
+            </button>
+          )}
         </nav>
+
+        {/* User info section - visible when expanded */}
+        <div className="sidebar-user-section">
+          <div className="sidebar-user-info">
+            <UserIcon />
+            <span className="sidebar-user-name">{user?.displayName || 'Guest'}</span>
+          </div>
+          {user?.email && (
+            <div className="sidebar-user-email">{user.email}</div>
+          )}
+        </div>
       </aside>
 
       {/* Floating hamburger button for mobile (visible when sidebar is collapsed) */}
@@ -274,11 +291,6 @@ export function Nav() {
         isOpen={isClaimAccountModalOpen}
         onClose={() => setIsClaimAccountModalOpen(false)}
         username={user?.displayName || ''}
-      />
-
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
       />
 
       <FeedbackModal
