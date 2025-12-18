@@ -29,6 +29,8 @@ function rowToUser(row: any): User {
  * Get or create an anonymous user by device ID
  */
 export async function getOrCreateDeviceUser(deviceId: string): Promise<User> {
+  console.log(`[getOrCreateDeviceUser] Looking up user with deviceId: ${deviceId}`);
+
   // First try to find existing user with this device ID
   const { data: existingUser, error: findError } = await supabase
     .from('users')
@@ -37,10 +39,16 @@ export async function getOrCreateDeviceUser(deviceId: string): Promise<User> {
     .single();
 
   if (existingUser && !findError) {
+    console.log(`[getOrCreateDeviceUser] Found existing user: ${existingUser.id}`);
     return rowToUser(existingUser);
   }
 
+  if (findError) {
+    console.log(`[getOrCreateDeviceUser] Find error (expected if new user):`, findError.message);
+  }
+
   // Create new anonymous user
+  console.log(`[getOrCreateDeviceUser] Creating new anonymous user for deviceId: ${deviceId}`);
   const { data: newUser, error: createError } = await supabase
     .from('users')
     .insert({
@@ -52,9 +60,11 @@ export async function getOrCreateDeviceUser(deviceId: string): Promise<User> {
     .single();
 
   if (createError) {
+    console.error(`[getOrCreateDeviceUser] FAILED to create user:`, createError);
     throw new Error(`Failed to create user: ${createError.message}`);
   }
 
+  console.log(`[getOrCreateDeviceUser] Created new user: ${newUser.id}`);
   return rowToUser(newUser);
 }
 
@@ -285,4 +295,80 @@ export async function getUserStats(userId: string): Promise<{
     user,
     recentGames: recentGames || [],
   };
+}
+
+// Username validation regex: 3-20 chars, alphanumeric + underscore
+const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,20}$/;
+
+/**
+ * Validate username format
+ */
+export function isValidUsername(username: string): boolean {
+  return USERNAME_REGEX.test(username);
+}
+
+/**
+ * Get user by username (case-insensitive)
+ */
+export async function getUserByUsername(username: string): Promise<User | null> {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .ilike('username', username)
+    .neq('username', 'Guest Player')
+    .single();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return rowToUser(data);
+}
+
+/**
+ * Check if a username is available (case-insensitive)
+ */
+export async function isUsernameAvailable(username: string): Promise<boolean> {
+  const existing = await getUserByUsername(username);
+  return existing === null;
+}
+
+/**
+ * Generate username suggestions based on a taken username
+ */
+export function generateUsernameSuggestions(baseUsername: string): string[] {
+  const suggestions: string[] = [];
+  const random = Math.floor(Math.random() * 1000);
+
+  suggestions.push(`${baseUsername}${random}`);
+  suggestions.push(`${baseUsername}_${random}`);
+  suggestions.push(`${baseUsername}${Math.floor(Math.random() * 100)}`);
+
+  return suggestions;
+}
+
+/**
+ * Set username for a device user (converts from anonymous to username-only)
+ */
+export async function setUsernameForDevice(
+  deviceId: string,
+  username: string
+): Promise<User> {
+  const existingUser = await getOrCreateDeviceUser(deviceId);
+
+  const { data, error } = await supabase
+    .from('users')
+    .update({
+      username: username,
+      is_anonymous: false,
+    })
+    .eq('id', existingUser.id)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to set username: ${error.message}`);
+  }
+
+  return rowToUser(data);
 }

@@ -30,7 +30,7 @@ export async function recordUserResponse(
     answerValueAtResponse: number;
   }
 ): Promise<void> {
-  const { error } = await supabase.from('user_responses').insert({
+  const insertData = {
     user_id: userId,
     question_id: questionId,
     lower_bound: data.lowerBound,
@@ -39,12 +39,21 @@ export async function recordUserResponse(
     captured: data.captured,
     answer_value_at_response: data.answerValueAtResponse,
     answered_at: new Date().toISOString(),
-  });
+  };
+
+  console.log(`[recordUserResponse] Inserting into user_responses:`, insertData);
+
+  const { data: insertedData, error } = await supabase
+    .from('user_responses')
+    .insert(insertData)
+    .select();
 
   if (error) {
-    console.error('Failed to record user response:', error);
+    console.error('[recordUserResponse] FAILED to insert:', error);
     throw new Error(`Failed to record response: ${error.message}`);
   }
+
+  console.log(`[recordUserResponse] Successfully inserted:`, insertedData);
 }
 
 /**
@@ -58,16 +67,27 @@ export async function updateUserStatsAfterSession(
     questionsAnswered: number;
   }
 ): Promise<void> {
+  console.log(`[updateUserStats] Starting for userId: ${userId}`, sessionData);
+
   // First get current user stats
+  console.log(`[updateUserStats] Fetching current stats for userId: ${userId}`);
   const { data: user, error: fetchError } = await supabase
     .from('users')
     .select('total_score, games_played, questions_captured, best_single_score, current_streak, best_streak, last_played_at')
     .eq('id', userId)
     .single();
 
-  if (fetchError || !user) {
-    throw new Error('Failed to fetch user stats');
+  if (fetchError) {
+    console.error(`[updateUserStats] FAILED to fetch user stats:`, fetchError);
+    throw new Error(`Failed to fetch user stats: ${fetchError.message}`);
   }
+
+  if (!user) {
+    console.error(`[updateUserStats] No user found with id: ${userId}`);
+    throw new Error(`No user found with id: ${userId}`);
+  }
+
+  console.log(`[updateUserStats] Current user stats:`, user);
 
   const newTotalScore = Number(user.total_score) + sessionData.sessionScore;
   const newGamesPlayed = user.games_played + 1;
@@ -111,25 +131,32 @@ export async function updateUserStatsAfterSession(
 
   const newBestStreak = Math.max(user.best_streak, newCurrentStreak);
 
-  const { error: updateError } = await supabase
+  const updateData = {
+    total_score: newTotalScore,
+    average_score: newAverageScore,
+    games_played: newGamesPlayed,
+    questions_captured: newQuestionsCaptured,
+    calibration_rate: newCalibrationRate,
+    current_streak: newCurrentStreak,
+    best_streak: newBestStreak,
+    best_single_score: newBestSingleScore,
+    last_played_at: new Date().toISOString(),
+  };
+
+  console.log(`[updateUserStats] Updating user ${userId} with:`, updateData);
+
+  const { data: updatedData, error: updateError } = await supabase
     .from('users')
-    .update({
-      total_score: newTotalScore,
-      average_score: newAverageScore,
-      games_played: newGamesPlayed,
-      questions_captured: newQuestionsCaptured,
-      calibration_rate: newCalibrationRate,
-      current_streak: newCurrentStreak,
-      best_streak: newBestStreak,
-      best_single_score: newBestSingleScore,
-      last_played_at: new Date().toISOString(),
-    })
-    .eq('id', userId);
+    .update(updateData)
+    .eq('id', userId)
+    .select();
 
   if (updateError) {
-    console.error('Failed to update user stats:', updateError);
+    console.error('[updateUserStats] FAILED to update user stats:', updateError);
     throw new Error(`Failed to update user stats: ${updateError.message}`);
   }
+
+  console.log(`[updateUserStats] Successfully updated user ${userId}:`, updatedData);
 }
 
 /**

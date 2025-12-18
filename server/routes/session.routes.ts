@@ -150,10 +150,27 @@ router.post('/finalize', async (req: Request, res: Response) => {
     // to a different user than who actually played
     const userId = session.userId;
 
+    // === DIAGNOSTIC LOGGING ===
+    console.log(`[Finalize] Session ${sessionId} starting finalization`);
+    console.log(`[Finalize] Session details:`, {
+      sessionId: session.sessionId,
+      userId: session.userId,
+      startedAt: session.startedAt,
+      questionCount: session.questionIds.length,
+      answerCount: session.answers.length,
+    });
+    console.log(`[Finalize] Current req.user:`, req.user);
+
     // Log for debugging user-answer attribution issues
     const currentUserId = req.user?.userId;
     if (userId !== currentUserId) {
-      console.log(`Session ${sessionId}: userId mismatch - session owner: ${userId}, current user: ${currentUserId}`);
+      console.log(`[Finalize] WARNING: userId mismatch - session owner: ${userId}, current user: ${currentUserId}`);
+    }
+
+    if (!userId) {
+      console.log(`[Finalize] WARNING: No userId on session - responses will NOT be saved to database`);
+    } else {
+      console.log(`[Finalize] Will save responses for userId: ${userId}`);
     }
 
     // Compute judgements for each question
@@ -181,6 +198,7 @@ router.post('/finalize', async (req: Request, res: Response) => {
       // Persist to database if user is authenticated
       if (userId) {
         try {
+          console.log(`[Finalize] Saving response for question ${questionId}, userId: ${userId}, score: ${individualScore}`);
           await recordUserResponse(userId, questionId, {
             lowerBound: answer.lower,
             upperBound: answer.upper,
@@ -188,10 +206,13 @@ router.post('/finalize', async (req: Request, res: Response) => {
             captured: hit,
             answerValueAtResponse: question.trueValue,
           });
+          console.log(`[Finalize] Successfully saved response for question ${questionId}`);
         } catch (dbError) {
-          console.error('Failed to persist user response:', dbError);
+          console.error(`[Finalize] FAILED to persist user response for question ${questionId}:`, dbError);
           // Continue even if persistence fails
         }
+      } else {
+        console.log(`[Finalize] SKIPPING response save for question ${questionId} - no userId`);
       }
 
       // Get community stats for this question
@@ -252,13 +273,20 @@ router.post('/finalize', async (req: Request, res: Response) => {
     if (userId) {
       try {
         // Update aggregate user stats
+        console.log(`[Finalize] Updating user stats for userId: ${userId}`, {
+          sessionScore: score,
+          questionsCaptured,
+          questionsAnswered: judgements.length,
+        });
         await updateUserStatsAfterSession(userId, {
           sessionScore: score,
           questionsCaptured,
           questionsAnswered: judgements.length,
         });
+        console.log(`[Finalize] Successfully updated user stats for userId: ${userId}`);
 
         // Fetch daily stats, performance history, calibration milestones, overall leaderboard, and standing
+        console.log(`[Finalize] Fetching additional stats for userId: ${userId}`);
         const [daily, history, milestones, overall, standing] = await Promise.all([
           getDailyStats(userId),
           getPerformanceHistory(userId, 10),
@@ -272,11 +300,13 @@ router.post('/finalize', async (req: Request, res: Response) => {
         calibrationMilestones = milestones;
         overallLeaderboard = overall;
         overallStanding = standing ?? undefined;
+        console.log(`[Finalize] Fetched all stats successfully for userId: ${userId}`);
       } catch (statsError) {
-        console.error('Failed to update/fetch user stats:', statsError);
+        console.error(`[Finalize] FAILED to update/fetch user stats for userId ${userId}:`, statsError);
         // Continue even if stats fail
       }
     } else {
+      console.log(`[Finalize] SKIPPING user stats update - no userId`);
       // Fetch overall leaderboard even for anonymous users
       try {
         overallLeaderboard = await getOverallLeaderboard();

@@ -9,6 +9,10 @@ import {
   createAuthenticatedUser,
   mergeUsers,
   linkDeviceToUser,
+  isValidUsername,
+  isUsernameAvailable,
+  generateUsernameSuggestions,
+  setUsernameForDevice,
 } from '../database/users.js';
 import { extractDeviceId } from '../middleware/auth.js';
 
@@ -21,13 +25,17 @@ const router = Router();
 router.post('/device', async (req: Request, res: Response) => {
   try {
     const deviceId = extractDeviceId(req);
+    console.log('[Auth] /device endpoint called with deviceId:', deviceId);
 
     if (!deviceId) {
+      console.log('[Auth] /device - missing X-Device-Id header');
       res.status(400).json({ error: 'X-Device-Id header required' });
       return;
     }
 
+    console.log('[Auth] /device - calling getOrCreateDeviceUser');
     const user = await getOrCreateDeviceUser(deviceId);
+    console.log('[Auth] /device - got user:', user.id, user.displayName);
 
     res.json({
       user: {
@@ -46,7 +54,7 @@ router.post('/device', async (req: Request, res: Response) => {
       },
     });
   } catch (err) {
-    console.error('Device auth error:', err);
+    console.error('[Auth] /device error:', err);
     res.status(500).json({ error: 'Failed to initialize user' });
   }
 });
@@ -264,6 +272,93 @@ router.get('/me', async (req: Request, res: Response) => {
   } catch (err) {
     console.error('Get me error:', err);
     res.status(500).json({ error: 'Failed to get user info' });
+  }
+});
+
+/**
+ * POST /api/auth/check-username
+ * Check if a username is valid and available
+ */
+router.post('/check-username', async (req: Request, res: Response) => {
+  try {
+    const { username } = req.body;
+
+    if (!username || !username.trim()) {
+      res.json({ valid: false, available: false, error: 'Username required' });
+      return;
+    }
+
+    const valid = isValidUsername(username);
+    if (!valid) {
+      res.json({ valid: false, available: false, error: 'Invalid format' });
+      return;
+    }
+
+    const available = await isUsernameAvailable(username);
+    res.json({ valid: true, available });
+  } catch (err) {
+    console.error('Check username error:', err);
+    res.status(500).json({ error: 'Failed to check username' });
+  }
+});
+
+/**
+ * POST /api/auth/claim-username
+ * Claim a username for a device user (username-only signup)
+ */
+router.post('/claim-username', async (req: Request, res: Response) => {
+  try {
+    const { username } = req.body;
+    const deviceId = extractDeviceId(req);
+
+    if (!deviceId) {
+      res.status(400).json({ error: 'Device ID required' });
+      return;
+    }
+
+    if (!username || !username.trim()) {
+      res.status(400).json({ error: 'Username required' });
+      return;
+    }
+
+    if (!isValidUsername(username)) {
+      res.status(400).json({
+        error: 'Username must be 3-20 characters (letters, numbers, underscores only)'
+      });
+      return;
+    }
+
+    const available = await isUsernameAvailable(username);
+    if (!available) {
+      const suggestions = generateUsernameSuggestions(username);
+      res.status(409).json({
+        error: 'Username already taken',
+        suggestions
+      });
+      return;
+    }
+
+    const user = await setUsernameForDevice(deviceId, username);
+
+    res.json({
+      user: {
+        id: user.id,
+        displayName: user.displayName,
+        isAnonymous: user.isAnonymous,
+        totalScore: user.totalScore,
+        averageScore: user.averageScore,
+        gamesPlayed: user.gamesPlayed,
+        currentStreak: user.currentStreak,
+        bestStreak: user.bestStreak,
+        calibrationRate: user.calibrationRate,
+        questionsCaptured: user.questionsCaptured,
+        bestSingleScore: user.bestSingleScore,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (err) {
+    console.error('Claim username error:', err);
+    res.status(500).json({ error: 'Failed to claim username' });
   }
 });
 
