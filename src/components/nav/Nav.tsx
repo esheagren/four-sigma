@@ -179,20 +179,20 @@ export function Nav() {
         ref={sidebarRef}
         className={`sidebar ${isExpanded ? 'expanded' : 'collapsed'}`}
       >
-        {/* Hamburger toggle button */}
-        <button
-          className="sidebar-toggle"
-          onClick={() => setIsExpanded(!isExpanded)}
-          aria-label={isExpanded ? 'Collapse menu' : 'Expand menu'}
-        >
-          <HamburgerIcon isExpanded={isExpanded} />
-        </button>
-
-        {/* Logo - visible when expanded */}
-        <div className="sidebar-logo">
-          <Link to="/" className="brand-link" onClick={() => setIsExpanded(false)}>
-            4-σ
-          </Link>
+        {/* Header with logo and close button */}
+        <div className="sidebar-header">
+          <div className="sidebar-logo">
+            <Link to="/" className="brand-link" onClick={() => setIsExpanded(false)}>
+              4-σ
+            </Link>
+          </div>
+          <button
+            className="sidebar-toggle"
+            onClick={() => setIsExpanded(!isExpanded)}
+            aria-label={isExpanded ? 'Collapse menu' : 'Expand menu'}
+          >
+            <HamburgerIcon isExpanded={isExpanded} />
+          </button>
         </div>
 
         {/* Menu items */}
