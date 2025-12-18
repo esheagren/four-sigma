@@ -68,8 +68,12 @@ async function handleStart(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: 'No daily questions available for today' });
   }
 
+  // Capture userId at session start time - this is the user who will own the session
+  const authUser = await getAuthUser(req);
+  const userId = authUser?.userId || null;
+
   const questionIds = selectedQuestions.map(q => q.id);
-  await createSession(sessionId, questionIds);
+  await createSession(sessionId, questionIds, userId);
 
   const questionStubs = selectedQuestions.map(q => ({
     id: q.id,
@@ -128,8 +132,10 @@ async function handleFinalize(req: VercelRequest, res: VercelResponse) {
     return res.status(404).json({ error: 'Session not found' });
   }
 
-  const authUser = await getAuthUser(req);
-  const userId = authUser?.userId;
+  // Use the userId captured at session start time, NOT the current auth user
+  // This prevents issues where a user logs in mid-game and answers get attributed
+  // to a different user than who actually played
+  const userId = session.userId;
 
   const judgements: Judgement[] = [];
   let questionsCaptured = 0;

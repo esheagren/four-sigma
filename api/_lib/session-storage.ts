@@ -10,14 +10,18 @@ export function generateSessionId(): string {
 
 /**
  * Create a new session in Supabase
+ * @param sessionId - Unique session identifier
+ * @param questionIds - Array of question IDs for this session
+ * @param userId - User ID who started the session (null if not authenticated)
  */
-export async function createSession(sessionId: string, questionIds: string[]): Promise<void> {
+export async function createSession(sessionId: string, questionIds: string[], userId: string | null = null): Promise<void> {
   const { error } = await supabase
     .from('game_sessions')
     .insert({
       id: sessionId,
       question_ids: questionIds,
       answers: [],
+      user_id: userId,
       created_at: new Date().toISOString(),
     });
 
@@ -34,6 +38,7 @@ export async function getSession(sessionId: string): Promise<{
   sessionId: string;
   questionIds: string[];
   answers: Answer[];
+  userId: string | null;
 } | null> {
   const { data, error } = await supabase
     .from('game_sessions')
@@ -54,6 +59,7 @@ export async function getSession(sessionId: string): Promise<{
       upper: a.upper,
       submittedAt: new Date(a.submittedAt),
     })),
+    userId: data.user_id || null,
   };
 }
 
