@@ -56,14 +56,17 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
   // Username claim state
   const [showUsernameClaim, setShowUsernameClaim] = useState(false);
 
-  // Check if user has scrolled to bottom
+  // Check if user has scrolled to bottom (sticky - once true, stays true)
   const checkScrollPosition = useCallback(() => {
     const element = modalBodyRef.current;
     if (!element) return;
 
     const threshold = 20; // pixels from bottom to consider "at bottom"
     const isAtBottom = element.scrollHeight - element.scrollTop - element.clientHeight < threshold;
-    setHasScrolledToBottom(isAtBottom);
+    // Only update if scrolling TO bottom (never flip back to false)
+    if (isAtBottom) {
+      setHasScrolledToBottom(true);
+    }
   }, []);
 
   // Set up scroll listener and initial check
