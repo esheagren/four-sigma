@@ -111,12 +111,16 @@ export async function getAuthUser(req: VercelRequest): Promise<AuthUser | null> 
   try {
     // Check for Bearer token first (authenticated user)
     const authHeader = req.headers.authorization;
+    console.log(`[getAuthUser] Authorization header: ${authHeader ? 'present' : 'missing'}`);
+
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
       const validatedAuth = await validateAuthToken(token);
+      console.log(`[getAuthUser] Token validation result:`, validatedAuth ? 'valid' : 'invalid');
 
       if (validatedAuth) {
         const user = await getUserByAuthId(validatedAuth.authId);
+        console.log(`[getAuthUser] User by authId ${validatedAuth.authId}:`, user ? user.id : 'not found');
         if (user) {
           return {
             userId: user.id,
@@ -129,20 +133,26 @@ export async function getAuthUser(req: VercelRequest): Promise<AuthUser | null> 
 
     // Check for device ID (anonymous user)
     const deviceId = extractDeviceId(req);
+    console.log(`[getAuthUser] Device ID from header: ${deviceId || 'missing'}`);
+
     if (deviceId) {
       const user = await getUserByDeviceId(deviceId);
+      console.log(`[getAuthUser] User by deviceId ${deviceId}:`, user ? `found (id=${user.id}, username=${user.username})` : 'not found');
       if (user) {
         return {
           userId: user.id,
           authId: user.authId,
           isAnonymous: user.isAnonymous,
         };
+      } else {
+        console.log(`[getAuthUser] No user found for deviceId=${deviceId}. User may not have been created yet.`);
       }
     }
 
+    console.log(`[getAuthUser] Returning null - no auth method succeeded`);
     return null;
   } catch (err) {
-    console.error('Auth error:', err);
+    console.error('[getAuthUser] Auth error:', err);
     return null;
   }
 }
