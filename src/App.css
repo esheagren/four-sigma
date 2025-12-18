@@ -190,13 +190,17 @@ body {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Menu Container */
+/* Menu Container - hidden when collapsed */
 .sidebar-menu {
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: 0.25rem;
   padding: 0 0.5rem;
   flex: 1;
+}
+
+.sidebar.expanded .sidebar-menu {
+  display: flex;
 }
 
 /* Menu Items */
@@ -231,12 +235,17 @@ body {
 
 .sidebar-item svg {
   flex-shrink: 0;
-  opacity: 0.7;
+  opacity: 0;
   width: 18px;
   height: 18px;
+  transition: opacity 0.2s ease;
 }
 
-.sidebar-item:hover svg {
+.sidebar.expanded .sidebar-item svg {
+  opacity: 0.7;
+}
+
+.sidebar.expanded .sidebar-item:hover svg {
   opacity: 1;
 }
 
