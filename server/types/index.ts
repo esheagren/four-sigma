@@ -58,6 +58,8 @@ export interface Session {
   sessionId: string;
   questionIds: string[];
   answers: Answer[];
+  userId: string | null;  // User who started the session (captured at start time)
+  startedAt: Date;
 }
 
 export interface Judgement {

@@ -29,15 +29,27 @@ export function generateSessionId(): string {
 
 /**
  * Create a new session
+ * @param sessionId - Unique session identifier
+ * @param questionIds - Array of question IDs for this session
+ * @param userId - User ID who started the session (null if not authenticated)
  */
-export function createSession(sessionId: string, questionIds: string[]): Session {
+export function createSession(sessionId: string, questionIds: string[], userId: string | null = null): Session {
   const session: Session = {
     sessionId,
     questionIds,
     answers: [],
+    userId,
+    startedAt: new Date(),
   };
-  
+
   sessions.set(sessionId, session);
+
+  if (userId) {
+    console.log(`Session ${sessionId} created for user ${userId}`);
+  } else {
+    console.log(`Session ${sessionId} created without user context`);
+  }
+
   return session;
 }
 

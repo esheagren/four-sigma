@@ -36,6 +36,8 @@ export async function validateAuthToken(token: string): Promise<{ authId: string
  * 3. If neither, request proceeds without user context
  */
 export async function attachUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const requestPath = req.path;
+
   try {
     // Check for Bearer token first (authenticated user)
     const authHeader = req.headers.authorization;
@@ -53,7 +55,11 @@ export async function attachUser(req: Request, res: Response, next: NextFunction
           };
           next();
           return;
+        } else {
+          console.warn(`[Auth] Bearer token valid but no user found for authId: ${validatedAuth.authId} (path: ${requestPath})`);
         }
+      } else {
+        console.warn(`[Auth] Bearer token validation failed (path: ${requestPath})`);
       }
     }
 
@@ -67,13 +73,20 @@ export async function attachUser(req: Request, res: Response, next: NextFunction
           authId: user.authId,
           isAnonymous: user.isAnonymous,
         };
+      } else {
+        console.warn(`[Auth] No user found for deviceId: ${deviceId} (path: ${requestPath})`);
       }
       // Note: We don't auto-create users here - that happens at /api/auth/device
     }
 
+    // Log when no user context could be established for session endpoints
+    if (!req.user && (requestPath.includes('/session/start') || requestPath.includes('/session/finalize'))) {
+      console.warn(`[Auth] No user context for ${requestPath} - answers will not be persisted to database`);
+    }
+
     next();
   } catch (err) {
-    console.error('Auth middleware error:', err);
+    console.error(`[Auth] Middleware error on ${requestPath}:`, err);
     next();
   }
 }

@@ -57,8 +57,13 @@ router.post('/start', async (req: Request, res: Response) => {
 
     const questionIds = selectedQuestions.map(q => q.id);
 
-    // Create session
-    createSession(sessionId, questionIds);
+    // Capture userId at session start time - this is the user who will own the session
+    // This prevents issues where a user logs in mid-game and answers get attributed
+    // to the wrong user
+    const userId = req.user?.userId || null;
+
+    // Create session with userId captured
+    createSession(sessionId, questionIds, userId);
 
     // Return question stubs without true values
     const questionStubs = selectedQuestions.map(q => ({
@@ -140,8 +145,16 @@ router.post('/finalize', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Session not found' });
     }
 
-    // Get user ID from request (set by auth middleware)
-    const userId = req.user?.userId;
+    // Use the userId captured at session start time, NOT the current req.user
+    // This prevents issues where a user logs in mid-game and answers get attributed
+    // to a different user than who actually played
+    const userId = session.userId;
+
+    // Log for debugging user-answer attribution issues
+    const currentUserId = req.user?.userId;
+    if (userId !== currentUserId) {
+      console.log(`Session ${sessionId}: userId mismatch - session owner: ${userId}, current user: ${currentUserId}`);
+    }
 
     // Compute judgements for each question
     const judgements: Judgement[] = [];
