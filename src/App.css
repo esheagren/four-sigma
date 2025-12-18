@@ -2861,6 +2861,8 @@ a.judgement-answer-below:hover .judgement-answer-value {
 }
 
 .modal-content {
+  position: relative;
+  z-index: 1;
   background: var(--surface);
   border-radius: 12px;
   box-shadow: var(--shadow-lg), 0 0 30px rgba(99, 91, 255, 0.3);
