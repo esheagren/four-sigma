@@ -5,7 +5,6 @@ import { AuthModal } from './AuthModal';
 import { SignUpPromptModal } from './SignUpPromptModal';
 import { ClaimAccountModal } from './ClaimAccountModal';
 import { UsernameClaimModal } from './UsernameClaimModal';
-import { StatisticsModal } from './StatisticsModal';
 import { SettingsModal } from './SettingsModal';
 import { FeedbackModal } from './FeedbackModal';
 import { AboutModal } from './AboutModal';
@@ -37,16 +36,6 @@ function HamburgerIcon({ isExpanded }: { isExpanded: boolean }) {
     >
       <line x1="3" y1="8" x2="21" y2="8" className="hamburger-line hamburger-line-top" />
       <line x1="3" y1="16" x2="21" y2="16" className="hamburger-line hamburger-line-bottom" />
-    </svg>
-  );
-}
-
-function BarChartIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="12" y1="20" x2="12" y2="10" />
-      <line x1="18" y1="20" x2="18" y2="4" />
-      <line x1="6" y1="20" x2="6" y2="16" />
     </svg>
   );
 }
@@ -94,7 +83,6 @@ export function Nav() {
   const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
   const [isUsernameClaimModalOpen, setIsUsernameClaimModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [isStatisticsOpen, setIsStatisticsOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
@@ -226,13 +214,6 @@ export function Nav() {
           </button>
           <button
             className="sidebar-item"
-            onClick={() => handleMenuItemClick(() => setIsStatisticsOpen(true))}
-          >
-            <BarChartIcon />
-            <span className="sidebar-item-text">Statistics</span>
-          </button>
-          <button
-            className="sidebar-item"
             onClick={() => handleMenuItemClick(() => setIsFeedbackOpen(true))}
           >
             <MessageIcon />
@@ -312,11 +293,6 @@ export function Nav() {
         isOpen={isClaimAccountModalOpen}
         onClose={() => setIsClaimAccountModalOpen(false)}
         username={user?.displayName || ''}
-      />
-
-      <StatisticsModal
-        isOpen={isStatisticsOpen}
-        onClose={() => setIsStatisticsOpen(false)}
       />
 
       <SettingsModal
