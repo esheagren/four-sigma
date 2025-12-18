@@ -126,7 +126,6 @@ export async function updateUserStatsAfterSession(
       best_streak: newBestStreak,
       best_single_score: newBestSingleScore,
       last_played_at: new Date().toISOString(),
-      session_count: supabase.raw('session_count + 1'),
     })
     .eq('id', userId);
 
