@@ -3450,6 +3450,47 @@ a.judgement-answer-below:hover .judgement-answer-value {
   }
 }
 
+/* Modal Footer Actions */
+.modal-footer-actions {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.got-it-button {
+  padding: 0.875rem 2.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, rgba(99, 91, 255, 0.85) 0%, rgba(139, 92, 246, 0.75) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow:
+    0 4px 16px rgba(99, 91, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: all 0.2s ease;
+  letter-spacing: 0.01em;
+}
+
+.got-it-button:hover {
+  background: linear-gradient(135deg, rgba(99, 91, 255, 0.95) 0%, rgba(139, 92, 246, 0.85) 100%);
+  box-shadow:
+    0 6px 24px rgba(99, 91, 255, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.got-it-button:active {
+  transform: translateY(0);
+  box-shadow:
+    0 2px 8px rgba(99, 91, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
 /* Statistics Modal */
 .statistics-modal {
   max-width: 700px;
