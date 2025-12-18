@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getAuthUser, getUserById } from './_lib/auth.js';
-import { getUserStats, updateUserProfile, isValidUsername, isUsernameAvailable, generateUsernameSuggestions } from './_lib/users.js';
+import { getUserStats, updateUserProfile } from './_lib/users.js';
 import { getDailyStats, getPerformanceHistory } from './_lib/sessions.js';
 
 function setCors(res: VercelResponse) {
@@ -54,9 +54,8 @@ async function handleProfile(req: VercelRequest, res: VercelResponse, userId: st
       user: {
         id: stats.user.id,
         email: stats.user.email,
-        username: stats.user.username,
+        displayName: stats.user.displayName,
         isAnonymous: stats.user.isAnonymous,
-        emailVerified: stats.user.emailVerified,
         createdAt: stats.user.createdAt,
         lastPlayedAt: stats.user.lastPlayedAt,
         themePreference: stats.user.themePreference,
@@ -92,32 +91,19 @@ async function handleProfile(req: VercelRequest, res: VercelResponse, userId: st
   }
 
   if (req.method === 'PATCH') {
-    const { username, timezone, themePreference } = req.body;
+    const { displayName, timezone, themePreference } = req.body;
 
-    // Validate username if provided
-    if (username !== undefined) {
-      if (typeof username !== 'string' || !isValidUsername(username)) {
-        return res.status(400).json({ 
-          error: 'Username must be 3-20 characters and contain only letters, numbers, and underscores' 
-        });
+    if (displayName !== undefined) {
+      if (typeof displayName !== 'string' || displayName.trim().length < 1) {
+        return res.status(400).json({ error: 'Display name must be at least 1 character' });
       }
-
-      // Check if username is available (excluding current user)
-      const currentUser = await getUserById(userId);
-      if (currentUser && currentUser.username.toLowerCase() !== username.toLowerCase()) {
-        const available = await isUsernameAvailable(username);
-        if (!available) {
-          const suggestions = generateUsernameSuggestions(username);
-          return res.status(409).json({ 
-            error: 'Username is already taken',
-            suggestions 
-          });
-        }
+      if (displayName.length > 50) {
+        return res.status(400).json({ error: 'Display name must be 50 characters or less' });
       }
     }
 
     const user = await updateUserProfile(userId, {
-      username: username?.trim(),
+      displayName: displayName?.trim(),
       timezone,
       themePreference,
     });
@@ -125,7 +111,7 @@ async function handleProfile(req: VercelRequest, res: VercelResponse, userId: st
     return res.json({
       user: {
         id: user.id,
-        username: user.username,
+        displayName: user.displayName,
         timezone: user.timezone,
         themePreference: user.themePreference,
       },

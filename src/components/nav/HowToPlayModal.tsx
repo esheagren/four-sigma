@@ -1,6 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ModalBackdropAnimation } from '../ModalBackdropAnimation';
+import { UsernameClaimModal } from './UsernameClaimModal';
+import { useAuth } from '../../context/AuthContext';
 
 interface HowToPlayModalProps {
   isOpen: boolean;
@@ -40,6 +42,8 @@ function calculateScore(lower: number, upper: number, answer: number): number {
 }
 
 export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
+  const { user, hasClaimedUsername } = useAuth();
+
   // Interactive slider state
   const [demoUncertainty, setDemoUncertainty] = useState(10);
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -48,6 +52,9 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
   // Scroll detection state
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const modalBodyRef = useRef<HTMLDivElement>(null);
+
+  // Username claim state
+  const [showUsernameClaim, setShowUsernameClaim] = useState(false);
 
   // Check if user has scrolled to bottom
   const checkScrollPosition = useCallback(() => {
@@ -499,11 +506,28 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
           </div>
         ) : (
           <div className="modal-footer-actions">
-            <button className="got-it-button" onClick={onClose}>
+            <button className="got-it-button" onClick={() => {
+              // Check if user needs to claim username
+              if (user?.isAnonymous || !hasClaimedUsername) {
+                setShowUsernameClaim(true);
+              } else {
+                onClose();
+              }
+            }}>
               Got it
             </button>
           </div>
         )}
+
+        {/* Username claim modal - shown after "Got it" if user hasn't claimed username */}
+        <UsernameClaimModal
+          isOpen={showUsernameClaim}
+          onUsernameClaimed={() => {
+            setShowUsernameClaim(false);
+            onClose();
+          }}
+        />
+      </div>
       </div>
     </div>,
     document.body

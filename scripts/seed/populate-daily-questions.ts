@@ -3,9 +3,9 @@
 /**
  * Populate Daily Questions Script
  *
- * Populates the daily_questions table with questions that have
- * distribution_tier = 'mind_blowing'. Each day gets 3 questions,
- * starting from today and continuing until all questions are used.
+ * Populates the daily_questions table with active questions.
+ * Each day gets 3 questions, starting from today and continuing
+ * until all questions are used.
  *
  * Usage:
  *   npm run populate-daily-questions
@@ -65,14 +65,14 @@ function addDays(date: Date, days: number): Date {
 }
 
 /**
- * Fetch all mind_blowing questions
+ * Fetch all active questions
  */
-async function fetchMindBlowingQuestions(): Promise<Question[]> {
+async function fetchActiveQuestions(): Promise<Question[]> {
   const { data, error } = await supabase
     .from('questions')
     .select('id, question_text')
-    .eq('distribution_tier', 'mind_blowing')
-    .eq('is_active', true);
+    .eq('is_active', true)
+    .eq('usage_type', 'daily');
 
   if (error) {
     throw new Error(`Failed to fetch questions: ${error.message}`);
@@ -215,9 +215,9 @@ async function main() {
     }
   }
 
-  // Fetch mind_blowing questions
-  console.log('\n1. Fetching mind_blowing questions...');
-  const questions = await fetchMindBlowingQuestions();
+  // Fetch active questions
+  console.log('\n1. Fetching active questions...');
+  const questions = await fetchActiveQuestions();
   stats.questionsFound = questions.length;
   console.log(`   Found ${questions.length} questions`);
 

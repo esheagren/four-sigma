@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { HowToPlayModal } from './HowToPlayModal';
 import { AuthModal } from './AuthModal';
 import { SignUpPromptModal } from './SignUpPromptModal';
-import { EmailUpgradePromptModal } from './EmailUpgradePromptModal';
+import { ClaimAccountModal } from './ClaimAccountModal';
 import { StatisticsModal } from './StatisticsModal';
 import { SettingsModal } from './SettingsModal';
 import { FeedbackModal } from './FeedbackModal';
@@ -79,12 +79,9 @@ function InfoIcon() {
 }
 
 const HAS_SEEN_HOW_TO_PLAY_KEY = 'four_sigma_has_seen_how_to_play';
-const VISIT_COUNT_KEY = 'four_sigma_visit_count';
-const HAS_DISMISSED_EMAIL_UPGRADE_KEY = 'four_sigma_dismissed_email_upgrade';
-const EMAIL_UPGRADE_VISIT_THRESHOLD = 4;
 
 export function Nav() {
-  const { isAnonymous, isLoading, hasUsername, hasEmail, checkUsername, setUsername } = useAuth();
+  const { user, isAnonymous, hasClaimedUsername, isLoading } = useAuth();
   const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isStatisticsOpen, setIsStatisticsOpen] = useState(false);
@@ -93,39 +90,43 @@ export function Nav() {
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSignUpPromptOpen, setIsSignUpPromptOpen] = useState(false);
-  const [isEmailUpgradeOpen, setIsEmailUpgradeOpen] = useState(false);
+  const [isClaimAccountModalOpen, setIsClaimAccountModalOpen] = useState(false);
   const [authModalInitialMode, setAuthModalInitialMode] = useState<'login' | 'signup'>('login');
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Show How to Play modal for first-time visitors, sign-up prompt for anonymous users,
-  // or email upgrade prompt for username-only users on 4th+ visit
+  // Show How to Play modal for first-time visitors, claim account modal every 3 sessions, or sign-up prompt for returning anonymous users
   useEffect(() => {
     if (isLoading) return;
 
     const hasSeenHowToPlay = localStorage.getItem(HAS_SEEN_HOW_TO_PLAY_KEY);
 
-    // Track visit count
-    const currentCount = parseInt(localStorage.getItem(VISIT_COUNT_KEY) || '0', 10);
-    const newCount = currentCount + 1;
-    localStorage.setItem(VISIT_COUNT_KEY, String(newCount));
-
     if (!hasSeenHowToPlay) {
-      // First visit: show HowToPlay, then sign-up prompt will show when they click "Got it"
+      // First visit: show HowToPlay (username claim happens within modal)
       setIsHowToPlayOpen(true);
       localStorage.setItem(HAS_SEEN_HOW_TO_PLAY_KEY, 'true');
-    } else if (isAnonymous && !hasUsername) {
-      // Return visit + anonymous without username: show sign-up prompt directly
-      setIsSignUpPromptOpen(true);
-    } else if (hasUsername && !hasEmail) {
-      // User has username but no email - check if we should prompt for email upgrade
-      const hasDismissed = localStorage.getItem(HAS_DISMISSED_EMAIL_UPGRADE_KEY);
-      if (!hasDismissed && newCount >= EMAIL_UPGRADE_VISIT_THRESHOLD) {
-        setIsEmailUpgradeOpen(true);
-      }
+      return;
     }
-  }, [isLoading, isAnonymous, hasUsername, hasEmail]);
+
+    // Check if user should see claim account modal
+    // Conditions: has claimed username, doesn't have email, and every 3 sessions
+    if (
+      user &&
+      hasClaimedUsername &&
+      !user.email &&
+      user.sessionCount > 0 &&
+      user.sessionCount % 3 === 0
+    ) {
+      setIsClaimAccountModalOpen(true);
+      return;
+    }
+
+    // Legacy behavior: show sign-up prompt for anonymous users
+    if (isAnonymous) {
+      setIsSignUpPromptOpen(true);
+    }
+  }, [isLoading, isAnonymous, user, hasClaimedUsername]);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -157,25 +158,14 @@ export function Nav() {
     }
   };
 
-  const handleSignUpPromptContinueAsGuest = () => {
+  const handleSignUpPromptCreateAccount = () => {
     setIsSignUpPromptOpen(false);
-  };
-
-  const handleSignUpPromptSignIn = () => {
-    setIsSignUpPromptOpen(false);
-    setAuthModalInitialMode('login');
+    setAuthModalInitialMode('signup');
     setIsAuthModalOpen(true);
   };
 
-  const handleEmailUpgradeAddEmail = () => {
-    // Form is shown inline in the modal
-  };
-
-  const handleEmailUpgradeMaybeLater = () => {
-    // Mark as dismissed so we don't show again this session
-    // User can still add email from Settings
-    localStorage.setItem(HAS_DISMISSED_EMAIL_UPGRADE_KEY, 'true');
-    setIsEmailUpgradeOpen(false);
+  const handleSignUpPromptContinueAsGuest = () => {
+    setIsSignUpPromptOpen(false);
   };
 
   const getDropdownPosition = () => {
@@ -287,17 +277,14 @@ export function Nav() {
       <SignUpPromptModal
         isOpen={isSignUpPromptOpen}
         onClose={handleSignUpPromptContinueAsGuest}
+        onCreateAccount={handleSignUpPromptCreateAccount}
         onContinueAsGuest={handleSignUpPromptContinueAsGuest}
-        onSignIn={handleSignUpPromptSignIn}
-        checkUsername={checkUsername}
-        setUsername={setUsername}
       />
 
-      <EmailUpgradePromptModal
-        isOpen={isEmailUpgradeOpen}
-        onClose={() => setIsEmailUpgradeOpen(false)}
-        onAddEmail={handleEmailUpgradeAddEmail}
-        onMaybeLater={handleEmailUpgradeMaybeLater}
+      <ClaimAccountModal
+        isOpen={isClaimAccountModalOpen}
+        onClose={() => setIsClaimAccountModalOpen(false)}
+        username={user?.displayName || ''}
       />
 
       <StatisticsModal

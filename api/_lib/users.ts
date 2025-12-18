@@ -186,7 +186,6 @@ export async function updateUserProfile(
 export async function getUserStats(userId: string): Promise<{
   user: User;
   recentGames: any[];
-  categoryStats: any[];
 } | null> {
   const user = await getUserById(userId);
   if (!user) {
@@ -207,26 +206,9 @@ export async function getUserStats(userId: string): Promise<{
     .order('answered_at', { ascending: false })
     .limit(10);
 
-  // Get category stats
-  const { data: categoryStats } = await supabase
-    .from('user_category_stats')
-    .select(`
-      *,
-      subcategory:subcategories(
-        name,
-        category:categories(
-          name,
-          domain:domains(name)
-        )
-      )
-    `)
-    .eq('user_id', userId)
-    .order('total_score', { ascending: false });
-
   return {
     user,
     recentGames: recentGames || [],
-    categoryStats: categoryStats || [],
   };
 }
 

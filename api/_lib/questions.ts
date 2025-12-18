@@ -11,7 +11,6 @@ export async function getQuestionById(id: string): Promise<Question | undefined>
       id,
       question_text,
       answer_value,
-      answer_explanation,
       source_url,
       source_name,
       units (name)
@@ -44,7 +43,6 @@ export async function getQuestionsForSession(count: number = 3): Promise<Questio
       id,
       question_text,
       answer_value,
-      answer_explanation,
       source_url,
       source_name,
       units (name)
@@ -89,7 +87,6 @@ export async function getDailyQuestions(overrideDate?: string): Promise<Question
         id,
         question_text,
         answer_value,
-        answer_explanation,
         source_url,
         source_name,
         units (name)

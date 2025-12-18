@@ -32,9 +32,8 @@ router.post('/device', async (req: Request, res: Response) => {
     res.json({
       user: {
         id: user.id,
-        username: user.username,
+        displayName: user.displayName,
         isAnonymous: user.isAnonymous,
-        emailVerified: user.emailVerified,
         totalScore: user.totalScore,
         averageScore: user.averageScore,
         gamesPlayed: user.gamesPlayed,
@@ -55,15 +54,15 @@ router.post('/device', async (req: Request, res: Response) => {
 /**
  * POST /api/auth/signup
  * Create authenticated account, merging anonymous data if exists
- * Body: { email, password, username }
+ * Body: { email, password, displayName }
  */
 router.post('/signup', async (req: Request, res: Response) => {
   try {
-    const { email, password, username } = req.body;
+    const { email, password, displayName } = req.body;
     const deviceId = extractDeviceId(req);
 
-    if (!email || !password || !username) {
-      res.status(400).json({ error: 'Email, password, and username required' });
+    if (!email || !password || !displayName) {
+      res.status(400).json({ error: 'Email, password, and display name required' });
       return;
     }
 
@@ -93,22 +92,21 @@ router.post('/signup', async (req: Request, res: Response) => {
       const anonymousUser = await getUserByDeviceId(deviceId);
       if (anonymousUser && anonymousUser.isAnonymous) {
         // Convert the anonymous user to authenticated (keeps their data)
-        user = await convertToAuthenticatedUser(anonymousUser.id, authId, email, username);
+        user = await convertToAuthenticatedUser(anonymousUser.id, authId, email, displayName);
       }
     }
 
     // If no anonymous user to convert, create new authenticated user
     if (!user) {
-      user = await createAuthenticatedUser(authId, email, username, deviceId || undefined);
+      user = await createAuthenticatedUser(authId, email, displayName, deviceId || undefined);
     }
 
     res.status(201).json({
       user: {
         id: user.id,
         email: user.email,
-        username: user.username,
+        displayName: user.displayName,
         isAnonymous: user.isAnonymous,
-        emailVerified: user.emailVerified,
         totalScore: user.totalScore,
         averageScore: user.averageScore,
         gamesPlayed: user.gamesPlayed,
@@ -187,9 +185,8 @@ router.post('/login', async (req: Request, res: Response) => {
       user: user ? {
         id: user.id,
         email: user.email,
-        username: user.username,
+        displayName: user.displayName,
         isAnonymous: user.isAnonymous,
-        emailVerified: user.emailVerified,
         totalScore: user.totalScore,
         averageScore: user.averageScore,
         gamesPlayed: user.gamesPlayed,
@@ -251,9 +248,8 @@ router.get('/me', async (req: Request, res: Response) => {
       user: {
         id: user.id,
         email: user.email,
-        username: user.username,
+        displayName: user.displayName,
         isAnonymous: user.isAnonymous,
-        emailVerified: user.emailVerified,
         totalScore: user.totalScore,
         averageScore: user.averageScore,
         gamesPlayed: user.gamesPlayed,

@@ -48,13 +48,13 @@ export function PostHogProvider({ children }: PostHogProviderProps) {
       // Anonymous user - identify with device ID
       posthog.identify(deviceId, {
         isAnonymous: true,
-        username: user.username,
+        displayName: user.displayName,
       });
     } else {
       // Authenticated user - identify with user ID
       posthog.identify(user.id, {
         email: user.email,
-        username: user.username,
+        displayName: user.displayName,
         isAnonymous: false,
         gamesPlayed: user.gamesPlayed,
         totalScore: user.totalScore,

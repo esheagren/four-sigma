@@ -28,14 +28,13 @@ interface CSVRow {
   answer_value: string;
   answer_unit: string;
   question_type: string;
-  distribution_tier: string;
   domain: string;
   category: string;
   subcategory: string;
   source_url: string;
   source_name: string;
   source_retrieved_at: string;
-  answer_explanation: string;
+  answer_context?: string;
 }
 
 interface ImportStats {
@@ -338,7 +337,8 @@ async function findOrCreateSubcategory(
   const { data: existing } = await supabase
     .from('subcategories')
     .select('id')
-    .eq('slug', slug)
+    .eq('name', subcategoryName)
+    .eq('category_id', categoryId)
     .single();
 
   if (existing) {
@@ -433,16 +433,14 @@ async function importQuestion(row: CSVRow, dryRun: boolean): Promise<void> {
         unit_id: unitId,
         question_text: row.question_text,
         answer_value: parseFloat(row.answer_value),
-        fun_fact: null,
-        answer_explanation: row.answer_explanation,
         source_url: row.source_url,
         source_name: row.source_name,
         source_retrieved_at: row.source_retrieved_at || null,
         question_type: row.question_type,
-        distribution_tier: row.distribution_tier,
         creation_source: 'automated',
         created_by_user_id: null,
         is_active: true,
+        answer_context: row.answer_context || null,
       })
       .select('id')
       .single();

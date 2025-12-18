@@ -22,9 +22,8 @@ router.get('/profile', requireUser, async (req: Request, res: Response) => {
       user: {
         id: stats.user.id,
         email: stats.user.email,
-        username: stats.user.username,
+        displayName: stats.user.displayName,
         isAnonymous: stats.user.isAnonymous,
-        emailVerified: stats.user.emailVerified,
         createdAt: stats.user.createdAt,
         lastPlayedAt: stats.user.lastPlayedAt,
       },
@@ -64,35 +63,34 @@ router.get('/profile', requireUser, async (req: Request, res: Response) => {
 
 /**
  * PATCH /api/user/profile
- * Update user profile (username, timezone)
- * Body: { username?, timezone? }
+ * Update user profile (display name, timezone)
+ * Body: { displayName?, timezone? }
  */
 router.patch('/profile', requireUser, async (req: Request, res: Response) => {
   try {
-    const { username, timezone } = req.body;
+    const { displayName, timezone } = req.body;
 
-    // Validate username
-    if (username !== undefined) {
-      if (typeof username !== 'string' || username.trim().length < 3) {
-        res.status(400).json({ error: 'Username must be at least 3 characters' });
+    // Validate display name
+    if (displayName !== undefined) {
+      if (typeof displayName !== 'string' || displayName.trim().length < 1) {
+        res.status(400).json({ error: 'Display name must be at least 1 character' });
         return;
       }
-      if (username.length > 20) {
-        res.status(400).json({ error: 'Username must be 20 characters or less' });
+      if (displayName.length > 50) {
+        res.status(400).json({ error: 'Display name must be 50 characters or less' });
         return;
       }
-      // TODO: Add username availability check
     }
 
     const user = await updateUserProfile(req.user!.userId, {
-      username: username?.trim(),
+      displayName: displayName?.trim(),
       timezone,
     });
 
     res.json({
       user: {
         id: user.id,
-        username: user.username,
+        displayName: user.displayName,
         timezone: user.timezone,
       },
     });
