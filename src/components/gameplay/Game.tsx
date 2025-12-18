@@ -87,7 +87,7 @@ interface FinalizeResponse {
 }
 
 export function Game() {
-  const { authToken, isLoading: authLoading } = useAuth();
+  const { authToken, isLoading: authLoading, refreshUser } = useAuth();
   const { animationPhase, triggerRevealAnimation } = useAnimation();
   const { capture } = useAnalytics();
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -314,6 +314,9 @@ export function Game() {
         topScoreToday: data.dailyStats?.topScoreToday ?? null,
         totalParticipantsToday: data.dailyStats?.totalParticipantsToday ?? null,
       });
+
+      // Refresh user data to get updated stats (games_played, total_score, etc.)
+      await refreshUser();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       capture('game_error', {
