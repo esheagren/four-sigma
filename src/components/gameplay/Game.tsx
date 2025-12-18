@@ -87,7 +87,7 @@ interface FinalizeResponse {
 }
 
 export function Game() {
-  const { authToken } = useAuth();
+  const { authToken, isLoading: authLoading } = useAuth();
   const { animationPhase, triggerRevealAnimation } = useAnimation();
   const { capture } = useAnalytics();
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -192,9 +192,13 @@ export function Game() {
     }
   };
 
+  // Wait for auth to be ready before starting session
+  // This ensures the user record exists before we try to associate it with the session
   useEffect(() => {
-    startSession();
-  }, []);
+    if (!authLoading) {
+      startSession();
+    }
+  }, [authLoading]);
 
   // Track question views when index changes
   useEffect(() => {
@@ -319,7 +323,8 @@ export function Game() {
     }
   };
 
-  if (isLoading) {
+  // Show loading while auth is initializing OR while session is loading
+  if (authLoading || isLoading) {
     return (
       <div className="game-container">
         <LoadingOrb />
