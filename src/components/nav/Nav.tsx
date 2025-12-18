@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { HowToPlayModal } from './HowToPlayModal';
 import { AuthModal } from './AuthModal';
@@ -23,12 +22,21 @@ function HelpCircleIcon() {
   );
 }
 
-function MenuIcon() {
+function HamburgerIcon({ isExpanded }: { isExpanded: boolean }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="3" y1="12" x2="21" y2="12" />
-      <line x1="3" y1="6" x2="21" y2="6" />
-      <line x1="3" y1="18" x2="21" y2="18" />
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`hamburger-icon ${isExpanded ? 'expanded' : ''}`}
+    >
+      <line x1="3" y1="8" x2="21" y2="8" className="hamburger-line hamburger-line-top" />
+      <line x1="3" y1="16" x2="21" y2="16" className="hamburger-line hamburger-line-bottom" />
     </svg>
   );
 }
@@ -90,13 +98,11 @@ export function Nav() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [isSignUpPromptOpen, setIsSignUpPromptOpen] = useState(false);
   const [isClaimAccountModalOpen, setIsClaimAccountModalOpen] = useState(false);
   const [authModalInitialMode, setAuthModalInitialMode] = useState<'login' | 'signup'>('login');
-  const menuRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
 
   // Show How to Play modal for first-time visitors, claim account modal every 3 sessions, or sign-up prompt for returning anonymous users
   useEffect(() => {
@@ -131,25 +137,35 @@ export function Nav() {
     }
   }, [isLoading, isAnonymous, user, hasClaimedUsername]);
 
-  // Close menu when clicking outside
+  // Close sidebar when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node;
-      const clickedInMenu = menuRef.current?.contains(target);
-      const clickedInDropdown = dropdownRef.current?.contains(target);
-      if (!clickedInMenu && !clickedInDropdown) {
-        setIsMenuOpen(false);
+      if (sidebarRef.current && !sidebarRef.current.contains(target)) {
+        setIsExpanded(false);
       }
     }
 
-    if (isMenuOpen) {
+    if (isExpanded) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [isMenuOpen]);
+  }, [isExpanded]);
+
+  // Close sidebar on Escape key
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape' && isExpanded) {
+        setIsExpanded(false);
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isExpanded]);
 
   const handleMenuItemClick = (openModal: () => void) => {
-    setIsMenuOpen(false);
+    setIsExpanded(false);
     openModal();
   };
 
@@ -177,100 +193,85 @@ export function Nav() {
     setIsSignUpPromptOpen(false);
   };
 
-  const getDropdownPosition = () => {
-    if (!buttonRef.current) return { top: 0, right: 0 };
-    const rect = buttonRef.current.getBoundingClientRect();
-    return {
-      top: rect.bottom + 8,
-      right: window.innerWidth - rect.right,
-    };
-  };
-
   return (
     <>
-      <nav className="navbar">
-        <div className="navbar-container">
-          <div className="navbar-brand">
-            <Link to="/" className="brand-name-button">
-              4-σ
-            </Link>
-          </div>
-          <div className="navbar-actions">
-            <div className="nav-menu-container" ref={menuRef}>
-              <button
-                ref={buttonRef}
-                className="nav-button nav-icon-button"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                aria-label="Menu"
-                title="Menu"
-              >
-                <MenuIcon />
-              </button>
-              {isMenuOpen && createPortal(
-                <div
-                  ref={dropdownRef}
-                  className="nav-dropdown-menu"
-                  style={{
-                    position: 'fixed',
-                    top: getDropdownPosition().top,
-                    right: getDropdownPosition().right,
-                    zIndex: 99999,
-                  }}
-                >
-                  <button
-                    className="nav-dropdown-item"
-                    onClick={() => handleMenuItemClick(() => setIsHowToPlayOpen(true))}
-                  >
-                    <HelpCircleIcon />
-                    <span>How to Play</span>
-                  </button>
-                  <button
-                    className="nav-dropdown-item"
-                    onClick={() => handleMenuItemClick(() => setIsStatisticsOpen(true))}
-                  >
-                    <BarChartIcon />
-                    <span>Statistics</span>
-                  </button>
-                  <button
-                    className="nav-dropdown-item"
-                    onClick={() => handleMenuItemClick(() => setIsFeedbackOpen(true))}
-                  >
-                    <MessageIcon />
-                    <span>Feedback</span>
-                  </button>
-                  {!isLoading && isAnonymous && (
-                    <button
-                      className="nav-dropdown-item"
-                      onClick={() => handleMenuItemClick(() => {
-                        setAuthModalInitialMode('login');
-                        setIsAuthModalOpen(true);
-                      })}
-                    >
-                      <UserIcon />
-                      <span>Sign In</span>
-                    </button>
-                  )}
-                  <button
-                    className="nav-dropdown-item"
-                    onClick={() => handleMenuItemClick(() => setIsSettingsOpen(true))}
-                  >
-                    <SettingsIcon />
-                    <span>Settings</span>
-                  </button>
-                  <button
-                    className="nav-dropdown-item"
-                    onClick={() => handleMenuItemClick(() => setIsAboutOpen(true))}
-                  >
-                    <InfoIcon />
-                    <span>About</span>
-                  </button>
-                </div>,
-                document.body
-              )}
-            </div>
-          </div>
+      <aside
+        ref={sidebarRef}
+        className={`sidebar ${isExpanded ? 'expanded' : 'collapsed'}`}
+      >
+        {/* Hamburger toggle button */}
+        <button
+          className="sidebar-toggle"
+          onClick={() => setIsExpanded(!isExpanded)}
+          aria-label={isExpanded ? 'Collapse menu' : 'Expand menu'}
+        >
+          <HamburgerIcon isExpanded={isExpanded} />
+        </button>
+
+        {/* Logo - visible when expanded */}
+        <div className="sidebar-logo">
+          <Link to="/" className="brand-link" onClick={() => setIsExpanded(false)}>
+            4-σ
+          </Link>
         </div>
-      </nav>
+
+        {/* Menu items */}
+        <nav className="sidebar-menu">
+          <button
+            className="sidebar-item"
+            onClick={() => handleMenuItemClick(() => setIsHowToPlayOpen(true))}
+          >
+            <HelpCircleIcon />
+            <span className="sidebar-item-text">How to Play</span>
+          </button>
+          <button
+            className="sidebar-item"
+            onClick={() => handleMenuItemClick(() => setIsStatisticsOpen(true))}
+          >
+            <BarChartIcon />
+            <span className="sidebar-item-text">Statistics</span>
+          </button>
+          <button
+            className="sidebar-item"
+            onClick={() => handleMenuItemClick(() => setIsFeedbackOpen(true))}
+          >
+            <MessageIcon />
+            <span className="sidebar-item-text">Feedback</span>
+          </button>
+          {!isLoading && isAnonymous && (
+            <button
+              className="sidebar-item"
+              onClick={() => handleMenuItemClick(() => {
+                setAuthModalInitialMode('login');
+                setIsAuthModalOpen(true);
+              })}
+            >
+              <UserIcon />
+              <span className="sidebar-item-text">Sign In</span>
+            </button>
+          )}
+          <button
+            className="sidebar-item"
+            onClick={() => handleMenuItemClick(() => setIsSettingsOpen(true))}
+          >
+            <SettingsIcon />
+            <span className="sidebar-item-text">Settings</span>
+          </button>
+          <button
+            className="sidebar-item"
+            onClick={() => handleMenuItemClick(() => setIsAboutOpen(true))}
+          >
+            <InfoIcon />
+            <span className="sidebar-item-text">About</span>
+          </button>
+        </nav>
+      </aside>
+
+      {/* Mobile backdrop */}
+      <div
+        className={`sidebar-backdrop ${isExpanded ? 'visible' : ''}`}
+        onClick={() => setIsExpanded(false)}
+      />
 
       <HowToPlayModal
         isOpen={isHowToPlayOpen}

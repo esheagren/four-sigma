@@ -10,11 +10,15 @@ function App() {
   return (
     <AnimationProvider>
       <BackgroundAnimation />
-      <Nav />
-      <Routes>
-        <Route path="/" element={<Game />} />
-        <Route path="/profile" element={<ProfilePage />} />
-      </Routes>
+      <div className="app-layout">
+        <Nav />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<Game />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Routes>
+        </main>
+      </div>
     </AnimationProvider>
   )
 }
