@@ -53,7 +53,6 @@ body {
 
 /* CSS Custom Properties for Sidebar */
 :root {
-  --sidebar-collapsed-width: 56px;
   --sidebar-expanded-width: 220px;
   --sidebar-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -64,7 +63,7 @@ body {
   top: 0;
   left: 0;
   height: 100vh;
-  width: var(--sidebar-collapsed-width);
+  width: var(--sidebar-expanded-width);
   background: rgba(30, 30, 35, 0.95);
   backdrop-filter: blur(24px) saturate(1.8);
   -webkit-backdrop-filter: blur(24px) saturate(1.8);
@@ -73,8 +72,9 @@ body {
   display: flex;
   flex-direction: column;
   padding: 1rem 0;
-  transition: width var(--sidebar-transition);
   overflow: hidden;
+  transform: translateX(-100%);
+  transition: transform var(--sidebar-transition);
 
   /* iOS safe area support */
   padding-top: max(1rem, env(safe-area-inset-top));
@@ -82,7 +82,7 @@ body {
 }
 
 .sidebar.expanded {
-  width: var(--sidebar-expanded-width);
+  transform: translateX(0);
 }
 
 /* Aurora effect adapted for vertical orientation */
@@ -117,18 +117,14 @@ body {
   }
 }
 
-/* Sidebar Header - logo and toggle on same row */
+/* Sidebar Header */
 .sidebar-header {
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 0.5rem 0 1rem;
   margin-bottom: 1.5rem;
   flex-shrink: 0;
-}
-
-.sidebar.expanded .sidebar-header {
-  display: flex;
 }
 
 /* Toggle Button (Hamburger/X) */
@@ -191,17 +187,13 @@ body {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Menu Container - hidden when collapsed */
+/* Menu Container */
 .sidebar-menu {
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: 0.25rem;
   padding: 0 0.5rem;
   flex: 1;
-}
-
-.sidebar.expanded .sidebar-menu {
-  display: flex;
 }
 
 /* Menu Items */
@@ -222,11 +214,6 @@ body {
   white-space: nowrap;
   width: 100%;
   min-height: 44px;
-  justify-content: center;
-}
-
-.sidebar.expanded .sidebar-item {
-  justify-content: flex-start;
 }
 
 .sidebar-item:hover {
@@ -236,55 +223,23 @@ body {
 
 .sidebar-item svg {
   flex-shrink: 0;
-  opacity: 0;
+  opacity: 0.7;
   width: 18px;
   height: 18px;
-  transition: opacity 0.2s ease;
 }
 
-.sidebar.expanded .sidebar-item svg {
-  opacity: 0.7;
-}
-
-.sidebar.expanded .sidebar-item:hover svg {
+.sidebar-item:hover svg {
   opacity: 1;
 }
-
-/* Item text - hidden when collapsed */
-.sidebar-item-text {
-  opacity: 0;
-  transform: translateX(-10px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  overflow: hidden;
-  width: 0;
-}
-
-.sidebar.expanded .sidebar-item-text {
-  opacity: 1;
-  transform: translateX(0);
-  width: auto;
-}
-
-/* Staggered text reveal animation */
-.sidebar.expanded .sidebar-item:nth-child(1) .sidebar-item-text { transition-delay: 0.05s; }
-.sidebar.expanded .sidebar-item:nth-child(2) .sidebar-item-text { transition-delay: 0.075s; }
-.sidebar.expanded .sidebar-item:nth-child(3) .sidebar-item-text { transition-delay: 0.1s; }
-.sidebar.expanded .sidebar-item:nth-child(4) .sidebar-item-text { transition-delay: 0.125s; }
-.sidebar.expanded .sidebar-item:nth-child(5) .sidebar-item-text { transition-delay: 0.15s; }
-.sidebar.expanded .sidebar-item:nth-child(6) .sidebar-item-text { transition-delay: 0.175s; }
 
 /* User info section at bottom of sidebar */
 .sidebar-user-section {
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: 0.25rem;
   padding: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   margin-top: auto;
-}
-
-.sidebar.expanded .sidebar-user-section {
-  display: flex;
 }
 
 .sidebar-user-info {
@@ -316,16 +271,6 @@ body {
   white-space: nowrap;
 }
 
-/* Sidebar Backdrop (for mobile click-outside) */
-.sidebar-backdrop {
-  display: none;
-}
-
-/* Floating toggle button - hidden on desktop, visible on mobile */
-.sidebar-toggle-floating {
-  display: none;
-}
-
 /* App Layout */
 .app-layout {
   display: flex;
@@ -336,76 +281,49 @@ body {
 
 .main-content {
   flex: 1;
-  margin-left: var(--sidebar-collapsed-width);
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
 }
 
-/* Mobile Styles */
-@media (max-width: 640px) {
-  :root {
-    --sidebar-collapsed-width: 0px;
-    --sidebar-expanded-width: 280px;
-  }
+/* Floating hamburger button to open sidebar */
+.sidebar-toggle-floating {
+  position: fixed;
+  top: max(1rem, env(safe-area-inset-top));
+  left: max(1rem, env(safe-area-inset-left));
+  z-index: 101;
+  background: rgba(30, 30, 35, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.8);
+  transition: all 0.15s ease;
+}
 
-  .sidebar {
-    width: 0;
-    transform: translateX(-100%);
-  }
+.sidebar-toggle-floating:hover {
+  background: rgba(30, 30, 35, 1);
+  color: white;
+}
 
-  .sidebar.expanded {
-    width: var(--sidebar-expanded-width);
-    transform: translateX(0);
-  }
+/* Sidebar Backdrop for click-outside */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+}
 
-  /* Floating hamburger button when collapsed */
-  .sidebar-toggle-floating {
-    position: fixed;
-    top: max(1rem, env(safe-area-inset-top));
-    left: max(1rem, env(safe-area-inset-left));
-    z-index: 101;
-    background: rgba(30, 30, 35, 0.9);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    cursor: pointer;
-    color: rgba(255, 255, 255, 0.8);
-    transition: all 0.15s ease;
-  }
-
-  .sidebar-toggle-floating:hover {
-    background: rgba(30, 30, 35, 1);
-    color: white;
-  }
-
-  .sidebar.expanded + .sidebar-toggle-floating {
-    display: none;
-  }
-
-  .main-content {
-    margin-left: 0;
-  }
-
-  /* Backdrop overlay on mobile */
-  .sidebar-backdrop {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 99;
-  }
-
-  .sidebar-backdrop.visible {
-    display: block;
-  }
+.sidebar-backdrop.visible {
+  display: block;
 }
 
 /* Main Content */
