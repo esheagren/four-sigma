@@ -7,7 +7,6 @@ import { ClaimAccountModal } from './ClaimAccountModal';
 import { UsernameClaimModal } from './UsernameClaimModal';
 import { SettingsModal } from './SettingsModal';
 import { FeedbackModal } from './FeedbackModal';
-import { AboutModal } from './AboutModal';
 import { useAuth } from '../../context/AuthContext';
 
 // Icon components
@@ -66,16 +65,6 @@ function SettingsIcon() {
   );
 }
 
-function InfoIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="16" x2="12" y2="12" />
-      <line x1="12" y1="8" x2="12.01" y2="8" />
-    </svg>
-  );
-}
-
 const HAS_SEEN_HOW_TO_PLAY_KEY = 'four_sigma_has_seen_how_to_play';
 
 export function Nav() {
@@ -85,7 +74,6 @@ export function Nav() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
-  const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSignUpPromptOpen, setIsSignUpPromptOpen] = useState(false);
   const [isClaimAccountModalOpen, setIsClaimAccountModalOpen] = useState(false);
@@ -238,13 +226,6 @@ export function Nav() {
             <SettingsIcon />
             <span className="sidebar-item-text">Settings</span>
           </button>
-          <button
-            className="sidebar-item"
-            onClick={() => handleMenuItemClick(() => setIsAboutOpen(true))}
-          >
-            <InfoIcon />
-            <span className="sidebar-item-text">About</span>
-          </button>
         </nav>
       </aside>
 
@@ -303,11 +284,6 @@ export function Nav() {
       <FeedbackModal
         isOpen={isFeedbackOpen}
         onClose={() => setIsFeedbackOpen(false)}
-      />
-
-      <AboutModal
-        isOpen={isAboutOpen}
-        onClose={() => setIsAboutOpen(false)}
       />
     </>
   );
