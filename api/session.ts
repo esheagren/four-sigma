@@ -183,6 +183,7 @@ async function handleFinalize(req: VercelRequest, res: VercelResponse) {
       score: individualScore,
       source: question.source,
       sourceUrl: question.sourceUrl,
+      answerContext: question.answerContext,
       communityStats: communityStats || undefined,
       crowdData: crowdData || undefined,
     });

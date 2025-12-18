@@ -36,6 +36,7 @@ export interface Question {
   trueValue: number;
   source?: string;
   sourceUrl?: string;
+  answerContext?: string;
 }
 
 export interface Answer {
@@ -76,6 +77,7 @@ export interface Judgement {
   score: number;
   source?: string;
   sourceUrl?: string;
+  answerContext?: string;
   communityStats?: {
     averageScore: number;
     highestScore: number;

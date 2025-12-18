@@ -11,6 +11,7 @@ export async function getQuestionById(id: string): Promise<Question | undefined>
       id,
       question_text,
       answer_value,
+      answer_context,
       source_url,
       source_name,
       units (name)
@@ -30,6 +31,7 @@ export async function getQuestionById(id: string): Promise<Question | undefined>
     trueValue: data.answer_value,
     source: data.source_name || '',
     sourceUrl: data.source_url || '',
+    answerContext: data.answer_context || undefined,
   };
 }
 
@@ -87,6 +89,7 @@ export async function getDailyQuestions(overrideDate?: string): Promise<Question
         id,
         question_text,
         answer_value,
+        answer_context,
         source_url,
         source_name,
         units (name)
@@ -113,5 +116,6 @@ export async function getDailyQuestions(overrideDate?: string): Promise<Question
     trueValue: dq.questions.answer_value,
     source: dq.questions.source_name || '',
     sourceUrl: dq.questions.source_url || '',
+    answerContext: dq.questions.answer_context || undefined,
   }));
 }
