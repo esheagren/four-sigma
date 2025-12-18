@@ -6,9 +6,8 @@ export interface User {
   deviceId: string | null;
   authId: string | null;
   email: string | null;
-  username: string;
+  displayName: string;
   isAnonymous: boolean;
-  emailVerified: boolean;
   createdAt: Date;
   lastPlayedAt: Date | null;
   timezone: string;
@@ -45,6 +44,7 @@ export interface Question {
   trueValue: number;
   source?: string;
   sourceUrl?: string;
+  answerContext?: string;
 }
 
 export interface Answer {
@@ -71,6 +71,7 @@ export interface Judgement {
   score: number;
   source?: string;
   sourceUrl?: string;
+  answerContext?: string;
   communityStats?: {
     averageScore: number;
     highestScore: number;
@@ -106,7 +107,7 @@ export interface TodayLeaderboardEntry {
 
 export interface OverallLeaderboardEntry {
   rank: number;
-  username: string;
+  displayName: string;
   totalScore: number;
   gamesPlayed: number;
   isCurrentUser?: boolean;

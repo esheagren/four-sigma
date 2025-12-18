@@ -5,7 +5,6 @@ import { UserStatsSlide } from './UserStatsSlide';
 import { ScoreOrbSlide } from './ScoreOrbSlide';
 import { QuestionLeadersSlide } from './QuestionLeadersSlide';
 import { ShareScoreCard, type ShareScoreCardRef } from './ShareScoreCard';
-import { generateOrbWebm } from '../../lib/orbVideo';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../context/PostHogContext';
 
@@ -35,6 +34,7 @@ interface Judgement {
   score: number;
   source?: string;
   sourceUrl?: string;
+  answerContext?: string;
   crowdData?: CrowdData;
   communityStats?: CommunityStats;
 }
@@ -62,15 +62,10 @@ interface TodayLeaderboardEntry {
 
 interface OverallLeaderboardEntry {
   rank: number;
-  username: string;
+  displayName: string;
   totalScore: number;
   gamesPlayed: number;
   isCurrentUser?: boolean;
-}
-
-interface OverallStanding {
-  percentile: number;
-  totalPlayers: number;
 }
 
 interface ResultsCarouselProps {
@@ -84,7 +79,6 @@ interface ResultsCarouselProps {
   calibrationMilestones?: CalibrationMilestone[];
   todayLeaderboard?: TodayLeaderboardEntry[];
   overallLeaderboard?: OverallLeaderboardEntry[];
-  overallStanding?: OverallStanding;
   onScroll?: (progress: number) => void;
 }
 
@@ -99,7 +93,6 @@ export function ResultsCarousel({
   calibrationMilestones,
   todayLeaderboard,
   overallLeaderboard,
-  overallStanding,
   onScroll,
 }: ResultsCarouselProps) {
   const { user } = useAuth();
@@ -185,37 +178,6 @@ export function ResultsCarousel({
     setIsSharing(true);
 
     try {
-      // Prefer an animated share asset when supported (falls back to PNG below)
-      try {
-        const videoBlob = await generateOrbWebm({ score });
-        if (videoBlob) {
-          const videoFile = new File([videoBlob], '4sigma-orb.webm', { type: videoBlob.type || 'video/webm' });
-          const shareData = { files: [videoFile] };
-
-          if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-            await navigator.share(shareData);
-            capture('score_shared', { score, shareMethod: 'native_share_video', hits, total, calibration, percentile });
-            return;
-          }
-
-          // If native share isn't available/compatible, download the video as the best animated fallback.
-          const url = URL.createObjectURL(videoBlob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = '4sigma-orb.webm';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-
-          capture('score_shared', { score, shareMethod: 'download_video', hits, total, calibration, percentile });
-          return;
-        }
-      } catch (e) {
-        // If video generation fails, proceed with the existing PNG pipeline
-        console.warn('Animated share generation failed, falling back to PNG:', e);
-      }
-
       const blob = await shareCardRef.current.generateImage();
       if (!blob) {
         throw new Error('Failed to generate image');
@@ -273,7 +235,7 @@ export function ResultsCarousel({
       <ShareScoreCard
         ref={shareCardRef}
         totalScore={score}
-        username={user?.username || 'Player'}
+        displayName={user?.displayName || 'Player'}
         hits={hits}
         total={total}
         calibration={calibration}
@@ -313,8 +275,6 @@ export function ResultsCarousel({
           <DailyStatsSlide
             ref={setSlideRef(safeJudgements.length + 1)}
             overallLeaderboard={overallLeaderboard}
-            overallStanding={overallStanding}
-            username={user?.username || 'Player'}
           />
 
           {/* User Stats Slide (Long-term stats) */}

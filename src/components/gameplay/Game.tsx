@@ -24,6 +24,7 @@ interface Judgement {
   score: number;
   source?: string;
   sourceUrl?: string;
+  answerContext?: string;
   communityStats?: {
     averageScore: number;
     highestScore: number;
@@ -39,7 +40,7 @@ interface TodayLeaderboardEntry {
 
 interface OverallLeaderboardEntry {
   rank: number;
-  username: string;
+  displayName: string;
   totalScore: number;
   gamesPlayed: number;
   isCurrentUser?: boolean;
