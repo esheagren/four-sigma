@@ -101,62 +101,39 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
 
   return createPortal(
     <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal-content feedback-modal dark-glass-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2 className="modal-title">Squash a Bug</h2>
-          <button className="modal-close-button" onClick={handleClose} aria-label="Close">
-            ×
-          </button>
-        </div>
-
-        <div className="modal-body">
-          {submitSuccess ? (
-            <div className="feedback-success">
-              <div className="feedback-success-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                  <polyline points="22 4 12 14.01 9 11.01" />
-                </svg>
-              </div>
-              <h3 className="feedback-success-title">Thanks!</h3>
-              <p className="feedback-success-message">Bug report submitted.</p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="feedback-form">
-              <textarea
-                ref={textareaRef}
-                className="feedback-textarea feedback-textarea-auto"
-                value={feedbackText}
-                onChange={handleTextareaChange}
-                placeholder="Describe the issue you encountered."
-                rows={2}
-                maxLength={5000}
-                autoFocus
-                disabled={isSubmitting}
-              />
-              <div className="feedback-char-count">
-                {feedbackText.length}/5000
-              </div>
-              {error && <div className="feedback-error">{error}</div>}
-            </form>
-          )}
-        </div>
-
-        <div className="modal-footer">
-          {submitSuccess ? (
-            <button className="modal-button" onClick={handleClose}>
-              Close
-            </button>
-          ) : (
+      <div className="modal-content feedback-modal-compact dark-glass-modal" onClick={(e) => e.stopPropagation()}>
+        {submitSuccess ? (
+          <div className="feedback-success-compact">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            <span>Bug report submitted!</span>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="feedback-form-compact">
+            <textarea
+              ref={textareaRef}
+              className="feedback-textarea-compact"
+              value={feedbackText}
+              onChange={handleTextareaChange}
+              placeholder="Describe the bug..."
+              rows={1}
+              maxLength={5000}
+              autoFocus
+              disabled={isSubmitting}
+            />
             <button
-              className="modal-button modal-button-primary"
-              onClick={handleSubmit}
+              type="submit"
+              className="feedback-submit-compact"
               disabled={isSubmitting || !feedbackText.trim()}
+              aria-label="Submit"
             >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+              {isSubmitting ? '...' : '→'}
             </button>
-          )}
-        </div>
+          </form>
+        )}
+        {error && <div className="feedback-error-compact">{error}</div>}
       </div>
     </div>,
     document.body
