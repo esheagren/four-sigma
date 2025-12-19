@@ -288,12 +288,17 @@ export function DirectBoundsNumPad({ onSubmit, isTouch }: DirectBoundsNumPadProp
     setSelectedBound(bound);
   }, [currentInput, expression, setCurrentValue, selectedBound, lowerValue, upperValue]);
 
-  // Check if we can submit
+  // Check if we can submit - consider currentInput for the active bound
   const canSubmit = useMemo(() => {
-    const lower = parseFormattedNumber(lowerValue);
-    const upper = parseFormattedNumber(upperValue);
-    return !isNaN(lower) && !isNaN(upper) && lowerValue !== '' && upperValue !== '';
-  }, [lowerValue, upperValue]);
+    // Get effective values considering current input
+    const effectiveLower = selectedBound === 'lower' && currentInput ? currentInput : lowerValue;
+    const effectiveUpper = selectedBound === 'upper' && currentInput ? currentInput : upperValue;
+
+    const lower = parseFormattedNumber(effectiveLower);
+    const upper = parseFormattedNumber(effectiveUpper);
+
+    return !isNaN(lower) && !isNaN(upper) && effectiveLower !== '' && effectiveUpper !== '';
+  }, [lowerValue, upperValue, selectedBound, currentInput]);
 
   // Handle submit
   const handleSubmit = useCallback(() => {
