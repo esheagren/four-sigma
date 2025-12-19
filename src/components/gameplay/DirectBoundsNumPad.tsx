@@ -127,42 +127,34 @@ export function DirectBoundsNumPad({ onSubmit, isTouch }: DirectBoundsNumPadProp
     return Math.max(minFontSize, baseFontSize - reduction);
   }, [displayValue]);
 
-  // Compute display text for each bound independently
-  const lowerDisplayText = useMemo(() => {
-    if (selectedBound === 'lower') {
-      // This bound is active - show current typing/expression
+  // Helper to compute display text for a bound
+  const computeBoundDisplay = useCallback((
+    bound: 'lower' | 'upper',
+    savedValue: string
+  ): string => {
+    // Only show active input if this bound is currently selected
+    if (selectedBound === bound) {
       if (isCalculating) {
         const parts = [...expression];
         if (currentInput) {
           parts.push(formatWithCommas(currentInput));
         }
-        return parts.join(' ');
+        return parts.join(' ') || '0';
       }
       if (currentInput) {
         return currentInput;
       }
     }
-    // Not active or no input - show saved value
-    return lowerValue ? formatDisplay(parseFormattedNumber(lowerValue)) : '0';
-  }, [selectedBound, isCalculating, expression, currentInput, lowerValue]);
+    // Show saved value or default
+    if (savedValue) {
+      return formatDisplay(parseFormattedNumber(savedValue));
+    }
+    return '0';
+  }, [selectedBound, isCalculating, expression, currentInput]);
 
-  const upperDisplayText = useMemo(() => {
-    if (selectedBound === 'upper') {
-      // This bound is active - show current typing/expression
-      if (isCalculating) {
-        const parts = [...expression];
-        if (currentInput) {
-          parts.push(formatWithCommas(currentInput));
-        }
-        return parts.join(' ');
-      }
-      if (currentInput) {
-        return currentInput;
-      }
-    }
-    // Not active or no input - show saved value
-    return upperValue ? formatDisplay(parseFormattedNumber(upperValue)) : '0';
-  }, [selectedBound, isCalculating, expression, currentInput, upperValue]);
+  // Compute display text for each bound
+  const lowerDisplayText = computeBoundDisplay('lower', lowerValue);
+  const upperDisplayText = computeBoundDisplay('upper', upperValue);
 
   // Handle digit input
   const handleDigit = useCallback((digit: string) => {
@@ -410,7 +402,7 @@ export function DirectBoundsNumPad({ onSubmit, isTouch }: DirectBoundsNumPadProp
             onClick={() => handleSelectBound('lower')}
             style={{ fontSize: `${calculateBoundFontSize(lowerDisplayText)}rem` }}
           >
-            {lowerDisplayText}
+            <span key={`lower-${lowerDisplayText}`}>{lowerDisplayText}</span>
           </button>
         </div>
 
@@ -423,7 +415,7 @@ export function DirectBoundsNumPad({ onSubmit, isTouch }: DirectBoundsNumPadProp
             onClick={() => handleSelectBound('upper')}
             style={{ fontSize: `${calculateBoundFontSize(upperDisplayText)}rem` }}
           >
-            {upperDisplayText}
+            <span key={`upper-${upperDisplayText}`}>{upperDisplayText}</span>
           </button>
         </div>
       </div>
