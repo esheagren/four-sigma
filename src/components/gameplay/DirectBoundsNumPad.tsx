@@ -127,20 +127,42 @@ export function DirectBoundsNumPad({ onSubmit, isTouch }: DirectBoundsNumPadProp
     return Math.max(minFontSize, baseFontSize - reduction);
   }, [displayValue]);
 
-  // Compute display text for each bound (with dynamic font sizing)
+  // Compute display text for each bound independently
   const lowerDisplayText = useMemo(() => {
-    if (selectedBound === 'lower' && (isCalculating || currentInput)) {
-      return displayValue;
+    if (selectedBound === 'lower') {
+      // This bound is active - show current typing/expression
+      if (isCalculating) {
+        const parts = [...expression];
+        if (currentInput) {
+          parts.push(formatWithCommas(currentInput));
+        }
+        return parts.join(' ');
+      }
+      if (currentInput) {
+        return currentInput;
+      }
     }
+    // Not active or no input - show saved value
     return lowerValue ? formatDisplay(parseFormattedNumber(lowerValue)) : '0';
-  }, [selectedBound, isCalculating, currentInput, displayValue, lowerValue]);
+  }, [selectedBound, isCalculating, expression, currentInput, lowerValue]);
 
   const upperDisplayText = useMemo(() => {
-    if (selectedBound === 'upper' && (isCalculating || currentInput)) {
-      return displayValue;
+    if (selectedBound === 'upper') {
+      // This bound is active - show current typing/expression
+      if (isCalculating) {
+        const parts = [...expression];
+        if (currentInput) {
+          parts.push(formatWithCommas(currentInput));
+        }
+        return parts.join(' ');
+      }
+      if (currentInput) {
+        return currentInput;
+      }
     }
+    // Not active or no input - show saved value
     return upperValue ? formatDisplay(parseFormattedNumber(upperValue)) : '0';
-  }, [selectedBound, isCalculating, currentInput, displayValue, upperValue]);
+  }, [selectedBound, isCalculating, expression, currentInput, upperValue]);
 
   // Handle digit input
   const handleDigit = useCallback((digit: string) => {
