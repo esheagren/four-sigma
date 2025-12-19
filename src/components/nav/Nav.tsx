@@ -118,10 +118,17 @@ export function Nav() {
   });
   const sidebarRef = useRef<HTMLElement>(null);
 
-  // Apply animation theme to document
+  // Apply animation theme to document and update status bar color
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', navAnimationTheme);
     localStorage.setItem(NAV_ANIMATION_THEME_KEY, navAnimationTheme);
+
+    // Update theme-color meta tag for iOS status bar
+    const themeColorMap: Record<string, string> = { classic: '#635bff', magma: '#ff6600' };
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', themeColorMap[navAnimationTheme] || '#635bff');
+    }
   }, [navAnimationTheme]);
 
   // Cycle to next animation theme
