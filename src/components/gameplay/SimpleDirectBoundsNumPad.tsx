@@ -87,20 +87,6 @@ export function SimpleDirectBoundsNumPad({ onSubmit, isTouch }: SimpleDirectBoun
     setCurrentInput(formatWithCommas(newInput.replace(/,/g, '')));
   }, [currentInput]);
 
-  // Handle 00 input
-  const handleDoubleZero = useCallback(() => {
-    if (currentInput === '' || currentInput === '0') return;
-    const newInput = currentInput + '00';
-    setCurrentInput(formatWithCommas(newInput.replace(/,/g, '')));
-  }, [currentInput]);
-
-  // Handle 000 input
-  const handleTripleZero = useCallback(() => {
-    if (currentInput === '' || currentInput === '0') return;
-    const newInput = currentInput + '000';
-    setCurrentInput(formatWithCommas(newInput.replace(/,/g, '')));
-  }, [currentInput]);
-
   // Handle decimal point
   const handleDecimal = useCallback(() => {
     if (!currentInput.includes('.')) {
@@ -120,11 +106,6 @@ export function SimpleDirectBoundsNumPad({ onSubmit, isTouch }: SimpleDirectBoun
       setCurrentInput(formatWithCommas(newValue));
     }
   }, [currentInput]);
-
-  // Handle clear
-  const handleClear = useCallback(() => {
-    setCurrentInput('');
-  }, []);
 
   // Handle bound selection
   const handleSelectBound = useCallback((bound: 'lower' | 'upper') => {
@@ -210,9 +191,6 @@ export function SimpleDirectBoundsNumPad({ onSubmit, isTouch }: SimpleDirectBoun
       } else if (key === 'Backspace') {
         e.preventDefault();
         handleBackspace();
-      } else if (key === 'Escape' || key.toLowerCase() === 'c') {
-        e.preventDefault();
-        handleClear();
       } else if (key === 'Tab') {
         e.preventDefault();
         handleSelectBound(selectedBound === 'lower' ? 'upper' : 'lower');
@@ -223,7 +201,7 @@ export function SimpleDirectBoundsNumPad({ onSubmit, isTouch }: SimpleDirectBoun
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [
     isTouch, handleDigit, handleDecimal,
-    handleBackspace, handleClear, handleSubmit, handleSelectBound,
+    handleBackspace, handleSubmit, handleSelectBound,
     selectedBound
   ]);
 
@@ -256,12 +234,26 @@ export function SimpleDirectBoundsNumPad({ onSubmit, isTouch }: SimpleDirectBoun
         </div>
       </div>
 
-      {/* Simple Calculator Grid - No operators */}
-      <div className="calc-grid-unified">
+      {/* Simple Calculator Grid - 3 columns */}
+      <div className="calc-grid-unified" style={{gridTemplateColumns: 'repeat(3, 1fr)'}}>
         {/* Row 1 */}
         <button className="calc-key-unified" onClick={() => handleDigit('7')}>7</button>
         <button className="calc-key-unified" onClick={() => handleDigit('8')}>8</button>
         <button className="calc-key-unified" onClick={() => handleDigit('9')}>9</button>
+
+        {/* Row 2 */}
+        <button className="calc-key-unified" onClick={() => handleDigit('4')}>4</button>
+        <button className="calc-key-unified" onClick={() => handleDigit('5')}>5</button>
+        <button className="calc-key-unified" onClick={() => handleDigit('6')}>6</button>
+
+        {/* Row 3 */}
+        <button className="calc-key-unified" onClick={() => handleDigit('1')}>1</button>
+        <button className="calc-key-unified" onClick={() => handleDigit('2')}>2</button>
+        <button className="calc-key-unified" onClick={() => handleDigit('3')}>3</button>
+
+        {/* Row 4 */}
+        <button className="calc-key-unified" onClick={handleDecimal}>.</button>
+        <button className="calc-key-unified" onClick={() => handleDigit('0')}>0</button>
         <button className="calc-key-unified calc-key-backspace-unified" onClick={handleBackspace}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
@@ -270,26 +262,12 @@ export function SimpleDirectBoundsNumPad({ onSubmit, isTouch }: SimpleDirectBoun
           </svg>
         </button>
 
-        {/* Row 2 */}
-        <button className="calc-key-unified" onClick={() => handleDigit('4')}>4</button>
-        <button className="calc-key-unified" onClick={() => handleDigit('5')}>5</button>
-        <button className="calc-key-unified" onClick={() => handleDigit('6')}>6</button>
-        <button className="calc-key-unified calc-key-clear-unified" onClick={handleClear}>CLR</button>
-
-        {/* Row 3 */}
-        <button className="calc-key-unified" onClick={() => handleDigit('1')}>1</button>
-        <button className="calc-key-unified" onClick={() => handleDigit('2')}>2</button>
-        <button className="calc-key-unified" onClick={() => handleDigit('3')}>3</button>
-        <button className="calc-key-unified" onClick={handleDoubleZero}>00</button>
-
-        {/* Row 4 */}
-        <button className="calc-key-unified" onClick={handleDecimal}>.</button>
-        <button className="calc-key-unified" onClick={() => handleDigit('0')}>0</button>
-        <button className="calc-key-unified" onClick={handleTripleZero}>000</button>
+        {/* Row 5 - Submit spans full width */}
         <button
           className="calc-key-unified calc-key-submit-unified"
           onClick={handleSubmit}
           disabled={!canSubmit}
+          style={{gridColumn: '1 / -1'}}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="5" y1="12" x2="19" y2="12"></line>
