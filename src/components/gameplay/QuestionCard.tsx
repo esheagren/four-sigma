@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { EstimateNumPad, BoundsData, formatDisplay } from './EstimateNumPad';
 import { DirectBoundsNumPad } from './DirectBoundsNumPad';
+import { SimpleEstimateNumPad } from './SimpleEstimateNumPad';
+import { SimpleDirectBoundsNumPad } from './SimpleDirectBoundsNumPad';
 import { ProgressDots } from './ProgressDots';
 import { isTouchDevice } from '../../lib/device';
 import { useNumPadMode } from '../../hooks/useNumPadMode';
+import { useCalculatorMode } from '../../hooks/useCalculatorMode';
 
 interface Question {
   id: string;
@@ -30,6 +33,7 @@ function parseFormattedNumber(value: string): number {
 
 export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQuestions }: QuestionCardProps) {
   const { numPadMode } = useNumPadMode();
+  const { calculatorMode } = useCalculatorMode();
   const [isTouch, setIsTouch] = useState(true);
 
   // Bounds state from EstimateNumPad
@@ -196,26 +200,51 @@ export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQu
 
       <div onClick={(e) => e.stopPropagation()}>
         {numPadMode === 'direct' ? (
-          <DirectBoundsNumPad
-            key={question.id}
-            onSubmit={onSubmit}
-            isTouch={isTouch}
-          />
+          calculatorMode === 'on' ? (
+            <DirectBoundsNumPad
+              key={question.id}
+              onSubmit={onSubmit}
+              isTouch={isTouch}
+            />
+          ) : (
+            <SimpleDirectBoundsNumPad
+              key={question.id}
+              onSubmit={onSubmit}
+              isTouch={isTouch}
+            />
+          )
         ) : (
-          <EstimateNumPad
-            key={question.id}
-            onSubmit={onSubmit}
-            isTouch={isTouch}
-            onBoundsChange={handleBoundsChange}
-            lowerOverride={lowerOverride}
-            upperOverride={upperOverride}
-            onClearOverrides={handleClearOverrides}
-            editingBound={editingBound}
-            boundEditValue={editValue}
-            hasStartedTypingBound={hasStartedTyping}
-            onBoundEditChange={handleBoundEditChange}
-            onBoundEditComplete={handleEditComplete}
-          />
+          calculatorMode === 'on' ? (
+            <EstimateNumPad
+              key={question.id}
+              onSubmit={onSubmit}
+              isTouch={isTouch}
+              onBoundsChange={handleBoundsChange}
+              lowerOverride={lowerOverride}
+              upperOverride={upperOverride}
+              onClearOverrides={handleClearOverrides}
+              editingBound={editingBound}
+              boundEditValue={editValue}
+              hasStartedTypingBound={hasStartedTyping}
+              onBoundEditChange={handleBoundEditChange}
+              onBoundEditComplete={handleEditComplete}
+            />
+          ) : (
+            <SimpleEstimateNumPad
+              key={question.id}
+              onSubmit={onSubmit}
+              isTouch={isTouch}
+              onBoundsChange={handleBoundsChange}
+              lowerOverride={lowerOverride}
+              upperOverride={upperOverride}
+              onClearOverrides={handleClearOverrides}
+              editingBound={editingBound}
+              boundEditValue={editValue}
+              hasStartedTypingBound={hasStartedTyping}
+              onBoundEditChange={handleBoundEditChange}
+              onBoundEditComplete={handleEditComplete}
+            />
+          )
         )}
       </div>
     </div>
