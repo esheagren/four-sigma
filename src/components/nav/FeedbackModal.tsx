@@ -91,7 +91,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal-content feedback-modal dark-glass-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 className="modal-title">Send Feedback</h2>
+          <h2 className="modal-title">Report a Bug</h2>
           <button className="modal-close-button" onClick={handleClose} aria-label="Close">
             ×
           </button>
@@ -106,8 +106,8 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                   <polyline points="22 4 12 14.01 9 11.01" />
                 </svg>
               </div>
-              <h3 className="feedback-success-title">Thank you!</h3>
-              <p className="feedback-success-message">Your feedback has been submitted.</p>
+              <h3 className="feedback-success-title">Thanks!</h3>
+              <p className="feedback-success-message">Bug report submitted.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="feedback-form">
@@ -115,7 +115,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                 className="feedback-textarea"
                 value={feedbackText}
                 onChange={(e) => setFeedbackText(e.target.value)}
-                placeholder="We'd love to hear your thoughts, suggestions, or any issues you've encountered."
+                placeholder="Describe the issue you encountered."
                 rows={8}
                 maxLength={5000}
                 autoFocus
