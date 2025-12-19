@@ -258,6 +258,9 @@ export function DirectBoundsNumPad({ onSubmit, isTouch }: DirectBoundsNumPadProp
 
   // Handle bound selection
   const handleSelectBound = useCallback((bound: 'lower' | 'upper') => {
+    // If already on this bound, do nothing
+    if (bound === selectedBound) return;
+
     // First, save current input if any
     if (currentInput || expression.length > 0) {
       let fullExpr = [...expression];
@@ -277,9 +280,13 @@ export function DirectBoundsNumPad({ onSubmit, isTouch }: DirectBoundsNumPadProp
 
     // Reset expression state
     setExpression([]);
-    setCurrentInput('');
+
+    // Load the new bound's existing value into currentInput for editing
+    const newBoundValue = bound === 'lower' ? lowerValue : upperValue;
+    setCurrentInput(newBoundValue);
+
     setSelectedBound(bound);
-  }, [currentInput, expression, setCurrentValue]);
+  }, [currentInput, expression, setCurrentValue, selectedBound, lowerValue, upperValue]);
 
   // Check if we can submit
   const canSubmit = useMemo(() => {
