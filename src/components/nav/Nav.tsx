@@ -285,6 +285,16 @@ export function Nav() {
           </button>
           <button
             className="sidebar-item"
+            onClick={toggleNumPadMode}
+            title={numPadMode === 'slider' ? 'Switch to Direct Bounds Entry' : 'Switch to Slider Mode'}
+          >
+            <CalculatorIcon />
+            <span className="sidebar-item-text">
+              {numPadMode === 'slider' ? '± Slider' : 'Bounds'}
+            </span>
+          </button>
+          <button
+            className="sidebar-item"
             onClick={() => handleMenuItemClick(() => setIsFeedbackOpen(true))}
           >
             <BugIcon />
@@ -297,16 +307,6 @@ export function Nav() {
           >
             <PaintbrushIcon />
             <span className="sidebar-item-text">{currentThemeInfo?.name}</span>
-          </button>
-          <button
-            className="sidebar-item"
-            onClick={toggleNumPadMode}
-            title={numPadMode === 'slider' ? 'Switch to Direct Bounds Entry' : 'Switch to Slider Mode'}
-          >
-            <CalculatorIcon />
-            <span className="sidebar-item-text">
-              {numPadMode === 'slider' ? '± Slider' : 'Bounds'}
-            </span>
           </button>
           {!isLoading && isAnonymous && (
             <button
