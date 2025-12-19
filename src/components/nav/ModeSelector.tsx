@@ -34,6 +34,23 @@ function TwoBoxesIcon() {
   );
 }
 
+function NumPadTitleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {/* 3x3 grid of dots representing numpad */}
+      <circle cx="6" cy="6" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="6" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="18" cy="6" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="6" cy="12" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="18" cy="12" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="6" cy="18" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="18" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="18" cy="18" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 function CalcOnIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -148,7 +165,10 @@ export function ModeSelector({ numPadMode, calculatorMode, onModeChange }: ModeS
 
   return (
     <div className="mode-selector">
-      <div className="mode-selector-title">Number Pad</div>
+      <div className="mode-selector-title">
+        <NumPadTitleIcon />
+        <span>Number Pad</span>
+      </div>
 
       <div className="mode-selector-container">
         {/* Column labels (above grid) */}

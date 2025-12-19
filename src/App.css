@@ -452,10 +452,18 @@ body {
 }
 
 .mode-selector-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   color: rgba(255, 255, 255, 0.85);
   font-size: 0.9rem;
   font-weight: 500;
   padding: 0.75rem 0 0.5rem 0;
+}
+
+.mode-selector-title svg {
+  opacity: 0.7;
+  flex-shrink: 0;
 }
 
 .mode-selector-container {
