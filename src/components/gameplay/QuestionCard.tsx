@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { EstimateNumPad, BoundsData, formatDisplay } from './EstimateNumPad';
+import { DirectBoundsNumPad } from './DirectBoundsNumPad';
 import { ProgressDots } from './ProgressDots';
 import { isTouchDevice } from '../../lib/device';
+import { useNumPadMode } from '../../hooks/useNumPadMode';
 
 interface Question {
   id: string;
@@ -27,6 +29,7 @@ function parseFormattedNumber(value: string): number {
 }
 
 export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQuestions }: QuestionCardProps) {
+  const { numPadMode } = useNumPadMode();
   const [isTouch, setIsTouch] = useState(true);
 
   // Bounds state from EstimateNumPad
@@ -167,8 +170,8 @@ export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQu
           )}
         </div>
 
-        {/* Bounds display - shown below question when uncertainty > 0 */}
-        {showBounds && (
+        {/* Bounds display - shown below question when uncertainty > 0 (slider mode only) */}
+        {showBounds && numPadMode === 'slider' && (
           <div className="bounds-display-question">
             {/* Lower bound */}
             <button
@@ -192,20 +195,28 @@ export function QuestionCard({ question, onSubmit, currentQuestionIndex, totalQu
       </div>
 
       <div onClick={(e) => e.stopPropagation()}>
-        <EstimateNumPad
-          key={question.id}
-          onSubmit={onSubmit}
-          isTouch={isTouch}
-          onBoundsChange={handleBoundsChange}
-          lowerOverride={lowerOverride}
-          upperOverride={upperOverride}
-          onClearOverrides={handleClearOverrides}
-          editingBound={editingBound}
-          boundEditValue={editValue}
-          hasStartedTypingBound={hasStartedTyping}
-          onBoundEditChange={handleBoundEditChange}
-          onBoundEditComplete={handleEditComplete}
-        />
+        {numPadMode === 'direct' ? (
+          <DirectBoundsNumPad
+            key={question.id}
+            onSubmit={onSubmit}
+            isTouch={isTouch}
+          />
+        ) : (
+          <EstimateNumPad
+            key={question.id}
+            onSubmit={onSubmit}
+            isTouch={isTouch}
+            onBoundsChange={handleBoundsChange}
+            lowerOverride={lowerOverride}
+            upperOverride={upperOverride}
+            onClearOverrides={handleClearOverrides}
+            editingBound={editingBound}
+            boundEditValue={editValue}
+            hasStartedTypingBound={hasStartedTyping}
+            onBoundEditChange={handleBoundEditChange}
+            onBoundEditComplete={handleEditComplete}
+          />
+        )}
       </div>
     </div>
   );

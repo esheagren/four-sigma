@@ -7607,6 +7607,174 @@ a.judgement-answer-below:hover .judgement-answer-value {
 }
 
 /* ============================================
+   DirectBoundsNumPad Styles
+   ============================================ */
+
+.direct-bounds-numpad-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(10, 10, 30, 0.85) 100%
+  );
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Bounds entry row - two bound cards side by side */
+.direct-bounds-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* Bound card wrapper for label + input */
+.direct-bound-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  max-width: 150px;
+}
+
+/* Label above each bound */
+.direct-bound-label {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+/* Individual bound input card */
+.direct-bound-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Lower bound styling */
+.direct-bound-input-lower {
+  color: rgba(165, 180, 255, 1);
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.direct-bound-input-lower:hover {
+  border-color: rgba(99, 102, 241, 0.6);
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.2) 0%,
+    rgba(99, 102, 241, 0.08) 100%
+  );
+}
+
+.direct-bound-input-lower.selected {
+  border-color: rgba(99, 102, 241, 0.8);
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.4);
+  animation: bound-pulse 1.5s ease-in-out infinite;
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.25) 0%,
+    rgba(99, 102, 241, 0.1) 100%
+  );
+}
+
+/* Upper bound styling */
+.direct-bound-input-upper {
+  color: rgba(220, 170, 255, 1);
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.direct-bound-input-upper:hover {
+  border-color: rgba(168, 85, 247, 0.6);
+  background: linear-gradient(
+    135deg,
+    rgba(168, 85, 247, 0.2) 0%,
+    rgba(168, 85, 247, 0.08) 100%
+  );
+}
+
+.direct-bound-input-upper.selected {
+  border-color: rgba(168, 85, 247, 0.8);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.4);
+  animation: bound-pulse 1.5s ease-in-out infinite;
+  background: linear-gradient(
+    135deg,
+    rgba(168, 85, 247, 0.25) 0%,
+    rgba(168, 85, 247, 0.1) 100%
+  );
+}
+
+@keyframes bound-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+/* Separator between bounds */
+.direct-bounds-separator {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+/* Expression history bar (when building expression) */
+.direct-bounds-expression {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  min-height: 1.2em;
+  padding: 0 10px;
+  word-break: break-all;
+}
+
+/* Mobile responsive */
+@media (max-width: 380px) {
+  .direct-bounds-numpad-container {
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+    gap: 8px;
+  }
+
+  .direct-bound-wrapper {
+    max-width: 130px;
+  }
+
+  .direct-bound-input {
+    padding: 8px 10px;
+    font-size: 1rem;
+    min-height: 40px;
+  }
+
+  .direct-bound-label {
+    font-size: 0.65rem;
+  }
+}
+
+/* ============================================
    Uncertainty Confirmation Modal
    ============================================ */
 
