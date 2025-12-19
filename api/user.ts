@@ -54,7 +54,7 @@ async function handleProfile(req: VercelRequest, res: VercelResponse, userId: st
       user: {
         id: stats.user.id,
         email: stats.user.email,
-        displayName: stats.user.displayName,
+        displayName: stats.user.username,
         isAnonymous: stats.user.isAnonymous,
         createdAt: stats.user.createdAt,
         lastPlayedAt: stats.user.lastPlayedAt,
@@ -111,7 +111,7 @@ async function handleProfile(req: VercelRequest, res: VercelResponse, userId: st
     return res.json({
       user: {
         id: user.id,
-        displayName: user.displayName,
+        displayName: user.username,
         timezone: user.timezone,
         themePreference: user.themePreference,
       },

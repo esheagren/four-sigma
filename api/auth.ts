@@ -73,7 +73,7 @@ async function handleDevice(req: VercelRequest, res: VercelResponse) {
   return res.json({
     user: {
       id: user.id,
-      displayName: user.displayName,
+      displayName: user.username,
       isAnonymous: user.isAnonymous,
       sessionCount: user.sessionCount || 0,
       totalScore: user.totalScore,
@@ -129,7 +129,7 @@ async function handleSignup(req: VercelRequest, res: VercelResponse) {
     user: {
       id: user.id,
       email: user.email,
-      displayName: user.displayName,
+      displayName: user.username,
       isAnonymous: user.isAnonymous,
       totalScore: user.totalScore,
       averageScore: user.averageScore,
@@ -183,7 +183,7 @@ async function handleLogin(req: VercelRequest, res: VercelResponse) {
     user: user ? {
       id: user.id,
       email: user.email,
-      displayName: user.displayName,
+      displayName: user.username,
       isAnonymous: user.isAnonymous,
       totalScore: user.totalScore,
       averageScore: user.averageScore,
@@ -231,7 +231,7 @@ async function handleMe(req: VercelRequest, res: VercelResponse) {
     user: {
       id: user.id,
       email: user.email,
-      displayName: user.displayName,
+      displayName: user.username,
       isAnonymous: user.isAnonymous,
       sessionCount: user.sessionCount || 0,
       totalScore: user.totalScore,
@@ -292,7 +292,7 @@ async function handleClaimUsername(req: VercelRequest, res: VercelResponse) {
   return res.json({
     user: {
       id: user.id,
-      displayName: user.displayName,
+      displayName: user.username,
       isAnonymous: user.isAnonymous,
       sessionCount: user.sessionCount || 0,
       totalScore: user.totalScore,
@@ -388,7 +388,7 @@ async function handleClaimAccount(req: VercelRequest, res: VercelResponse) {
     user: {
       id: upgradedUser.id,
       email: upgradedUser.email,
-      displayName: upgradedUser.displayName,
+      displayName: upgradedUser.username,
       isAnonymous: upgradedUser.isAnonymous,
       sessionCount: upgradedUser.sessionCount || 0,
       totalScore: upgradedUser.totalScore,
