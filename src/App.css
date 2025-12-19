@@ -60,10 +60,18 @@ body {
   --nav-slide-duration: 0.25s;
   --nav-slide-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* Aurora background effect */
-  --nav-aurora-enabled: 1;
-  --nav-aurora-duration: 8s;
-  --nav-aurora-opacity: 0.7;
+  /* Sidebar effect (aurora/magma/etc) */
+  --nav-effect-enabled: 1;
+  --nav-effect-duration: 8s;
+  --nav-effect-opacity: 0.7;
+  --nav-effect-color-1: rgba(99, 91, 255, 0.25);
+  --nav-effect-color-2: rgba(139, 92, 246, 0.18);
+  --nav-effect-color-3: rgba(168, 85, 247, 0.12);
+  --nav-effect-animation: aurora-flow-vertical;
+  --nav-effect-blur: 15px;
+  --nav-effect-position: left;
+  --nav-effect-width: 200%;
+  --nav-effect-height: 50%;
 
   /* Hamburger icon animation */
   --nav-hamburger-duration: 0.25s;
@@ -102,35 +110,68 @@ body {
   transform: translateX(0);
 }
 
-/* Aurora effect adapted for vertical orientation */
+/* Sidebar effect (aurora/magma/etc) */
 .sidebar::before {
   content: '';
   position: absolute;
   left: -50%;
   top: -10%;
-  width: 200%;
-  height: 50%;
+  width: var(--nav-effect-width);
+  height: var(--nav-effect-height);
   background: linear-gradient(
     180deg,
     transparent 0%,
-    rgba(99, 91, 255, 0.25) 20%,
-    rgba(139, 92, 246, 0.18) 40%,
-    rgba(168, 85, 247, 0.12) 60%,
+    var(--nav-effect-color-1) 20%,
+    var(--nav-effect-color-2) 40%,
+    var(--nav-effect-color-3) 60%,
     transparent 80%
   );
-  filter: blur(15px);
-  animation: aurora-flow-vertical var(--nav-aurora-duration) ease-in-out infinite;
+  filter: blur(var(--nav-effect-blur));
+  animation: var(--nav-effect-animation) var(--nav-effect-duration) ease-in-out infinite;
   pointer-events: none;
 }
 
+/* Classic aurora animation */
 @keyframes aurora-flow-vertical {
   0%, 100% {
     transform: translateY(-5%) translateX(0%) rotate(-5deg);
-    opacity: calc(var(--nav-aurora-opacity) * var(--nav-aurora-enabled));
+    opacity: calc(var(--nav-effect-opacity) * var(--nav-effect-enabled));
   }
   50% {
     transform: translateY(12%) translateX(5%) rotate(5deg);
-    opacity: calc(var(--nav-aurora-opacity) * 0.85 * var(--nav-aurora-enabled));
+    opacity: calc(var(--nav-effect-opacity) * 0.85 * var(--nav-effect-enabled));
+  }
+}
+
+/* Magma lava lamp animation */
+@keyframes magma-flow {
+  0% {
+    transform: translateY(100%) translateX(-20%) scale(1.2);
+    opacity: calc(var(--nav-effect-opacity) * var(--nav-effect-enabled));
+  }
+  15% {
+    transform: translateY(60%) translateX(-10%) scale(1.4);
+    opacity: calc(var(--nav-effect-opacity) * 1.1 * var(--nav-effect-enabled));
+  }
+  30% {
+    transform: translateY(20%) translateX(-25%) scale(1.1);
+    opacity: calc(var(--nav-effect-opacity) * 0.9 * var(--nav-effect-enabled));
+  }
+  45% {
+    transform: translateY(-20%) translateX(-15%) scale(1.3);
+    opacity: calc(var(--nav-effect-opacity) * 1.0 * var(--nav-effect-enabled));
+  }
+  60% {
+    transform: translateY(-40%) translateX(-30%) scale(1.0);
+    opacity: calc(var(--nav-effect-opacity) * 0.8 * var(--nav-effect-enabled));
+  }
+  75% {
+    transform: translateY(10%) translateX(-20%) scale(1.2);
+    opacity: calc(var(--nav-effect-opacity) * 1.0 * var(--nav-effect-enabled));
+  }
+  100% {
+    transform: translateY(100%) translateX(-20%) scale(1.2);
+    opacity: calc(var(--nav-effect-opacity) * var(--nav-effect-enabled));
   }
 }
 
@@ -347,58 +388,47 @@ body {
 /* ========================================
    NAV ANIMATION THEME VARIANTS
    Apply via data-theme attribute on a parent element
-   e.g., <div data-theme="snappy">
+   e.g., <div data-theme="classic">
    ======================================== */
 
-/* Classic Theme - Default balanced animations */
+/* Classic Theme - Default balanced animations with purple aurora */
 [data-theme="classic"] {
   --nav-slide-duration: 0.25s;
   --nav-slide-easing: cubic-bezier(0.4, 0, 0.2, 1);
-  --nav-aurora-enabled: 1;
-  --nav-aurora-duration: 8s;
-  --nav-aurora-opacity: 0.7;
+  --nav-effect-enabled: 1;
+  --nav-effect-duration: 8s;
+  --nav-effect-opacity: 0.7;
+  --nav-effect-color-1: rgba(99, 91, 255, 0.25);
+  --nav-effect-color-2: rgba(139, 92, 246, 0.18);
+  --nav-effect-color-3: rgba(168, 85, 247, 0.12);
+  --nav-effect-animation: aurora-flow-vertical;
+  --nav-effect-blur: 15px;
+  --nav-effect-width: 200%;
+  --nav-effect-height: 50%;
   --nav-hamburger-duration: 0.25s;
   --nav-hamburger-easing: ease;
   --nav-hover-duration: 0.15s;
   --nav-hover-easing: ease;
 }
 
-/* Snappy Theme - Quick, responsive animations */
-[data-theme="snappy"] {
-  --nav-slide-duration: 0.15s;
-  --nav-slide-easing: ease-out;
-  --nav-hamburger-duration: 0.15s;
-  --nav-hover-duration: 0.1s;
-  --nav-aurora-duration: 6s;
-}
-
-/* Calm Theme - Slow, relaxed animations */
-[data-theme="calm"] {
-  --nav-slide-duration: 0.4s;
-  --nav-slide-easing: ease-in-out;
-  --nav-hamburger-duration: 0.35s;
-  --nav-hover-duration: 0.25s;
-  --nav-aurora-duration: 12s;
-}
-
-/* Minimal Theme - No aurora, subtle transitions */
-[data-theme="minimal"] {
+/* Magma Theme - Fiery lava lamp effect on left edge */
+[data-theme="magma"] {
   --nav-slide-duration: 0.2s;
-  --nav-slide-easing: ease;
+  --nav-slide-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --nav-effect-enabled: 1;
+  --nav-effect-duration: 3s;
+  --nav-effect-opacity: 0.9;
+  --nav-effect-color-1: rgba(255, 100, 0, 0.6);
+  --nav-effect-color-2: rgba(255, 50, 0, 0.5);
+  --nav-effect-color-3: rgba(255, 180, 0, 0.4);
+  --nav-effect-animation: magma-flow;
+  --nav-effect-blur: 20px;
+  --nav-effect-width: 120%;
+  --nav-effect-height: 150%;
   --nav-hamburger-duration: 0.2s;
-  --nav-hover-duration: 0.15s;
-  --nav-aurora-enabled: 0;
-}
-
-/* Bouncy Theme - Playful, spring-like animations */
-[data-theme="bouncy"] {
-  --nav-slide-duration: 0.35s;
-  --nav-slide-easing: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  --nav-hamburger-duration: 0.3s;
-  --nav-hamburger-easing: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  --nav-hover-duration: 0.2s;
-  --nav-aurora-duration: 6s;
-  --nav-aurora-opacity: 0.9;
+  --nav-hamburger-easing: ease;
+  --nav-hover-duration: 0.12s;
+  --nav-hover-easing: ease;
 }
 
 /* Main Content */

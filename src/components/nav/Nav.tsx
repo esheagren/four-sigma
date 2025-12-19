@@ -88,6 +88,7 @@ function PaintbrushIcon() {
 // Nav animation themes
 const NAV_ANIMATION_THEMES = [
   { id: 'classic', name: 'Classic', description: 'Balanced animations' },
+  { id: 'magma', name: 'Magma', description: 'Fiery lava lamp effect' },
 ] as const;
 
 type NavAnimationTheme = typeof NAV_ANIMATION_THEMES[number]['id'];
