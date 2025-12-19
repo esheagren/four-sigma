@@ -5310,6 +5310,91 @@ a.judgement-answer-below:hover .judgement-answer-value {
   color: var(--text-secondary);
 }
 
+/* Compact Feedback Modal */
+.feedback-modal-compact {
+  max-width: 400px;
+  padding: 0.75rem;
+}
+
+.feedback-form-compact {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.feedback-textarea-compact {
+  flex: 1;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  resize: none;
+  overflow-y: hidden;
+  max-height: 150px;
+  line-height: 1.4;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.feedback-textarea-compact:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px rgba(99, 91, 255, 0.1);
+  overflow-y: auto;
+}
+
+.feedback-textarea-compact::placeholder {
+  color: var(--text-tertiary);
+}
+
+.feedback-textarea-compact:disabled {
+  background: var(--background);
+  cursor: not-allowed;
+}
+
+.feedback-submit-compact {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary);
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.feedback-submit-compact:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: scale(1.05);
+}
+
+.feedback-submit-compact:disabled {
+  background: var(--text-tertiary);
+  cursor: not-allowed;
+}
+
+.feedback-success-compact {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  color: var(--success);
+  font-size: 0.9375rem;
+}
+
+.feedback-error-compact {
+  color: var(--error);
+  font-size: 0.8125rem;
+  margin-top: 0.5rem;
+  padding: 0 0.25rem;
+}
+
 .modal-button-primary {
   background: var(--primary);
   color: white;
@@ -7565,11 +7650,15 @@ a.judgement-answer-below:hover .judgement-answer-value {
   font-weight: 500;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  /* Be specific about transitions to avoid text artifacts */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Ensure clean text rendering */
+  overflow: hidden;
+  position: relative;
 }
 
 /* Lower bound styling */
@@ -7590,7 +7679,6 @@ a.judgement-answer-below:hover .judgement-answer-value {
 .direct-bound-input-lower.selected {
   border-color: rgba(99, 102, 241, 0.8);
   box-shadow: 0 0 16px rgba(99, 102, 241, 0.4);
-  animation: bound-pulse 1.5s ease-in-out infinite;
   background: linear-gradient(
     135deg,
     rgba(99, 102, 241, 0.25) 0%,
@@ -7616,12 +7704,18 @@ a.judgement-answer-below:hover .judgement-answer-value {
 .direct-bound-input-upper.selected {
   border-color: rgba(168, 85, 247, 0.8);
   box-shadow: 0 0 16px rgba(168, 85, 247, 0.4);
-  animation: bound-pulse 1.5s ease-in-out infinite;
   background: linear-gradient(
     135deg,
     rgba(168, 85, 247, 0.25) 0%,
     rgba(168, 85, 247, 0.1) 100%
   );
+}
+
+/* Ensure clean text rendering inside bound buttons */
+.direct-bound-input > span {
+  display: block;
+  width: 100%;
+  transition: none;
 }
 
 @keyframes bound-pulse {
