@@ -63,15 +63,17 @@ body {
   /* Sidebar effect (aurora/magma/etc) */
   --nav-effect-enabled: 1;
   --nav-effect-duration: 8s;
-  --nav-effect-opacity: 0.7;
-  --nav-effect-color-1: rgba(99, 91, 255, 0.25);
-  --nav-effect-color-2: rgba(139, 92, 246, 0.18);
-  --nav-effect-color-3: rgba(168, 85, 247, 0.12);
+  --nav-effect-opacity: 0.85;
+  --nav-effect-color-1: rgba(34, 197, 94, 0.4);
+  --nav-effect-color-2: rgba(99, 91, 255, 0.45);
+  --nav-effect-color-3: rgba(139, 92, 246, 0.4);
+  --nav-effect-color-4: rgba(79, 70, 229, 0.35);
+  --nav-effect-color-5: rgba(34, 211, 138, 0.3);
   --nav-effect-animation: aurora-flow-vertical;
-  --nav-effect-blur: 15px;
+  --nav-effect-blur: 18px;
   --nav-effect-position: left;
   --nav-effect-width: 200%;
-  --nav-effect-height: 50%;
+  --nav-effect-height: 70%;
 
   /* Hamburger icon animation */
   --nav-hamburger-duration: 0.25s;
@@ -121,10 +123,12 @@ body {
   background: linear-gradient(
     180deg,
     transparent 0%,
-    var(--nav-effect-color-1) 20%,
-    var(--nav-effect-color-2) 40%,
-    var(--nav-effect-color-3) 60%,
-    transparent 80%
+    var(--nav-effect-color-1) 15%,
+    var(--nav-effect-color-2) 30%,
+    var(--nav-effect-color-3) 45%,
+    var(--nav-effect-color-4) 60%,
+    var(--nav-effect-color-5) 75%,
+    transparent 90%
   );
   filter: blur(var(--nav-effect-blur));
   animation: var(--nav-effect-animation) var(--nav-effect-duration) ease-in-out infinite;
@@ -544,20 +548,22 @@ body {
    e.g., <div data-theme="classic">
    ======================================== */
 
-/* Classic Theme - Default balanced animations with purple aurora */
+/* Classic Theme - Vibrant aurora with green, purple, and indigo */
 [data-theme="classic"] {
   --nav-slide-duration: 0.25s;
   --nav-slide-easing: cubic-bezier(0.4, 0, 0.2, 1);
   --nav-effect-enabled: 1;
-  --nav-effect-duration: 8s;
-  --nav-effect-opacity: 0.7;
-  --nav-effect-color-1: rgba(99, 91, 255, 0.25);
-  --nav-effect-color-2: rgba(139, 92, 246, 0.18);
-  --nav-effect-color-3: rgba(168, 85, 247, 0.12);
+  --nav-effect-duration: 10s;
+  --nav-effect-opacity: 0.9;
+  --nav-effect-color-1: rgba(34, 197, 94, 0.5);
+  --nav-effect-color-2: rgba(74, 222, 128, 0.4);
+  --nav-effect-color-3: rgba(99, 102, 241, 0.5);
+  --nav-effect-color-4: rgba(139, 92, 246, 0.45);
+  --nav-effect-color-5: rgba(34, 211, 138, 0.4);
   --nav-effect-animation: aurora-flow-vertical;
-  --nav-effect-blur: 15px;
-  --nav-effect-width: 200%;
-  --nav-effect-height: 50%;
+  --nav-effect-blur: 20px;
+  --nav-effect-width: 220%;
+  --nav-effect-height: 80%;
   --nav-hamburger-duration: 0.25s;
   --nav-hamburger-easing: ease;
   --nav-hover-duration: 0.15s;
