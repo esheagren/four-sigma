@@ -452,13 +452,10 @@ body {
 }
 
 .mode-selector-title {
-  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.9rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.5rem;
-  text-align: center;
+  padding: 0.75rem 0 0.5rem 0;
 }
 
 .mode-selector-container {

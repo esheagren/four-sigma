@@ -9,23 +9,27 @@ interface ModeSelectorProps {
 }
 
 // Icons for row/column labels
-function SliderIcon() {
+function PlusMinusIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="4" y1="12" x2="20" y2="12" />
-      <circle cx="12" cy="12" r="3" fill="currentColor" />
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      {/* Plus */}
+      <line x1="4" y1="7" x2="10" y2="7" />
+      <line x1="7" y1="4" x2="7" y2="10" />
+      {/* Slash */}
+      <line x1="10" y1="18" x2="14" y2="6" />
+      {/* Minus */}
+      <line x1="14" y1="17" x2="20" y2="17" />
     </svg>
   );
 }
 
-function BoundsIcon() {
+function TwoBoxesIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M8 4H6a2 2 0 00-2 2v2" />
-      <path d="M8 20H6a2 2 0 01-2-2v-2" />
-      <path d="M16 4h2a2 2 0 012 2v2" />
-      <path d="M16 20h2a2 2 0 002-2v-2" />
-      <text x="12" y="14" textAnchor="middle" fontSize="8" fill="currentColor" stroke="none">123</text>
+      {/* Left box */}
+      <rect x="2" y="6" width="9" height="12" rx="1" />
+      {/* Right box */}
+      <rect x="13" y="6" width="9" height="12" rx="1" />
     </svg>
   );
 }
@@ -161,10 +165,10 @@ export function ModeSelector({ numPadMode, calculatorMode, onModeChange }: ModeS
           {/* Row labels (left of grid) */}
           <div className="mode-selector-row-labels">
             <div className={`mode-selector-label ${numPadMode === 'slider' ? 'active' : ''}`}>
-              <SliderIcon />
+              <PlusMinusIcon />
             </div>
             <div className={`mode-selector-label ${numPadMode === 'direct' ? 'active' : ''}`}>
-              <BoundsIcon />
+              <TwoBoxesIcon />
             </div>
           </div>
 
