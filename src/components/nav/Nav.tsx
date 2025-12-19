@@ -7,6 +7,7 @@ import { ClaimAccountModal } from './ClaimAccountModal';
 import { UsernameClaimModal } from './UsernameClaimModal';
 import { FeedbackModal } from './FeedbackModal';
 import { useAuth } from '../../context/AuthContext';
+import { useNumPadMode } from '../../hooks/useNumPadMode';
 
 // Icon components
 function HelpCircleIcon() {
@@ -85,6 +86,24 @@ function PaintbrushIcon() {
   );
 }
 
+function CalculatorIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="2" width="16" height="20" rx="2" />
+      <line x1="8" y1="6" x2="16" y2="6" />
+      <line x1="8" y1="10" x2="8.01" y2="10" />
+      <line x1="12" y1="10" x2="12.01" y2="10" />
+      <line x1="16" y1="10" x2="16.01" y2="10" />
+      <line x1="8" y1="14" x2="8.01" y2="14" />
+      <line x1="12" y1="14" x2="12.01" y2="14" />
+      <line x1="16" y1="14" x2="16.01" y2="14" />
+      <line x1="8" y1="18" x2="8.01" y2="18" />
+      <line x1="12" y1="18" x2="12.01" y2="18" />
+      <line x1="16" y1="18" x2="16.01" y2="18" />
+    </svg>
+  );
+}
+
 // Nav animation themes
 const NAV_ANIMATION_THEMES = [
   { id: 'classic', name: 'Classic', description: 'Balanced animations' },
@@ -98,6 +117,7 @@ const HAS_SEEN_HOW_TO_PLAY_KEY = 'four_sigma_has_seen_how_to_play';
 
 export function Nav() {
   const { user, isAnonymous, hasClaimedUsername, isLoading, logout, authToken } = useAuth();
+  const { numPadMode, toggleNumPadMode } = useNumPadMode();
   const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
   const [howToPlayVariant, setHowToPlayVariant] = useState<'firstTime' | 'returning'>('firstTime');
   const [isUsernameClaimModalOpen, setIsUsernameClaimModalOpen] = useState(false);
@@ -277,6 +297,16 @@ export function Nav() {
           >
             <PaintbrushIcon />
             <span className="sidebar-item-text">{currentThemeInfo?.name}</span>
+          </button>
+          <button
+            className="sidebar-item"
+            onClick={toggleNumPadMode}
+            title={numPadMode === 'slider' ? 'Switch to Direct Bounds Entry' : 'Switch to Slider Mode'}
+          >
+            <CalculatorIcon />
+            <span className="sidebar-item-text">
+              {numPadMode === 'slider' ? '± Slider' : 'Bounds'}
+            </span>
           </button>
           {!isLoading && isAnonymous && (
             <button

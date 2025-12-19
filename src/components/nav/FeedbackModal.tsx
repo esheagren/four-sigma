@@ -16,6 +16,18 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const hasTrackedOpen = useRef(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-resize textarea as content grows
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setFeedbackText(e.target.value);
+
+    // Reset height to auto to get the correct scrollHeight
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  };
 
   // Track modal open (only once per open)
   useEffect(() => {
@@ -112,11 +124,12 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
           ) : (
             <form onSubmit={handleSubmit} className="feedback-form">
               <textarea
-                className="feedback-textarea"
+                ref={textareaRef}
+                className="feedback-textarea feedback-textarea-auto"
                 value={feedbackText}
-                onChange={(e) => setFeedbackText(e.target.value)}
+                onChange={handleTextareaChange}
                 placeholder="Describe the issue you encountered."
-                rows={8}
+                rows={2}
                 maxLength={5000}
                 autoFocus
                 disabled={isSubmitting}
