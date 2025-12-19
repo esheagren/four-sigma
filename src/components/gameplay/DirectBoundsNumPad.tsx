@@ -26,7 +26,10 @@ function formatDisplay(value: number): string {
   if (isNaN(value) || !isFinite(value)) return '0';
 
   const absValue = Math.abs(value);
-  if (absValue >= 1e12) {
+  // Use exponential for extremely large numbers (>= 1 quadrillion)
+  if (absValue >= 1e15) {
+    return value.toExponential(2);
+  } else if (absValue >= 1e12) {
     return (value / 1e12).toFixed(2) + 'T';
   } else if (absValue >= 1e9) {
     return (value / 1e9).toFixed(2) + 'B';
@@ -36,6 +39,18 @@ function formatDisplay(value: number): string {
     return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value);
   }
   return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(value);
+}
+
+// Calculate dynamic font size for bound buttons based on text length
+function calculateBoundFontSize(text: string): number {
+  const charCount = text.length;
+  const baseFontSize = 1.1; // rem (matches CSS)
+  const minFontSize = 0.65;
+  const shrinkStartChars = 8;
+  const shrinkRate = 0.05;
+
+  if (charCount <= shrinkStartChars) return baseFontSize;
+  return Math.max(minFontSize, baseFontSize - (charCount - shrinkStartChars) * shrinkRate);
 }
 
 // Evaluate expression with PEMDAS using JavaScript's native operator precedence
@@ -95,7 +110,7 @@ export function DirectBoundsNumPad({ onSubmit, isTouch }: DirectBoundsNumPadProp
     return currentInput || currentValue || '0';
   }, [expression, currentInput, currentValue, isCalculating]);
 
-  // Calculate dynamic font size based on text length
+  // Calculate dynamic font size based on text length (for expression display)
   const dynamicFontSize = useMemo(() => {
     const text = displayValue;
     const charCount = text.length;
@@ -111,6 +126,21 @@ export function DirectBoundsNumPad({ onSubmit, isTouch }: DirectBoundsNumPadProp
     const reduction = (charCount - shrinkStartChars) * shrinkRate;
     return Math.max(minFontSize, baseFontSize - reduction);
   }, [displayValue]);
+
+  // Compute display text for each bound (with dynamic font sizing)
+  const lowerDisplayText = useMemo(() => {
+    if (selectedBound === 'lower' && (isCalculating || currentInput)) {
+      return displayValue;
+    }
+    return lowerValue ? formatDisplay(parseFormattedNumber(lowerValue)) : '0';
+  }, [selectedBound, isCalculating, currentInput, displayValue, lowerValue]);
+
+  const upperDisplayText = useMemo(() => {
+    if (selectedBound === 'upper' && (isCalculating || currentInput)) {
+      return displayValue;
+    }
+    return upperValue ? formatDisplay(parseFormattedNumber(upperValue)) : '0';
+  }, [selectedBound, isCalculating, currentInput, displayValue, upperValue]);
 
   // Handle digit input
   const handleDigit = useCallback((digit: string) => {
@@ -356,10 +386,9 @@ export function DirectBoundsNumPad({ onSubmit, isTouch }: DirectBoundsNumPadProp
           <button
             className={`direct-bound-input direct-bound-input-lower ${selectedBound === 'lower' ? 'selected' : ''}`}
             onClick={() => handleSelectBound('lower')}
+            style={{ fontSize: `${calculateBoundFontSize(lowerDisplayText)}rem` }}
           >
-            {selectedBound === 'lower' && (isCalculating || currentInput)
-              ? displayValue
-              : (lowerValue ? formatDisplay(parseFormattedNumber(lowerValue)) : '0')}
+            {lowerDisplayText}
           </button>
         </div>
 
@@ -370,10 +399,9 @@ export function DirectBoundsNumPad({ onSubmit, isTouch }: DirectBoundsNumPadProp
           <button
             className={`direct-bound-input direct-bound-input-upper ${selectedBound === 'upper' ? 'selected' : ''}`}
             onClick={() => handleSelectBound('upper')}
+            style={{ fontSize: `${calculateBoundFontSize(upperDisplayText)}rem` }}
           >
-            {selectedBound === 'upper' && (isCalculating || currentInput)
-              ? displayValue
-              : (upperValue ? formatDisplay(parseFormattedNumber(upperValue)) : '0')}
+            {upperDisplayText}
           </button>
         </div>
       </div>
