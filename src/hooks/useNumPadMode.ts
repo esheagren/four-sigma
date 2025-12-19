@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export type NumPadMode = 'slider' | 'direct';
 
 const STORAGE_KEY = 'four_sigma_numpad_mode';
+const CHANGE_EVENT = 'numpad-mode-change';
 
 export function useNumPadMode() {
   const [numPadMode, setNumPadModeState] = useState<NumPadMode>(() => {
@@ -16,16 +17,29 @@ export function useNumPadMode() {
     return 'slider';
   });
 
-  const setNumPadMode = (mode: NumPadMode) => {
+  const setNumPadMode = useCallback((mode: NumPadMode) => {
     localStorage.setItem(STORAGE_KEY, mode);
     setNumPadModeState(mode);
-  };
+    // Dispatch custom event to sync within same tab
+    window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: mode }));
+  }, []);
 
-  const toggleNumPadMode = () => {
-    setNumPadMode(numPadMode === 'slider' ? 'direct' : 'slider');
-  };
+  const toggleNumPadMode = useCallback(() => {
+    const newMode = numPadMode === 'slider' ? 'direct' : 'slider';
+    setNumPadMode(newMode);
+  }, [numPadMode, setNumPadMode]);
 
-  // Sync across tabs
+  // Sync within same tab via custom event
+  useEffect(() => {
+    const handleModeChange = (e: CustomEvent<NumPadMode>) => {
+      setNumPadModeState(e.detail);
+    };
+
+    window.addEventListener(CHANGE_EVENT, handleModeChange as EventListener);
+    return () => window.removeEventListener(CHANGE_EVENT, handleModeChange as EventListener);
+  }, []);
+
+  // Sync across tabs via storage event
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === STORAGE_KEY && e.newValue) {
