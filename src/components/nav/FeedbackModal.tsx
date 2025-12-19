@@ -91,7 +91,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal-content feedback-modal dark-glass-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 className="modal-title">Report a Bug</h2>
+          <h2 className="modal-title">Squash a Bug</h2>
           <button className="modal-close-button" onClick={handleClose} aria-label="Close">
             ×
           </button>

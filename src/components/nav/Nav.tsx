@@ -268,7 +268,7 @@ export function Nav() {
             onClick={() => handleMenuItemClick(() => setIsFeedbackOpen(true))}
           >
             <BugIcon />
-            <span className="sidebar-item-text">Report a Bug</span>
+            <span className="sidebar-item-text">Squash a Bug</span>
           </button>
           <button
             className="sidebar-item"
