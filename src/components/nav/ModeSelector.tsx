@@ -8,7 +8,7 @@ interface ModeSelectorProps {
   onModeChange: (numPadMode: NumPadMode, calculatorMode: CalculatorMode) => void;
 }
 
-// Icons for the quadrants
+// Icons for row/column labels
 function SliderIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -144,52 +144,63 @@ export function ModeSelector({ numPadMode, calculatorMode, onModeChange }: ModeS
 
   return (
     <div className="mode-selector">
-      <div
-        className="mode-selector-grid"
-        ref={gridRef}
-      >
-        {/* Quadrant labels */}
-        <div
-          className={`mode-selector-quadrant top-left ${currentQuadrant.row === 0 && currentQuadrant.col === 0 ? 'active' : ''}`}
-          onClick={() => handleQuadrantClick(0, 0)}
-        >
-          <SliderIcon />
-          <CalcOffIcon />
-        </div>
-        <div
-          className={`mode-selector-quadrant top-right ${currentQuadrant.row === 0 && currentQuadrant.col === 1 ? 'active' : ''}`}
-          onClick={() => handleQuadrantClick(0, 1)}
-        >
-          <SliderIcon />
-          <CalcOnIcon />
-        </div>
-        <div
-          className={`mode-selector-quadrant bottom-left ${currentQuadrant.row === 1 && currentQuadrant.col === 0 ? 'active' : ''}`}
-          onClick={() => handleQuadrantClick(1, 0)}
-        >
-          <BoundsIcon />
-          <CalcOffIcon />
-        </div>
-        <div
-          className={`mode-selector-quadrant bottom-right ${currentQuadrant.row === 1 && currentQuadrant.col === 1 ? 'active' : ''}`}
-          onClick={() => handleQuadrantClick(1, 1)}
-        >
-          <BoundsIcon />
-          <CalcOnIcon />
+      <div className="mode-selector-title">Number Pad</div>
+
+      <div className="mode-selector-container">
+        {/* Column labels (above grid) */}
+        <div className="mode-selector-col-labels">
+          <div className={`mode-selector-label ${calculatorMode === 'off' ? 'active' : ''}`}>
+            <CalcOffIcon />
+          </div>
+          <div className={`mode-selector-label ${calculatorMode === 'on' ? 'active' : ''}`}>
+            <CalcOnIcon />
+          </div>
         </div>
 
-        {/* Draggable node */}
-        <div
-          className={`mode-selector-node ${isDragging ? 'dragging' : ''}`}
-          style={{
-            left: `${nodePosition.x}%`,
-            top: `${nodePosition.y}%`,
-          }}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-        />
+        <div className="mode-selector-row">
+          {/* Row labels (left of grid) */}
+          <div className="mode-selector-row-labels">
+            <div className={`mode-selector-label ${numPadMode === 'slider' ? 'active' : ''}`}>
+              <SliderIcon />
+            </div>
+            <div className={`mode-selector-label ${numPadMode === 'direct' ? 'active' : ''}`}>
+              <BoundsIcon />
+            </div>
+          </div>
+
+          {/* The 2x2 grid */}
+          <div className="mode-selector-grid" ref={gridRef}>
+            <div
+              className={`mode-selector-quadrant top-left ${currentQuadrant.row === 0 && currentQuadrant.col === 0 ? 'active' : ''}`}
+              onClick={() => handleQuadrantClick(0, 0)}
+            />
+            <div
+              className={`mode-selector-quadrant top-right ${currentQuadrant.row === 0 && currentQuadrant.col === 1 ? 'active' : ''}`}
+              onClick={() => handleQuadrantClick(0, 1)}
+            />
+            <div
+              className={`mode-selector-quadrant bottom-left ${currentQuadrant.row === 1 && currentQuadrant.col === 0 ? 'active' : ''}`}
+              onClick={() => handleQuadrantClick(1, 0)}
+            />
+            <div
+              className={`mode-selector-quadrant bottom-right ${currentQuadrant.row === 1 && currentQuadrant.col === 1 ? 'active' : ''}`}
+              onClick={() => handleQuadrantClick(1, 1)}
+            />
+
+            {/* Draggable node */}
+            <div
+              className={`mode-selector-node ${isDragging ? 'dragging' : ''}`}
+              style={{
+                left: `${nodePosition.x}%`,
+                top: `${nodePosition.y}%`,
+              }}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerUp}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

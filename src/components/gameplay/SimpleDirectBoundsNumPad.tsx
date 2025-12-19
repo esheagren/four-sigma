@@ -83,6 +83,15 @@ export function SimpleDirectBoundsNumPad({ onSubmit, isTouch }: SimpleDirectBoun
 
   // Handle digit input
   const handleDigit = useCallback((digit: string) => {
+    // If current input is just "0" and we're typing a non-zero digit, replace it
+    if (currentInput === '0' && digit !== '0') {
+      setCurrentInput(digit);
+      return;
+    }
+    // Don't allow multiple leading zeros
+    if (currentInput === '0' && digit === '0') {
+      return;
+    }
     const newInput = currentInput + digit;
     setCurrentInput(formatWithCommas(newInput.replace(/,/g, '')));
   }, [currentInput]);

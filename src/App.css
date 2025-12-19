@@ -451,14 +451,63 @@ body {
   margin: 0.25rem 0;
 }
 
+.mode-selector-title {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.mode-selector-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.mode-selector-col-labels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  width: 80px;
+  margin-left: 24px;
+}
+
+.mode-selector-row {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.mode-selector-row-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 2px;
+  width: 20px;
+}
+
+.mode-selector-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.3);
+  transition: color 0.15s ease;
+}
+
+.mode-selector-label.active {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .mode-selector-grid {
   position: relative;
-  width: 100%;
-  aspect-ratio: 1;
-  max-width: 120px;
-  margin: 0 auto;
+  width: 80px;
+  height: 80px;
   background: rgba(255, 255, 255, 0.03);
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -467,25 +516,16 @@ body {
 }
 
 .mode-selector-quadrant {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 0.25rem;
-  color: rgba(255, 255, 255, 0.35);
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-  border: 1px solid transparent;
+  transition: background 0.15s ease;
 }
 
 .mode-selector-quadrant:hover {
   background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.5);
 }
 
 .mode-selector-quadrant.active {
-  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .mode-selector-quadrant.top-left {
@@ -503,8 +543,8 @@ body {
 
 .mode-selector-node {
   position: absolute;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: var(--primary, #22c55e);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(255, 255, 255, 0.15);
