@@ -144,10 +144,10 @@ export function Nav() {
     localStorage.setItem(NAV_ANIMATION_THEME_KEY, navAnimationTheme);
 
     // Update theme-color meta tag for iOS status bar
-    const themeColorMap: Record<string, string> = { classic: '#635bff', magma: '#ff6600' };
+    const themeColorMap: Record<string, string> = { classic: '#22c55e', magma: '#ffc832' };
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', themeColorMap[navAnimationTheme] || '#635bff');
+      metaThemeColor.setAttribute('content', themeColorMap[navAnimationTheme] || '#22c55e');
     }
   }, [navAnimationTheme]);
 

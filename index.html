@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#635bff" />
+    <meta name="theme-color" content="#22c55e" />
     <title>four-sigma</title>
   </head>
   <body class="no-transition">
@@ -16,10 +16,10 @@
 
         // Set theme-color meta tag based on nav animation theme
         var navAnimTheme = localStorage.getItem('four_sigma_nav_animation_theme') || 'classic';
-        var themeColorMap = { classic: '#635bff', magma: '#ff6600' };
+        var themeColorMap = { classic: '#22c55e', magma: '#ffc832' };
         var metaThemeColor = document.querySelector('meta[name="theme-color"]');
         if (metaThemeColor) {
-          metaThemeColor.setAttribute('content', themeColorMap[navAnimTheme] || '#635bff');
+          metaThemeColor.setAttribute('content', themeColorMap[navAnimTheme] || '#22c55e');
         }
 
         // Remove no-transition class after a brief delay to enable transitions
