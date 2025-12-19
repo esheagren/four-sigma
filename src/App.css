@@ -7728,6 +7728,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   color: rgba(255, 255, 255, 0.4);
   font-size: 1.2rem;
   font-weight: 300;
+  margin-top: 1rem; /* Offset to align with input buttons, not labels */
 }
 
 /* Expression history bar (when building expression) */
