@@ -7,6 +7,7 @@ interface HowToPlayModalProps {
   isOpen: boolean;
   onClose: () => void;
   onGotIt?: () => void; // Called when user clicks "Got it" and needs to claim username
+  variant?: 'firstTime' | 'returning'; // firstTime: must scroll, no dismiss. returning: can dismiss anytime
 }
 
 // Scoring function matching server-side algorithm
@@ -41,7 +42,7 @@ function calculateScore(lower: number, upper: number, answer: number): number {
   return Math.round(score * 10) / 10;
 }
 
-export function HowToPlayModal({ isOpen, onClose, onGotIt }: HowToPlayModalProps) {
+export function HowToPlayModal({ isOpen, onClose, onGotIt, variant = 'firstTime' }: HowToPlayModalProps) {
   const { user, hasClaimedUsername } = useAuth();
 
   // Interactive slider state
@@ -49,9 +50,10 @@ export function HowToPlayModal({ isOpen, onClose, onGotIt }: HowToPlayModalProps
   const sliderRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
 
-  // Scroll detection state
+  // Scroll detection state (only used for firstTime variant)
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const modalBodyRef = useRef<HTMLDivElement>(null);
+  const modalContentRef = useRef<HTMLDivElement>(null);
 
   // Check if user has scrolled to bottom (sticky - once true, stays true)
   const checkScrollPosition = useCallback(() => {
@@ -89,6 +91,35 @@ export function HowToPlayModal({ isOpen, onClose, onGotIt }: HowToPlayModalProps
       element.removeEventListener('scroll', checkScrollPosition);
     };
   }, [isOpen, checkScrollPosition]);
+
+  // Handle click outside to close (only for returning variant)
+  useEffect(() => {
+    if (!isOpen || variant !== 'returning') return;
+
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as Node;
+      if (modalContentRef.current && !modalContentRef.current.contains(target)) {
+        onClose();
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen, variant, onClose]);
+
+  // Handle Escape key to close (only for returning variant)
+  useEffect(() => {
+    if (!isOpen || variant !== 'returning') return;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, variant, onClose]);
 
   const handleSliderInteraction = useCallback((clientX: number) => {
     if (!sliderRef.current) return;
@@ -158,7 +189,7 @@ export function HowToPlayModal({ isOpen, onClose, onGotIt }: HowToPlayModalProps
   return createPortal(
     <div className="modal-overlay">
       <ModalBackdropAnimation />
-      <div className="modal-content dark-glass-modal">
+      <div className="modal-content dark-glass-modal" ref={modalContentRef}>
         <div className="modal-header modal-header-horizontal">
           <h2 className="modal-title">4-σ</h2>
           <div className="modal-subtitle-stack">
@@ -487,33 +518,43 @@ export function HowToPlayModal({ isOpen, onClose, onGotIt }: HowToPlayModalProps
             </>
         </div>
 
-        {/* Floating scroll indicator or Got it button */}
-        {!hasScrolledToBottom ? (
-          <div className="floating-scroll-indicator">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-            >
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
-        ) : (
-          <div className="modal-footer-actions">
-            <button className="got-it-button" onClick={() => {
-              // Check if user needs to claim username
-              if (user?.isAnonymous || !hasClaimedUsername) {
-                // Signal to parent that user needs to claim username
-                if (onGotIt) {
-                  onGotIt();
+        {/* Footer: varies by variant */}
+        {variant === 'firstTime' ? (
+          // First-time: must scroll to bottom to see Got it button
+          !hasScrolledToBottom ? (
+            <div className="floating-scroll-indicator">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          ) : (
+            <div className="modal-footer-actions">
+              <button className="got-it-button" onClick={() => {
+                // Check if user needs to claim username
+                if (user?.isAnonymous || !hasClaimedUsername) {
+                  // Signal to parent that user needs to claim username
+                  if (onGotIt) {
+                    onGotIt();
+                  }
+                } else {
+                  onClose();
                 }
-              } else {
-                onClose();
-              }
-            }}>
+              }}>
+                Got it
+              </button>
+            </div>
+          )
+        ) : (
+          // Returning: Got it button always visible
+          <div className="modal-footer-actions">
+            <button className="got-it-button" onClick={onClose}>
               Got it
             </button>
           </div>

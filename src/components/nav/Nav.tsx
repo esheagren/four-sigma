@@ -99,6 +99,7 @@ const HAS_SEEN_HOW_TO_PLAY_KEY = 'four_sigma_has_seen_how_to_play';
 export function Nav() {
   const { user, isAnonymous, hasClaimedUsername, isLoading, logout, authToken } = useAuth();
   const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
+  const [howToPlayVariant, setHowToPlayVariant] = useState<'firstTime' | 'returning'>('firstTime');
   const [isUsernameClaimModalOpen, setIsUsernameClaimModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
@@ -140,6 +141,7 @@ export function Nav() {
 
     if (!hasSeenHowToPlay) {
       // First visit: show HowToPlay (username claim happens within modal)
+      setHowToPlayVariant('firstTime');
       setIsHowToPlayOpen(true);
       localStorage.setItem(HAS_SEEN_HOW_TO_PLAY_KEY, 'true');
       return;
@@ -161,6 +163,7 @@ export function Nav() {
     // For anonymous returning users who somehow haven't claimed username,
     // show HowToPlayModal again (which includes username claim)
     if (isAnonymous && !hasClaimedUsername) {
+      setHowToPlayVariant('firstTime');
       setIsHowToPlayOpen(true);
     }
   }, [isLoading, isAnonymous, user, hasClaimedUsername]);
@@ -245,7 +248,10 @@ export function Nav() {
         <nav className="sidebar-menu">
           <button
             className="sidebar-item"
-            onClick={() => handleMenuItemClick(() => setIsHowToPlayOpen(true))}
+            onClick={() => handleMenuItemClick(() => {
+              setHowToPlayVariant('returning');
+              setIsHowToPlayOpen(true);
+            })}
           >
             <HelpCircleIcon />
             <span className="sidebar-item-text">How to Play</span>
@@ -321,6 +327,7 @@ export function Nav() {
         isOpen={isHowToPlayOpen}
         onClose={handleHowToPlayClose}
         onGotIt={handleHowToPlayGotIt}
+        variant={howToPlayVariant}
       />
 
       <UsernameClaimModal

@@ -131,6 +131,62 @@ body {
   pointer-events: none;
 }
 
+/* Magma theme - override with radial blob gradients and multiple layers */
+[data-theme="magma"] .sidebar::before {
+  left: -30%;
+  top: 50%;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 120, 0, 0.95) 0%,
+    rgba(255, 60, 0, 0.8) 40%,
+    rgba(255, 30, 0, 0.4) 70%,
+    transparent 100%
+  );
+  filter: blur(12px);
+  animation: magma-blob-1 4s ease-in-out infinite;
+  box-shadow:
+    0 0 40px 20px rgba(255, 100, 0, 0.4),
+    0 0 80px 40px rgba(255, 50, 0, 0.2);
+}
+
+[data-theme="magma"] .sidebar::after {
+  content: '';
+  position: absolute;
+  left: -25%;
+  top: 50%;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 200, 50, 0.9) 0%,
+    rgba(255, 140, 0, 0.7) 40%,
+    rgba(255, 80, 0, 0.3) 70%,
+    transparent 100%
+  );
+  filter: blur(10px);
+  animation: magma-blob-2 5.5s ease-in-out infinite;
+  pointer-events: none;
+  box-shadow:
+    0 0 30px 15px rgba(255, 180, 0, 0.3),
+    0 0 60px 30px rgba(255, 100, 0, 0.15);
+}
+
+/* Third magma blob using box-shadow on ::before */
+[data-theme="magma"] .sidebar {
+  overflow: hidden;
+}
+
+[data-theme="magma"] .sidebar::before {
+  box-shadow:
+    0 0 40px 20px rgba(255, 100, 0, 0.4),
+    0 0 80px 40px rgba(255, 50, 0, 0.2),
+    /* Third blob effect via shadow offset */
+    -20px 200px 50px 25px rgba(255, 80, 0, 0.6),
+    -15px 200px 80px 40px rgba(255, 40, 0, 0.3);
+}
+
 /* Classic aurora animation */
 @keyframes aurora-flow-vertical {
   0%, 100% {
@@ -143,35 +199,132 @@ body {
   }
 }
 
-/* Magma lava lamp animation */
-@keyframes magma-flow {
+/* Magma lava lamp - primary blob layer rising with sinusoidal sway */
+@keyframes magma-blob-1 {
   0% {
-    transform: translateY(100%) translateX(-20%) scale(1.2);
-    opacity: calc(var(--nav-effect-opacity) * var(--nav-effect-enabled));
+    transform: translateY(120%) translateX(calc(-50% + 30px * 1)) scale(0.8);
+    opacity: 0;
   }
-  15% {
-    transform: translateY(60%) translateX(-10%) scale(1.4);
-    opacity: calc(var(--nav-effect-opacity) * 1.1 * var(--nav-effect-enabled));
+  5% {
+    opacity: var(--nav-effect-opacity);
+  }
+  10% {
+    transform: translateY(100%) translateX(calc(-50% + 30px * -0.5)) scale(1.1);
+  }
+  20% {
+    transform: translateY(80%) translateX(calc(-50% + 30px * 0.87)) scale(1.3);
   }
   30% {
-    transform: translateY(20%) translateX(-25%) scale(1.1);
-    opacity: calc(var(--nav-effect-opacity) * 0.9 * var(--nav-effect-enabled));
+    transform: translateY(60%) translateX(calc(-50% + 30px * -1)) scale(1.0);
   }
-  45% {
-    transform: translateY(-20%) translateX(-15%) scale(1.3);
-    opacity: calc(var(--nav-effect-opacity) * 1.0 * var(--nav-effect-enabled));
+  40% {
+    transform: translateY(40%) translateX(calc(-50% + 30px * 0.5)) scale(1.4);
+  }
+  50% {
+    transform: translateY(20%) translateX(calc(-50% + 30px * -0.87)) scale(1.1);
   }
   60% {
-    transform: translateY(-40%) translateX(-30%) scale(1.0);
-    opacity: calc(var(--nav-effect-opacity) * 0.8 * var(--nav-effect-enabled));
+    transform: translateY(0%) translateX(calc(-50% + 30px * 1)) scale(1.2);
   }
-  75% {
-    transform: translateY(10%) translateX(-20%) scale(1.2);
-    opacity: calc(var(--nav-effect-opacity) * 1.0 * var(--nav-effect-enabled));
+  70% {
+    transform: translateY(-20%) translateX(calc(-50% + 30px * -0.5)) scale(0.9);
+  }
+  80% {
+    transform: translateY(-40%) translateX(calc(-50% + 30px * 0.87)) scale(1.3);
+  }
+  90% {
+    transform: translateY(-60%) translateX(calc(-50% + 30px * -1)) scale(1.0);
+  }
+  95% {
+    opacity: var(--nav-effect-opacity);
   }
   100% {
-    transform: translateY(100%) translateX(-20%) scale(1.2);
-    opacity: calc(var(--nav-effect-opacity) * var(--nav-effect-enabled));
+    transform: translateY(-80%) translateX(calc(-50% + 30px * 0.5)) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* Magma secondary blob - offset phase, different speed */
+@keyframes magma-blob-2 {
+  0% {
+    transform: translateY(140%) translateX(calc(-50% + 25px * -0.7)) scale(1.0);
+    opacity: 0;
+  }
+  8% {
+    opacity: calc(var(--nav-effect-opacity) * 0.8);
+  }
+  15% {
+    transform: translateY(110%) translateX(calc(-50% + 25px * 0.9)) scale(1.2);
+  }
+  25% {
+    transform: translateY(85%) translateX(calc(-50% + 25px * -0.3)) scale(0.9);
+  }
+  35% {
+    transform: translateY(55%) translateX(calc(-50% + 25px * 1)) scale(1.5);
+  }
+  45% {
+    transform: translateY(30%) translateX(calc(-50% + 25px * -0.8)) scale(1.1);
+  }
+  55% {
+    transform: translateY(5%) translateX(calc(-50% + 25px * 0.6)) scale(1.3);
+  }
+  65% {
+    transform: translateY(-25%) translateX(calc(-50% + 25px * -1)) scale(1.0);
+  }
+  75% {
+    transform: translateY(-50%) translateX(calc(-50% + 25px * 0.4)) scale(1.4);
+  }
+  85% {
+    transform: translateY(-75%) translateX(calc(-50% + 25px * -0.6)) scale(1.1);
+  }
+  92% {
+    opacity: calc(var(--nav-effect-opacity) * 0.8);
+  }
+  100% {
+    transform: translateY(-100%) translateX(calc(-50% + 25px * 0.9)) scale(0.9);
+    opacity: 0;
+  }
+}
+
+/* Magma tertiary blob - faster, more erratic */
+@keyframes magma-blob-3 {
+  0% {
+    transform: translateY(130%) translateX(calc(-50% + 20px * 0.5)) scale(0.6);
+    opacity: 0;
+  }
+  6% {
+    opacity: calc(var(--nav-effect-opacity) * 0.6);
+  }
+  12% {
+    transform: translateY(105%) translateX(calc(-50% + 20px * -1)) scale(0.9);
+  }
+  22% {
+    transform: translateY(75%) translateX(calc(-50% + 20px * 0.7)) scale(1.1);
+  }
+  32% {
+    transform: translateY(45%) translateX(calc(-50% + 20px * -0.4)) scale(0.7);
+  }
+  42% {
+    transform: translateY(20%) translateX(calc(-50% + 20px * 1)) scale(1.2);
+  }
+  52% {
+    transform: translateY(-10%) translateX(calc(-50% + 20px * -0.9)) scale(0.8);
+  }
+  62% {
+    transform: translateY(-35%) translateX(calc(-50% + 20px * 0.3)) scale(1.0);
+  }
+  72% {
+    transform: translateY(-55%) translateX(calc(-50% + 20px * -0.7)) scale(1.3);
+  }
+  82% {
+    transform: translateY(-75%) translateX(calc(-50% + 20px * 1)) scale(0.9);
+  }
+  94% {
+    opacity: calc(var(--nav-effect-opacity) * 0.6);
+  }
+  100% {
+    transform: translateY(-95%) translateX(calc(-50% + 20px * -0.5)) scale(0.7);
+    opacity: 0;
   }
 }
 
@@ -411,20 +564,12 @@ body {
   --nav-hover-easing: ease;
 }
 
-/* Magma Theme - Fiery lava lamp effect on left edge */
+/* Magma Theme - Fiery lava lamp blobs with sinusoidal rise */
 [data-theme="magma"] {
   --nav-slide-duration: 0.2s;
   --nav-slide-easing: cubic-bezier(0.4, 0, 0.2, 1);
   --nav-effect-enabled: 1;
-  --nav-effect-duration: 3s;
   --nav-effect-opacity: 0.9;
-  --nav-effect-color-1: rgba(255, 100, 0, 0.6);
-  --nav-effect-color-2: rgba(255, 50, 0, 0.5);
-  --nav-effect-color-3: rgba(255, 180, 0, 0.4);
-  --nav-effect-animation: magma-flow;
-  --nav-effect-blur: 20px;
-  --nav-effect-width: 120%;
-  --nav-effect-height: 150%;
   --nav-hamburger-duration: 0.2s;
   --nav-hamburger-easing: ease;
   --nav-hover-duration: 0.12s;
