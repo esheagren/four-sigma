@@ -282,8 +282,14 @@ export function DirectBoundsNumPad({ onSubmit, isTouch }: DirectBoundsNumPadProp
     setExpression([]);
 
     // Load the new bound's existing value into currentInput for editing
-    const newBoundValue = bound === 'lower' ? lowerValue : upperValue;
-    setCurrentInput(newBoundValue);
+    // and clear the saved value so backspace works correctly
+    if (bound === 'lower') {
+      setCurrentInput(lowerValue);
+      setLowerValue('');
+    } else {
+      setCurrentInput(upperValue);
+      setUpperValue('');
+    }
 
     setSelectedBound(bound);
   }, [currentInput, expression, setCurrentValue, selectedBound, lowerValue, upperValue]);
