@@ -540,11 +540,11 @@ body {
 
 .mode-selector-node {
   position: absolute;
-  width: 18px;
-  height: 18px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: var(--primary, #22c55e);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   cursor: grab;
   touch-action: none;
   transform: translate(-50%, -50%);
@@ -559,7 +559,7 @@ body {
 .mode-selector-node.dragging {
   cursor: grabbing;
   transform: translate(-50%, -50%) scale(1.2);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 0 2px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
