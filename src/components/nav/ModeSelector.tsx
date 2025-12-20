@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { NumPadMode } from '../../hooks/useNumPadMode';
 import { CalculatorMode } from '../../hooks/useCalculatorMode';
 
@@ -6,6 +6,17 @@ interface ModeSelectorProps {
   numPadMode: NumPadMode;
   calculatorMode: CalculatorMode;
   onModeChange: (numPadMode: NumPadMode, calculatorMode: CalculatorMode) => void;
+}
+
+// Info icon for the help popup
+function InfoIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="16" x2="12" y2="12" />
+      <line x1="12" y1="8" x2="12.01" y2="8" />
+    </svg>
+  );
 }
 
 // Icons for row/column labels
@@ -105,10 +116,26 @@ function getQuadrantCenter(q: Quadrant): { x: number; y: number } {
 
 export function ModeSelector({ numPadMode, calculatorMode, onModeChange }: ModeSelectorProps) {
   const gridRef = useRef<HTMLDivElement>(null);
+  const infoPopupRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
+  const [showInfoPopup, setShowInfoPopup] = useState(false);
 
   const currentQuadrant = modesToQuadrant(numPadMode, calculatorMode);
+
+  // Close popup when clicking outside
+  useEffect(() => {
+    if (!showInfoPopup) return;
+
+    function handleClickOutside(e: MouseEvent) {
+      if (infoPopupRef.current && !infoPopupRef.current.contains(e.target as Node)) {
+        setShowInfoPopup(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showInfoPopup]);
   const currentCenter = getQuadrantCenter(currentQuadrant);
 
   // Get position for the node (drag position or snapped to quadrant center)
@@ -168,7 +195,43 @@ export function ModeSelector({ numPadMode, calculatorMode, onModeChange }: ModeS
       <div className="mode-selector-title">
         <NumPadTitleIcon />
         <span>Number Pad</span>
+        <button
+          className="mode-selector-info-btn"
+          onClick={() => setShowInfoPopup(!showInfoPopup)}
+          aria-label="Learn about numpad modes"
+        >
+          <InfoIcon />
+        </button>
       </div>
+
+      {/* Info popup */}
+      {showInfoPopup && (
+        <div className="mode-selector-info-popup" ref={infoPopupRef}>
+          <div className="mode-selector-info-section">
+            <div className="mode-selector-info-header">
+              <TwoBoxesIcon />
+              <span>Direct Entry</span>
+              <span className="mode-selector-info-vs">vs</span>
+              <PlusMinusIcon />
+              <span>Midpoint ±%</span>
+            </div>
+            <p><strong>Direct:</strong> Enter your lower and upper bounds separately.</p>
+            <p><strong>Midpoint:</strong> Enter your best guess, then drag to set your uncertainty range as a percentage (±%).</p>
+          </div>
+          <div className="mode-selector-info-divider" />
+          <div className="mode-selector-info-section">
+            <div className="mode-selector-info-header">
+              <CalcOnIcon />
+              <span>Calculator</span>
+              <span className="mode-selector-info-vs">vs</span>
+              <CalcOffIcon />
+              <span>Simple</span>
+            </div>
+            <p><strong>Calculator:</strong> Full calculator with +, −, ×, ÷ operations to compute your answer.</p>
+            <p><strong>Simple:</strong> Just digits—no calculator operations, for when you already know your numbers.</p>
+          </div>
+        </div>
+      )}
 
       <div className="mode-selector-container">
         {/* Column labels (above grid) */}

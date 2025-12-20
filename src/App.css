@@ -571,6 +571,81 @@ body {
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
+/* Info button next to title */
+.mode-selector-info-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: color 0.2s ease, background 0.2s ease;
+  margin-left: auto;
+}
+
+.mode-selector-info-btn:hover {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Info popup */
+.mode-selector-info-popup {
+  background: rgba(30, 30, 40, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.mode-selector-info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mode-selector-info-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.9);
+  flex-wrap: wrap;
+}
+
+.mode-selector-info-header svg {
+  opacity: 0.8;
+}
+
+.mode-selector-info-vs {
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+  font-style: italic;
+  margin: 0 0.25rem;
+}
+
+.mode-selector-info-section p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+}
+
+.mode-selector-info-section p strong {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.mode-selector-info-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0.75rem 0;
+}
+
 /* ========================================
    NAV ANIMATION THEME VARIANTS
    Apply via data-theme attribute on a parent element
