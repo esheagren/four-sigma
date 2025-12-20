@@ -204,31 +204,40 @@ export function ModeSelector({ numPadMode, calculatorMode, onModeChange }: ModeS
         </button>
       </div>
 
-      {/* Info popup */}
+      {/* Info modal */}
       {showInfoPopup && (
-        <div className="mode-selector-info-popup" ref={infoPopupRef}>
-          <div className="mode-selector-info-section">
-            <div className="mode-selector-info-header">
-              <TwoBoxesIcon />
-              <span>Direct Entry</span>
-              <span className="mode-selector-info-vs">vs</span>
-              <PlusMinusIcon />
-              <span>Midpoint ±%</span>
+        <div className="mode-selector-info-overlay" onClick={() => setShowInfoPopup(false)}>
+          <div className="mode-selector-info-modal" ref={infoPopupRef} onClick={(e) => e.stopPropagation()}>
+            <button className="mode-selector-info-close" onClick={() => setShowInfoPopup(false)}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+            <h3 className="mode-selector-info-title">Number Pad Modes</h3>
+            <div className="mode-selector-info-section">
+              <div className="mode-selector-info-header">
+                <TwoBoxesIcon />
+                <span>Direct Entry</span>
+                <span className="mode-selector-info-vs">vs</span>
+                <PlusMinusIcon />
+                <span>Midpoint ±%</span>
+              </div>
+              <p><strong>Direct:</strong> Enter your lower and upper bounds separately.</p>
+              <p><strong>Midpoint:</strong> Enter your best guess, then drag to set your uncertainty range as a percentage (±%).</p>
             </div>
-            <p><strong>Direct:</strong> Enter your lower and upper bounds separately.</p>
-            <p><strong>Midpoint:</strong> Enter your best guess, then drag to set your uncertainty range as a percentage (±%).</p>
-          </div>
-          <div className="mode-selector-info-divider" />
-          <div className="mode-selector-info-section">
-            <div className="mode-selector-info-header">
-              <CalcOnIcon />
-              <span>Calculator</span>
-              <span className="mode-selector-info-vs">vs</span>
-              <CalcOffIcon />
-              <span>Simple</span>
+            <div className="mode-selector-info-divider" />
+            <div className="mode-selector-info-section">
+              <div className="mode-selector-info-header">
+                <CalcOnIcon />
+                <span>Calculator</span>
+                <span className="mode-selector-info-vs">vs</span>
+                <CalcOffIcon />
+                <span>Simple</span>
+              </div>
+              <p><strong>Calculator:</strong> Full calculator with +, −, ×, ÷ operations to compute your answer.</p>
+              <p><strong>Simple:</strong> Just digits—no calculator operations, for when you already know your numbers.</p>
             </div>
-            <p><strong>Calculator:</strong> Full calculator with +, −, ×, ÷ operations to compute your answer.</p>
-            <p><strong>Simple:</strong> Just digits—no calculator operations, for when you already know your numbers.</p>
           </div>
         </div>
       )}
