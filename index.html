@@ -14,14 +14,6 @@
         var theme = localStorage.getItem('four_sigma_theme') || 'default';
         document.body.classList.add('theme-' + theme);
 
-        // Set theme-color meta tag based on nav animation theme
-        var navAnimTheme = localStorage.getItem('four_sigma_nav_animation_theme') || 'classic';
-        var themeColorMap = { classic: '#22c55e', magma: '#ffc832' };
-        var metaThemeColor = document.querySelector('meta[name="theme-color"]');
-        if (metaThemeColor) {
-          metaThemeColor.setAttribute('content', themeColorMap[navAnimTheme] || '#22c55e');
-        }
-
         // Remove no-transition class after a brief delay to enable transitions
         requestAnimationFrame(function() {
           requestAnimationFrame(function() {

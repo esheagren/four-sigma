@@ -78,25 +78,6 @@ function LogOutIcon() {
   );
 }
 
-function PaintbrushIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18.37 2.63L14 7l-1.59-1.59a2 2 0 00-2.82 0L8 7l9 9 1.59-1.59a2 2 0 000-2.82L17 10l4.37-4.37a2.12 2.12 0 10-3-3z" />
-      <path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7" />
-      <path d="M14.5 17.5L4.5 15" />
-    </svg>
-  );
-}
-
-// Nav animation themes
-const NAV_ANIMATION_THEMES = [
-  { id: 'classic', name: 'Classic', description: 'Balanced animations' },
-  { id: 'magma', name: 'Magma', description: 'Fiery lava lamp effect' },
-] as const;
-
-type NavAnimationTheme = typeof NAV_ANIMATION_THEMES[number]['id'];
-
-const NAV_ANIMATION_THEME_KEY = 'four_sigma_nav_animation_theme';
 const HAS_SEEN_HOW_TO_PLAY_KEY = 'four_sigma_has_seen_how_to_play';
 
 export function Nav() {
@@ -112,38 +93,7 @@ export function Nav() {
   const [isSignUpPromptOpen, setIsSignUpPromptOpen] = useState(false);
   const [isClaimAccountModalOpen, setIsClaimAccountModalOpen] = useState(false);
   const [authModalInitialMode, setAuthModalInitialMode] = useState<'login' | 'signup'>('login');
-  const [navAnimationTheme, setNavAnimationTheme] = useState<NavAnimationTheme>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(NAV_ANIMATION_THEME_KEY);
-      if (saved && NAV_ANIMATION_THEMES.some(t => t.id === saved)) {
-        return saved as NavAnimationTheme;
-      }
-    }
-    return 'classic';
-  });
   const sidebarRef = useRef<HTMLElement>(null);
-
-  // Apply animation theme to document and update status bar color
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', navAnimationTheme);
-    localStorage.setItem(NAV_ANIMATION_THEME_KEY, navAnimationTheme);
-
-    // Update theme-color meta tag for iOS status bar
-    const themeColorMap: Record<string, string> = { classic: '#22c55e', magma: '#ffc832' };
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', themeColorMap[navAnimationTheme] || '#22c55e');
-    }
-  }, [navAnimationTheme]);
-
-  // Cycle to next animation theme
-  const cycleAnimationTheme = () => {
-    const currentIndex = NAV_ANIMATION_THEMES.findIndex(t => t.id === navAnimationTheme);
-    const nextIndex = (currentIndex + 1) % NAV_ANIMATION_THEMES.length;
-    setNavAnimationTheme(NAV_ANIMATION_THEMES[nextIndex].id);
-  };
-
-  const currentThemeInfo = NAV_ANIMATION_THEMES.find(t => t.id === navAnimationTheme);
 
   // Show How to Play modal for first-time visitors, claim account modal every 3 sessions, or sign-up prompt for returning anonymous users
   useEffect(() => {
@@ -282,14 +232,6 @@ export function Nav() {
           >
             <BugIcon />
             <span className="sidebar-item-text">Squash a Bug</span>
-          </button>
-          <button
-            className="sidebar-item"
-            onClick={cycleAnimationTheme}
-            title={currentThemeInfo?.description}
-          >
-            <PaintbrushIcon />
-            <span className="sidebar-item-text">{currentThemeInfo?.name}</span>
           </button>
           {!isLoading && isAnonymous && (
             <button
