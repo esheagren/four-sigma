@@ -591,102 +591,53 @@ body {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Info modal overlay */
-.mode-selector-info-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-  padding: 1rem;
+/* Numpad info modal - uses existing modal-overlay and modal-content classes */
+.numpad-info-modal {
+  max-width: 400px;
 }
 
-.mode-selector-info-modal {
-  background: rgba(30, 30, 40, 0.98);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
-  padding: 1.5rem;
-  max-width: 360px;
-  width: 100%;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  position: relative;
-}
-
-.mode-selector-info-close {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: color 0.2s ease, background 0.2s ease;
-}
-
-.mode-selector-info-close:hover {
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.mode-selector-info-title {
-  margin: 0 0 1rem 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.mode-selector-info-section {
+.numpad-info-section {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
-.mode-selector-info-header {
+.numpad-info-header {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   font-weight: 600;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  color: #1e293b;
   flex-wrap: wrap;
 }
 
-.mode-selector-info-header svg {
-  opacity: 0.8;
+.numpad-info-header svg {
+  opacity: 0.7;
 }
 
-.mode-selector-info-vs {
-  color: rgba(255, 255, 255, 0.4);
+.numpad-info-vs {
+  color: #94a3b8;
   font-weight: 400;
   font-style: italic;
   margin: 0 0.25rem;
 }
 
-.mode-selector-info-section p {
+.numpad-info-section p {
   margin: 0;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.4;
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.5;
 }
 
-.mode-selector-info-section p strong {
-  color: rgba(255, 255, 255, 0.9);
+.numpad-info-section p strong {
+  color: #1e293b;
 }
 
-.mode-selector-info-divider {
+.numpad-info-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  margin: 0.75rem 0;
+  background: rgba(0, 0, 0, 0.1);
+  margin: 1.25rem 0;
 }
 
 /* ========================================

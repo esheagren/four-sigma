@@ -1,4 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { NumPadMode } from '../../hooks/useNumPadMode';
 import { CalculatorMode } from '../../hooks/useCalculatorMode';
 
@@ -204,42 +205,46 @@ export function ModeSelector({ numPadMode, calculatorMode, onModeChange }: ModeS
         </button>
       </div>
 
-      {/* Info modal */}
-      {showInfoPopup && (
-        <div className="mode-selector-info-overlay" onClick={() => setShowInfoPopup(false)}>
-          <div className="mode-selector-info-modal" ref={infoPopupRef} onClick={(e) => e.stopPropagation()}>
-            <button className="mode-selector-info-close" onClick={() => setShowInfoPopup(false)}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-            <h3 className="mode-selector-info-title">Number Pad Modes</h3>
-            <div className="mode-selector-info-section">
-              <div className="mode-selector-info-header">
-                <TwoBoxesIcon />
-                <span>Direct Entry</span>
-                <span className="mode-selector-info-vs">vs</span>
-                <PlusMinusIcon />
-                <span>Midpoint ±%</span>
-              </div>
-              <p><strong>Direct:</strong> Enter your lower and upper bounds separately.</p>
-              <p><strong>Midpoint:</strong> Enter your best guess, then drag to set your uncertainty range as a percentage (±%).</p>
+      {/* Info modal - rendered via portal to escape sidebar */}
+      {showInfoPopup && createPortal(
+        <div className="modal-overlay" onClick={() => setShowInfoPopup(false)}>
+          <div className="modal-content dark-glass-modal numpad-info-modal" ref={infoPopupRef} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">Number Pad Modes</h2>
             </div>
-            <div className="mode-selector-info-divider" />
-            <div className="mode-selector-info-section">
-              <div className="mode-selector-info-header">
-                <CalcOnIcon />
-                <span>Calculator</span>
-                <span className="mode-selector-info-vs">vs</span>
-                <CalcOffIcon />
-                <span>Simple</span>
+            <div className="modal-body">
+              <div className="numpad-info-section">
+                <div className="numpad-info-header">
+                  <TwoBoxesIcon />
+                  <span>Direct Entry</span>
+                  <span className="numpad-info-vs">vs</span>
+                  <PlusMinusIcon />
+                  <span>Midpoint ±%</span>
+                </div>
+                <p><strong>Direct:</strong> Enter your lower and upper bounds separately.</p>
+                <p><strong>Midpoint:</strong> Enter your best guess, then drag to set your uncertainty range as a percentage (±%).</p>
               </div>
-              <p><strong>Calculator:</strong> Full calculator with +, −, ×, ÷ operations to compute your answer.</p>
-              <p><strong>Simple:</strong> Just digits—no calculator operations, for when you already know your numbers.</p>
+              <div className="numpad-info-divider" />
+              <div className="numpad-info-section">
+                <div className="numpad-info-header">
+                  <CalcOnIcon />
+                  <span>Calculator</span>
+                  <span className="numpad-info-vs">vs</span>
+                  <CalcOffIcon />
+                  <span>Simple</span>
+                </div>
+                <p><strong>Calculator:</strong> Full calculator with +, −, ×, ÷ operations to compute your answer.</p>
+                <p><strong>Simple:</strong> Just digits—no calculator operations, for when you already know your numbers.</p>
+              </div>
+            </div>
+            <div className="modal-footer-actions">
+              <button className="got-it-button" onClick={() => setShowInfoPopup(false)}>
+                Got it
+              </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <div className="mode-selector-container">
