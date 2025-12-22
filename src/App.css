@@ -112,23 +112,19 @@ body {
   transform: translateX(0);
 }
 
-/* Sidebar effect (aurora/magma/etc) */
+/* Sidebar effect (aurora) - small section at top */
 .sidebar::before {
   content: '';
   position: absolute;
-  left: -50%;
-  top: -10%;
-  width: var(--nav-effect-width);
-  height: var(--nav-effect-height);
+  left: -30%;
+  top: 0;
+  width: 160%;
+  height: 120px;
   background: linear-gradient(
     180deg,
-    transparent 0%,
-    var(--nav-effect-color-1) 15%,
-    var(--nav-effect-color-2) 30%,
-    var(--nav-effect-color-3) 45%,
-    var(--nav-effect-color-4) 60%,
-    var(--nav-effect-color-5) 75%,
-    transparent 90%
+    var(--nav-effect-color-2) 0%,
+    var(--nav-effect-color-3) 40%,
+    transparent 100%
   );
   filter: blur(var(--nav-effect-blur));
   animation: var(--nav-effect-animation) var(--nav-effect-duration) ease-in-out infinite;
