@@ -7102,6 +7102,47 @@ a.judgement-answer-below:hover .judgement-answer-value {
   display: flex;
   align-items: center;
   padding-top: 34px; /* Space for bulb above */
+  gap: 8px;
+}
+
+/* Calculator/Simple mode toggle button */
+.calculator-mode-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.calculator-mode-toggle:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.12) 100%
+  );
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.calculator-mode-toggle:active {
+  transform: scale(0.95);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.15) 100%
+  );
 }
 
 .estimate-display-unified {

@@ -1,5 +1,6 @@
 // EstimateNumPad - Unified estimate + uncertainty slider component
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCalculatorMode } from '../../hooks/useCalculatorMode';
 
 // Bounds data passed to parent
 export interface BoundsData {
@@ -118,6 +119,9 @@ export function EstimateNumPad({
   onBoundEditChange,
   onBoundEditComplete
 }: EstimateNumPadProps) {
+  // Calculator mode toggle
+  const { setCalculatorMode } = useCalculatorMode();
+
   // Core state - the final estimate value (result after =)
   const [estimate, setEstimate] = useState<string>('');
   const [uncertainty, setUncertainty] = useState<number>(0);
@@ -580,6 +584,18 @@ export function EstimateNumPad({
             {isCalculating ? historyDisplay : displayValue}
           </div>
         </div>
+
+        {/* Simple mode toggle */}
+        <button
+          className="calculator-mode-toggle"
+          onClick={() => setCalculatorMode('off')}
+          aria-label="Switch to simple mode"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="4" y="4" width="16" height="16" rx="2" />
+            <line x1="8" y1="12" x2="16" y2="12" />
+          </svg>
+        </button>
       </div>
 
       {/* Calculator Grid */}
