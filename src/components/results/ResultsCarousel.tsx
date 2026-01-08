@@ -1,11 +1,29 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
-import { QuestionSlide } from './QuestionSlide';
+import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
+import { AnswerSlide } from './AnswerSlide';
+import { ExplanationSlide } from './ExplanationSlide';
 import { DailyStatsSlide } from './DailyStatsSlide';
 import { UserStatsSlide } from './UserStatsSlide';
 import { ScoreOrbSlide } from './ScoreOrbSlide';
 import { ShareScoreCard, type ShareScoreCardRef } from './ShareScoreCard';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../context/PostHogContext';
+
+// Maps slide index to dot index for the indicator navigation
+// Each question has 2 slides (answer + explanation) but only 1 dot
+function slideIndexToDotIndex(slideIndex: number, questionCount: number): number {
+  // ScoreOrbSlide
+  if (slideIndex === 0) return 0;
+
+  // Question slides region (indices 1 to questionCount * 2)
+  const questionSlideEnd = questionCount * 2;
+  if (slideIndex <= questionSlideEnd) {
+    // Both answer & explanation slides map to same question dot
+    return 1 + Math.floor((slideIndex - 1) / 2);
+  }
+
+  // Post-question slides (DailyStats, UserStats)
+  return 1 + questionCount + (slideIndex - questionSlideEnd - 1);
+}
 
 interface CrowdData {
   avgMin: number;
@@ -126,8 +144,18 @@ export function ResultsCarousel({
   const safeJudgements = judgements ?? [];
   const hits = safeJudgements.filter(j => j.hit).length;
   const total = safeJudgements.length;
-  // +4 for ScoreOrbSlide, DailyStatsSlide, UserStatsSlide, QuestionLeadersSlide
-  const totalSlides = safeJudgements.length + 4;
+  // Each question now has 2 slides (answer + explanation)
+  const questionSlideCount = safeJudgements.length * 2;
+  // +3 for ScoreOrbSlide, DailyStatsSlide, UserStatsSlide
+  const totalSlides = questionSlideCount + 3;
+  // Dots: one per question + non-question slides (ScoreOrb, DailyStats, UserStats)
+  const totalDots = safeJudgements.length + 3;
+
+  // Calculate active dot index from active slide index
+  const activeDotIndex = useMemo(
+    () => slideIndexToDotIndex(activeSlideIndex, safeJudgements.length),
+    [activeSlideIndex, safeJudgements.length]
+  );
 
   // Track which slide is currently visible
   useEffect(() => {
@@ -234,11 +262,12 @@ export function ResultsCarousel({
       {/* Flex layout: dots on left, content on right */}
       <div className="results-layout">
         {/* Dot indicators - own column, no overlap */}
+        {/* Each question has 1 dot (covering both answer + explanation slides) */}
         <div className="slide-dots">
-          {Array.from({ length: totalSlides }).map((_, i) => (
+          {Array.from({ length: totalDots }).map((_, i) => (
             <div
               key={i}
-              className={`slide-dot ${i === activeSlideIndex ? 'active' : ''}`}
+              className={`slide-dot ${i === activeDotIndex ? 'active' : ''}`}
             />
           ))}
         </div>
@@ -251,24 +280,40 @@ export function ResultsCarousel({
             scrollProgress={scrollProgress}
           />
 
-          {/* Individual question slides */}
-          {safeJudgements.map((judgement, index) => (
-            <QuestionSlide
-              key={judgement.questionId}
-              ref={setSlideRef(index + 1)}
-              {...judgement}
-            />
+          {/* Individual question slides - each question has 2 slides */}
+          {safeJudgements.map((judgement, i) => (
+            <React.Fragment key={judgement.questionId}>
+              <AnswerSlide
+                ref={setSlideRef(1 + i * 2)}
+                prompt={judgement.prompt}
+                unit={judgement.unit}
+                lower={judgement.lower}
+                upper={judgement.upper}
+                trueValue={judgement.trueValue}
+                hit={judgement.hit}
+                score={judgement.score}
+                crowdData={judgement.crowdData}
+              />
+              <ExplanationSlide
+                ref={setSlideRef(2 + i * 2)}
+                prompt={judgement.prompt}
+                answerContext={judgement.answerContext}
+                sourceUrl={judgement.sourceUrl}
+                trueValue={judgement.trueValue}
+                unit={judgement.unit}
+              />
+            </React.Fragment>
           ))}
 
           {/* Daily Stats Slide (Overall Leaderboard) */}
           <DailyStatsSlide
-            ref={setSlideRef(safeJudgements.length + 1)}
+            ref={setSlideRef(1 + safeJudgements.length * 2)}
             overallLeaderboard={overallLeaderboard}
           />
 
           {/* User Stats Slide (Long-term stats) */}
           <UserStatsSlide
-            ref={setSlideRef(safeJudgements.length + 2)}
+            ref={setSlideRef(2 + safeJudgements.length * 2)}
             calibration={calibration}
             performanceHistory={performanceHistory}
             calibrationMilestones={calibrationMilestones}

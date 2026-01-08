@@ -131,8 +131,8 @@ export function Game() {
     // After reveal (idle with results), scroll controls position
     // Scale: 1.0 at progress=0, 0.25 at progress=1 (shrink more to get closer to card)
     const scale = 1 - (scrollProgress * 0.75);
-    // Top: 50% (centered) at progress=0, 14% (below navbar) at progress=1
-    const topPercent = 50 - (scrollProgress * 36);
+    // Top: 50% (centered) at progress=0, 5% (aligned with nav button) at progress=1
+    const topPercent = 50 - (scrollProgress * 45);
     return {
       top: `${topPercent}%`,
       transform: `translateX(-50%) translateY(-50%) scale(${scale})`,
