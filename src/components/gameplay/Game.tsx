@@ -98,6 +98,7 @@ export function Game() {
   const [results, setResults] = useState<FinalizeResponse | null>(null);
   const [isFinalizingSession, setIsFinalizingSession] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [cumulativeScore, setCumulativeScore] = useState(0);
 
   // Track response time for each question
   const questionStartTime = useRef<number>(Date.now());
@@ -115,8 +116,9 @@ export function Game() {
   const showResults = results && ['reveal', 'idle'].includes(animationPhase);
 
   // Handle scroll progress from Results carousel
-  const handleResultsScroll = (progress: number) => {
+  const handleResultsScroll = (progress: number, cumScore: number) => {
     setScrollProgress(progress);
+    setCumulativeScore(cumScore);
   };
 
   // Compute orb position/scale based on animation phase and scroll progress
@@ -383,9 +385,10 @@ export function Game() {
       {showOrb && (
         <div className="game-orb-container" style={orbStyle}>
           <LoadingOrb
-            score={results?.score}
+            score={animationPhase === 'idle' ? cumulativeScore : results?.score}
             showScore={showScoreInOrb}
             animateScore={animationPhase === 'scoreReveal'}
+            scrollScale={animationPhase === 'idle' ? 1 - (scrollProgress * 0.75) : undefined}
           />
         </div>
       )}

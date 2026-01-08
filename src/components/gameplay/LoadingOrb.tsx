@@ -6,6 +6,7 @@ interface LoadingOrbProps {
   animateScore?: boolean;
   onScoreClick?: () => void;
   isClickable?: boolean;
+  scrollScale?: number; // Current orb scale from scroll (1.0 to 0.25), used to compensate text size
 }
 
 // Scale limits for orb growth
@@ -13,9 +14,18 @@ const MIN_SCALE = 1;
 const MAX_SCALE = 2.0;
 const MAX_SCORE_FOR_SCALE = 1500; // Score at which orb reaches max size
 
-export function LoadingOrb({ score, showScore = false, animateScore = false, onScoreClick, isClickable = true }: LoadingOrbProps) {
+export function LoadingOrb({ score, showScore = false, animateScore = false, onScoreClick, isClickable = true, scrollScale }: LoadingOrbProps) {
   const [displayScore, setDisplayScore] = useState(0);
   const [scale, setScale] = useState(MIN_SCALE);
+
+  // Calculate text scale compensation when orb is scaled down by scroll
+  // At scrollScale=1.0: no compensation needed
+  // At scrollScale=0.25: compensate by ~2.5x to keep text readable (not full 4x inverse)
+  const textScaleCompensation = useMemo(() => {
+    if (scrollScale === undefined || scrollScale >= 1) return 1;
+    // Apply partial inverse scale (1.5/scrollScale capped at 3x) for larger text when orb shrinks
+    return Math.min(1.5 / scrollScale, 3);
+  }, [scrollScale]);
 
   // Calculate scale based on current score relative to final score
   // This makes the orb grow proportionally as the number ticks up
@@ -130,6 +140,7 @@ export function LoadingOrb({ score, showScore = false, animateScore = false, onS
         {showScore && (
           <div
             className={`loading-orb-score ${onScoreClick && isClickable ? 'clickable' : ''}`}
+            style={textScaleCompensation !== 1 ? { transform: `translate(-50%, -50%) scale(${textScaleCompensation})` } : undefined}
             onClick={onScoreClick && isClickable ? onScoreClick : undefined}
             role={onScoreClick ? 'button' : undefined}
             tabIndex={onScoreClick && isClickable ? 0 : undefined}

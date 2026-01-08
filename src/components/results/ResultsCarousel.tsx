@@ -96,7 +96,7 @@ interface ResultsCarouselProps {
   calibrationMilestones?: CalibrationMilestone[];
   todayLeaderboard?: TodayLeaderboardEntry[];
   overallLeaderboard?: OverallLeaderboardEntry[];
-  onScroll?: (progress: number) => void;
+  onScroll?: (progress: number, cumulativeScore: number) => void;
 }
 
 export function ResultsCarousel({
@@ -121,7 +121,10 @@ export function ResultsCarousel({
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
 
-  // Track scroll position for orb shrinking effect
+  // Defensive check: ensure judgements is always an array
+  const safeJudgements = judgements ?? [];
+
+  // Track scroll position for orb shrinking effect and cumulative score
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -129,19 +132,38 @@ export function ResultsCarousel({
     const handleScroll = () => {
       const scrollTop = container.scrollTop;
       const slideHeight = window.innerHeight;
-      // Progress: 0 at top, 1 when scrolled one full slide
-      const progress = Math.min(scrollTop / slideHeight, 1);
-      setScrollProgress(progress);
-      // Notify parent of scroll progress for orb positioning
-      onScroll?.(progress);
+      // Progress: 0 at top, 1 when scrolled one full slide (for orb positioning)
+      const orbProgress = Math.min(scrollTop / slideHeight, 1);
+      setScrollProgress(orbProgress);
+
+      // Full scroll progress (which slide are we on, uncapped)
+      const fullProgress = scrollTop / slideHeight;
+
+      // Calculate cumulative score based on scroll position
+      // Each question has 2 slides (answer + explanation)
+      // Score for question i is added as user scrolls through its slides
+      let cumulativeScore = 0;
+      for (let i = 0; i < safeJudgements.length; i++) {
+        const questionStartSlide = 1 + (i * 2); // After ScoreOrbSlide
+        const questionEndSlide = questionStartSlide + 2; // Both answer + explanation
+
+        if (fullProgress >= questionEndSlide) {
+          // Fully past this question - add full score
+          cumulativeScore += safeJudgements[i].score;
+        } else if (fullProgress > questionStartSlide) {
+          // Partially through this question - add proportional score
+          const questionProgress = (fullProgress - questionStartSlide) / 2;
+          cumulativeScore += safeJudgements[i].score * questionProgress;
+        }
+      }
+
+      // Notify parent of scroll progress and cumulative score
+      onScroll?.(orbProgress, Math.round(cumulativeScore));
     };
 
     container.addEventListener('scroll', handleScroll, { passive: true });
     return () => container.removeEventListener('scroll', handleScroll);
-  }, [onScroll]);
-
-  // Defensive check: ensure judgements is always an array
-  const safeJudgements = judgements ?? [];
+  }, [onScroll, safeJudgements]);
   const hits = safeJudgements.filter(j => j.hit).length;
   const total = safeJudgements.length;
   // Each question now has 2 slides (answer + explanation)
