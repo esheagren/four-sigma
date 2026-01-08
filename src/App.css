@@ -7101,53 +7101,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
 .estimate-display-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-/* Up/down arrows for fine-grained uncertainty adjustment */
-.uncertainty-arrows {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 28px;
-}
-
-.uncertainty-arrow-btn {
-  width: 28px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.2) 0%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.uncertainty-arrow-btn:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.3) 0%,
-    rgba(255, 255, 255, 0.18) 100%
-  );
-  border-color: rgba(255, 255, 255, 0.3);
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.uncertainty-arrow-btn:active {
-  transform: scale(0.95);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.35) 0%,
-    rgba(255, 255, 255, 0.2) 100%
-  );
+  padding-top: 34px; /* Space for bulb above */
 }
 
 .estimate-display-unified {
@@ -7171,7 +7125,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.25),
     inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  overflow: hidden; /* Clip the fill */
+  overflow: visible; /* Allow bulb to overflow above */
   cursor: ew-resize;
   user-select: none;
   -webkit-user-select: none;
@@ -7222,6 +7176,103 @@ a.judgement-answer-below:hover .judgement-answer-value {
       2px 0 30px rgba(255, 255, 255, 0.7),
       0 0 40px rgba(255, 255, 255, 0.5);
     border-right-color: rgba(255, 255, 255, 1);
+  }
+}
+
+/* Uncertainty Bulb - floating above the slider */
+.uncertainty-bulb-container {
+  position: absolute;
+  bottom: 100%;
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+  transform: translateX(-50%);
+  z-index: 10;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.uncertainty-bulb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 46px;
+  height: 24px;
+  padding: 0 10px;
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.6) 0%,
+    rgba(139, 92, 246, 0.5) 50%,
+    rgba(168, 85, 247, 0.4) 100%
+  );
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  box-shadow:
+    0 0 8px rgba(255, 255, 255, 0.5),
+    0 0 16px rgba(255, 255, 255, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.uncertainty-bulb-container:hover .uncertainty-bulb {
+  box-shadow:
+    0 0 12px rgba(255, 255, 255, 0.7),
+    0 0 20px rgba(255, 255, 255, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.uncertainty-bulb-container:active .uncertainty-bulb {
+  transform: scale(0.95);
+  box-shadow:
+    0 0 16px rgba(255, 255, 255, 0.8),
+    0 0 24px rgba(255, 255, 255, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.uncertainty-stem {
+  width: 2px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 0 4px rgba(255, 255, 255, 0.5);
+}
+
+/* Initial state - glittering bulb to encourage interaction */
+.uncertainty-bulb-initial .uncertainty-bulb {
+  border-color: rgba(255, 255, 255, 1);
+  box-shadow:
+    0 0 12px rgba(255, 255, 255, 0.8),
+    0 0 24px rgba(255, 255, 255, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+  animation: bulbPulse 1.5s ease-in-out infinite;
+}
+
+.uncertainty-bulb-initial .uncertainty-stem {
+  box-shadow:
+    0 0 6px rgba(255, 255, 255, 0.8);
+  animation: bulbPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes bulbPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 12px rgba(255, 255, 255, 0.8),
+      0 0 24px rgba(255, 255, 255, 0.5),
+      0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 16px rgba(255, 255, 255, 1),
+      0 0 32px rgba(255, 255, 255, 0.7),
+      0 2px 8px rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -7325,16 +7376,6 @@ a.judgement-answer-below:hover .judgement-answer-value {
   text-align: center;
   font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
   letter-spacing: 0.02em;
-}
-
-/* Percentage label to the right of display */
-.uncertainty-percent-label {
-  min-width: 50px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
-  font-variant-numeric: tabular-nums;
-  text-align: center;
 }
 
 /* Compact Bound Cards */
@@ -7581,11 +7622,6 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
   .estimate-value-unified {
     font-size: 1.5rem;
-  }
-
-  .uncertainty-percent-label {
-    min-width: 45px;
-    font-size: 0.8rem;
   }
 
   .calc-key-unified {
@@ -8402,6 +8438,111 @@ a.judgement-answer-below:hover .judgement-answer-value {
 
 .question-context p:last-child {
   margin-bottom: 0;
+}
+
+/* Answer Slide - inherits from question-slide base */
+.answer-slide {
+  padding: 1.5rem;
+  padding-top: calc(60px + 1.5rem);
+  background: transparent;
+}
+
+/* Explanation Slide */
+.explanation-slide {
+  padding: 1.5rem;
+  padding-top: calc(60px + 1.5rem);
+  background: transparent;
+}
+
+.explanation-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 700px;
+  height: 100%;
+}
+
+.explanation-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.explanation-question {
+  font-size: clamp(0.9rem, 3vw, 1.1rem);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.explanation-answer-badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 0.4rem 0.8rem;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 9999px;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  font-size: 0.8rem;
+  color: #38bdf8;
+}
+
+.explanation-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  background: rgba(11, 14, 20, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.explanation-text {
+  font-size: clamp(1rem, 3vw, 1.15rem);
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+}
+
+.explanation-empty {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+  margin: 0;
+}
+
+.explanation-source-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #38bdf8;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  margin-top: auto;
+}
+
+.explanation-source-link:hover {
+  color: #7dd3fc;
+  text-decoration: underline;
+}
+
+/* Mobile adjustments for answer/explanation slides */
+@media (max-width: 640px) {
+  .answer-slide,
+  .explanation-slide {
+    padding: 1rem;
+    padding-top: calc(60px + 1rem);
+  }
+
+  .explanation-body {
+    padding: 1rem;
+  }
 }
 
 .slide-scroll-hint {

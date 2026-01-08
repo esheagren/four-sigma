@@ -538,31 +538,6 @@ export function EstimateNumPad({
     <div className="estimate-numpad-container">
       {/* Estimate Display - always same size, just hide slider elements when calculating or no estimate */}
       <div className="estimate-display-row">
-        {/* Up/down arrows for fine-grained uncertainty adjustment */}
-        <div
-          className="uncertainty-arrows"
-          style={{ visibility: showUncertaintyControls ? 'visible' : 'hidden' }}
-        >
-          <button
-            className="uncertainty-arrow-btn"
-            onClick={handleIncrementUncertainty}
-            aria-label="Increase uncertainty"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="18 15 12 9 6 15"></polyline>
-            </svg>
-          </button>
-          <button
-            className="uncertainty-arrow-btn"
-            onClick={handleDecrementUncertainty}
-            aria-label="Decrease uncertainty"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
-        </div>
-
         <div
           ref={sliderRef}
           className="estimate-display-unified"
@@ -580,6 +555,23 @@ export function EstimateNumPad({
             />
           )}
 
+          {/* Uncertainty bulb - floating above the slider at the current position */}
+          {showUncertaintyControls && (
+            <div
+              className={`uncertainty-bulb-container ${uncertainty === 0 ? 'uncertainty-bulb-initial' : ''}`}
+              style={{ left: `clamp(23px, ${uncertainty === 0 ? '6px' : `${uncertainty}%`}, calc(100% - 23px))` }}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerUp}
+            >
+              <div className="uncertainty-bulb">
+                ±{Math.round(uncertainty)}%
+              </div>
+              <div className="uncertainty-stem" />
+            </div>
+          )}
+
           {/* Number display (on top of fill) */}
           <div
             className="estimate-value-unified"
@@ -588,14 +580,6 @@ export function EstimateNumPad({
             {isCalculating ? historyDisplay : displayValue}
           </div>
         </div>
-
-        {/* Percentage label - always present for consistent width, but invisible until estimate entered */}
-        <span
-          className="uncertainty-percent-label"
-          style={{ visibility: showUncertaintyControls ? 'visible' : 'hidden' }}
-        >
-          ±{Math.round(uncertainty)}%
-        </span>
       </div>
 
       {/* Calculator Grid */}
