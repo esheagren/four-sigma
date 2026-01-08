@@ -7186,34 +7186,37 @@ a.judgement-answer-below:hover .judgement-answer-value {
   );
   pointer-events: none;
   border-radius: 12px 0 0 12px;
-  /* Subtle white edge on the right side */
-  border-right: 1px solid rgba(255, 255, 255, 0.45);
+  /* Bright white edge on the right side */
+  border-right: 2px solid rgba(255, 255, 255, 0.9);
   box-shadow:
-    1px 0 4px rgba(255, 255, 255, 0.15),
-    1px 0 8px rgba(255, 255, 255, 0.08);
+    2px 0 8px rgba(255, 255, 255, 0.5),
+    2px 0 16px rgba(255, 255, 255, 0.3);
 }
 
-/* Initial state - subtle pulsing edge to encourage interaction */
+/* Initial state - glittering edge to encourage interaction */
 .estimate-uncertainty-fill-initial {
-  border-right: 1px solid rgba(255, 255, 255, 0.6);
+  border-right: 2px solid rgba(255, 255, 255, 1);
   box-shadow:
-    1px 0 6px rgba(255, 255, 255, 0.3),
-    1px 0 12px rgba(255, 255, 255, 0.15);
+    2px 0 8px rgba(255, 255, 255, 0.8),
+    2px 0 20px rgba(255, 255, 255, 0.5),
+    0 0 30px rgba(255, 255, 255, 0.3);
   animation: glitterPulse 1.5s ease-in-out infinite;
 }
 
 @keyframes glitterPulse {
   0%, 100% {
     box-shadow:
-      1px 0 6px rgba(255, 255, 255, 0.3),
-      1px 0 12px rgba(255, 255, 255, 0.15);
-    border-right-color: rgba(255, 255, 255, 0.6);
+      2px 0 8px rgba(255, 255, 255, 0.8),
+      2px 0 20px rgba(255, 255, 255, 0.5),
+      0 0 30px rgba(255, 255, 255, 0.3);
+    border-right-color: rgba(255, 255, 255, 1);
   }
   50% {
     box-shadow:
-      1px 0 8px rgba(255, 255, 255, 0.5),
-      1px 0 16px rgba(255, 255, 255, 0.25);
-    border-right-color: rgba(255, 255, 255, 0.75);
+      2px 0 12px rgba(255, 255, 255, 1),
+      2px 0 30px rgba(255, 255, 255, 0.7),
+      0 0 40px rgba(255, 255, 255, 0.5);
+    border-right-color: rgba(255, 255, 255, 1);
   }
 }
 
@@ -7245,7 +7248,7 @@ a.judgement-answer-below:hover .judgement-answer-value {
     rgba(139, 92, 246, 0.5) 50%,
     rgba(168, 85, 247, 0.4) 100%
   );
-  border: 2px solid rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 12px;
   font-size: 0.75rem;
   font-weight: 600;
@@ -7253,63 +7256,59 @@ a.judgement-answer-below:hover .judgement-answer-value {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   box-shadow:
-    0 0 8px rgba(255, 255, 255, 0.5),
-    0 0 16px rgba(255, 255, 255, 0.3),
+    0 0 4px rgba(255, 255, 255, 0.15),
     0 2px 8px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(8px);
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
 .uncertainty-bulb-container:hover .uncertainty-bulb {
+  border-color: rgba(255, 255, 255, 0.55);
   box-shadow:
-    0 0 12px rgba(255, 255, 255, 0.7),
-    0 0 20px rgba(255, 255, 255, 0.4),
+    0 0 6px rgba(255, 255, 255, 0.25),
     0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .uncertainty-bulb-container:active .uncertainty-bulb {
   transform: scale(0.95);
+  border-color: rgba(255, 255, 255, 0.6);
   box-shadow:
-    0 0 16px rgba(255, 255, 255, 0.8),
-    0 0 24px rgba(255, 255, 255, 0.5),
+    0 0 8px rgba(255, 255, 255, 0.3),
     0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .uncertainty-stem {
-  width: 2px;
+  width: 1px;
   height: 6px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.5);
   box-shadow:
-    0 0 4px rgba(255, 255, 255, 0.5);
+    0 0 2px rgba(255, 255, 255, 0.2);
 }
 
-/* Initial state - glittering bulb to encourage interaction */
+/* Initial state - subtle pulsing bulb to encourage interaction */
 .uncertainty-bulb-initial .uncertainty-bulb {
-  border-color: rgba(255, 255, 255, 1);
+  border-color: rgba(255, 255, 255, 0.5);
   box-shadow:
-    0 0 12px rgba(255, 255, 255, 0.8),
-    0 0 24px rgba(255, 255, 255, 0.5),
+    0 0 6px rgba(255, 255, 255, 0.25),
     0 2px 8px rgba(0, 0, 0, 0.2);
   animation: bulbPulse 1.5s ease-in-out infinite;
 }
 
 .uncertainty-bulb-initial .uncertainty-stem {
   box-shadow:
-    0 0 6px rgba(255, 255, 255, 0.8);
+    0 0 3px rgba(255, 255, 255, 0.3);
   animation: bulbPulse 1.5s ease-in-out infinite;
 }
 
 @keyframes bulbPulse {
   0%, 100% {
     box-shadow:
-      0 0 12px rgba(255, 255, 255, 0.8),
-      0 0 24px rgba(255, 255, 255, 0.5),
+      0 0 6px rgba(255, 255, 255, 0.25),
       0 2px 8px rgba(0, 0, 0, 0.2);
   }
   50% {
     box-shadow:
-      0 0 16px rgba(255, 255, 255, 1),
-      0 0 32px rgba(255, 255, 255, 0.7),
+      0 0 10px rgba(255, 255, 255, 0.4),
       0 2px 8px rgba(0, 0, 0, 0.2);
   }
 }
